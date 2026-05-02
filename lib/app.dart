@@ -12,6 +12,13 @@ class BideshgamiApp extends StatelessWidget {
       title: 'Bideshgami',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      home: const AppHomePage(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en', 'US')],
       initialRoute: AppRoutes.login,
       routes: {
         AppRoutes.login: (_) => const SignInScreen(),
