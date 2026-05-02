@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'common/theme/app_theme.dart';
+import 'features/auth/sign_in_screen.dart';
 import 'routes/app_routes.dart';
 
 class BideshgamiApp extends StatelessWidget {
@@ -20,8 +21,11 @@ class BideshgamiApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en', 'US')],
-      initialRoute: AppRoutes.home,
-      routes: {AppRoutes.home: (_) => const AppHomePage()},
+      initialRoute: AppRoutes.login,
+      routes: {
+        AppRoutes.login: (_) => const SignInScreen(),
+        AppRoutes.home: (_) => const AppHomePage(),
+      },
     );
   }
 }
