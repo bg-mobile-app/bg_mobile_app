@@ -3,6 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'common/theme/app_theme.dart';
 import 'features/auth/sign_in_screen.dart';
 import 'features/auth/sign_up_screen.dart';
+import 'features/auth/partner_sign_up_screen.dart';
+import 'features/auth/agent_sign_up_screen.dart';
 import 'features/home/home_screen.dart';
 import 'routes/app_routes.dart';
 
@@ -26,6 +28,8 @@ class BideshgamiApp extends StatelessWidget {
         AppRoutes.home: (_) => const HomeScreen(),
         AppRoutes.login: (_) => const SignInScreen(),
         AppRoutes.signUpCustomer: (_) => const SignUpScreen(),
+        AppRoutes.signUpPartner: (_) => const PartnerSignUpScreen(),
+        AppRoutes.agentSignUp: (_) => const AgentSignUpScreen(),
       },
     );
   }

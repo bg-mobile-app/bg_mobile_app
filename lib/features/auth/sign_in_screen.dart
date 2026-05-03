@@ -161,6 +161,25 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
         const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRoutes.signUpPartner),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: _brandBlue,
+              side: const BorderSide(color: _brandBlue),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            child: const Text(
+              'Become a Partner',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
