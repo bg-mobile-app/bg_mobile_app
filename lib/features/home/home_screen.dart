@@ -540,6 +540,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final width = MediaQuery.of(context).size.width;
     final crossAxisCount = width >= 1024 ? 4 : (width >= 768 ? 3 : 2);
+    final childAspectRatio = width >= 1024
+        ? 0.66
+        : (width >= 768 ? 0.62 : (width >= 420 ? 0.56 : 0.5));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -586,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisCount: crossAxisCount,
               mainAxisSpacing: 14,
               crossAxisSpacing: 14,
-              childAspectRatio: 0.56,
+              childAspectRatio: childAspectRatio,
             ),
             itemBuilder: (context, index) {
               return _buildWorkPermitCard(_workPermits[index]);
@@ -646,101 +649,100 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
-            child: Text(
-              item.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 6, 10, 0),
-            child: Text(
-              '${_formatBdt(item.customerPrice)} BDT',
-              style: const TextStyle(
-                color: _brandBlue,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 6, 10, 0),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 14,
-                  child: Image.asset(item.countryFlag, fit: BoxFit.contain),
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    item.countryName,
-                    style: const TextStyle(fontSize: 10),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 6, 10, 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Row(
+                  const SizedBox(height: 6),
+                  Text(
+                    '${_formatBdt(item.customerPrice)} BDT',
+                    style: const TextStyle(
+                      color: _brandBlue,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
                     children: [
-                      const Icon(Icons.construction, size: 12),
-                      const SizedBox(width: 3),
+                      SizedBox(
+                        width: 20,
+                        height: 14,
+                        child: Image.asset(item.countryFlag, fit: BoxFit.contain),
+                      ),
+                      const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          item.workType,
+                          item.countryName,
                           style: const TextStyle(fontSize: 10),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
-                ),
-                const Text('|', style: TextStyle(fontSize: 10)),
-                const SizedBox(width: 4),
-                Text(
-                  _timeAgo(item.createdAt),
-                  style: const TextStyle(fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Center(
-            child: TextButton(
-              onPressed: _showComingSoon,
-              style: TextButton.styleFrom(padding: EdgeInsets.zero),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'View Details',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.construction, size: 12),
+                            const SizedBox(width: 3),
+                            Expanded(
+                              child: Text(
+                                item.workType,
+                                style: const TextStyle(fontSize: 10),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _timeAgo(item.createdAt),
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Center(
+                    child: TextButton(
+                      onPressed: _showComingSoon,
+                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'View Details',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Icon(Icons.arrow_right_alt, color: _brandBlue),
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(width: 4),
-                  Icon(Icons.arrow_right_alt, color: _brandBlue),
+                  Container(
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: _brandBlue,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-            height: 3,
-            decoration: BoxDecoration(
-              color: _brandBlue,
-              borderRadius: BorderRadius.circular(99),
             ),
           ),
         ],
