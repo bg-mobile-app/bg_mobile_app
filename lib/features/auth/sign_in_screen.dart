@@ -90,7 +90,7 @@ class _SignInScreenState extends State<SignInScreen> {
     return Column(
       children: [
         Image.asset(
-          'assets/logo_black.png',
+          'assets/img/logo/logo_black.png',
           width: 120,
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => const Icon(
