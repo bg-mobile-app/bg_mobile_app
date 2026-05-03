@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'common/theme/app_theme.dart';
-import 'routes/app_routes.dart';
 
 class BideshgamiApp extends StatelessWidget {
   const BideshgamiApp({super.key});
@@ -13,21 +12,19 @@ class BideshgamiApp extends StatelessWidget {
       title: 'Bideshgami',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const AppHomePage(),
+      home: const SingleScreenPage(),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en', 'US')],
-      initialRoute: AppRoutes.home,
-      routes: {AppRoutes.home: (_) => const AppHomePage()},
     );
   }
 }
 
-class AppHomePage extends StatelessWidget {
-  const AppHomePage({super.key});
+class SingleScreenPage extends StatelessWidget {
+  const SingleScreenPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +33,7 @@ class AppHomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bideshgami'),
+        title: const Text('bideshgami app'),
         centerTitle: false,
         elevation: 0,
       ),
