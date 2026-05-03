@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'common/theme/app_theme.dart';
+import 'features/auth/sign_in_screen.dart';
+import 'features/auth/sign_up_screen.dart';
 import 'routes/app_routes.dart';
 
 class BideshgamiApp extends StatelessWidget {
@@ -19,7 +21,11 @@ class BideshgamiApp extends StatelessWidget {
       ],
       supportedLocales: const [Locale('en', 'US')],
       initialRoute: AppRoutes.home,
-      routes: {AppRoutes.home: (_) => const SingleScreenPage()},
+      routes: {
+        AppRoutes.home: (_) => const SingleScreenPage(),
+        AppRoutes.login: (_) => const SignInScreen(),
+        AppRoutes.signUpCustomer: (_) => const SignUpScreen(),
+      },
     );
   }
 }
@@ -71,6 +77,16 @@ class SingleScreenPage extends StatelessWidget {
                 context,
                 title: 'Manage your profile',
                 subtitle: 'Keep your account and contact details up to date.',
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pushNamed(
+                    AppRoutes.login,
+                  ),
+                  child: const Text('Check Sign In Screen'),
+                ),
               ),
             ],
           ),

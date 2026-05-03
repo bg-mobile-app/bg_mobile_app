@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../routes/app_routes.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -29,49 +30,51 @@ class _SignInScreenState extends State<SignInScreen> {
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth >= 768;
             return SingleChildScrollView(
-              child: Center(
-                child: Container(
-                  margin: const EdgeInsets.only(top: 56),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 20,
-                  ),
-                  constraints: const BoxConstraints(maxWidth: 1200),
-                  child: Form(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (isDesktop)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 20),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(6),
-                                child: Image.asset(
-                                  'assets/img/sign-in/login.jpg',
-                                  fit: BoxFit.cover,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 20,
+                    ),
+                    constraints: const BoxConstraints(maxWidth: 1200),
+                    child: Form(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (isDesktop)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 20),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Image.asset(
+                                    'assets/img/sign-in/login.jpg',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(6),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x1A000000),
-                                  blurRadius: 14,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x1A000000),
+                                    blurRadius: 14,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: _buildLoginCard(),
                             ),
-                            child: _buildLoginCard(),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -87,9 +90,14 @@ class _SignInScreenState extends State<SignInScreen> {
     return Column(
       children: [
         Image.asset(
-          'assets/img/logo/logo_black.png',
+          'assets/logo_black.png',
           width: 120,
           fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => const Icon(
+            Icons.language,
+            size: 56,
+            color: _brandBlue,
+          ),
         ),
         const SizedBox(height: 12),
         const Text(
@@ -158,7 +166,8 @@ class _SignInScreenState extends State<SignInScreen> {
           children: [
             const Text('Didn\'t have an account? '),
             TextButton(
-              onPressed: () {},
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.signUpCustomer),
               style: TextButton.styleFrom(
                 foregroundColor: _brandBlue,
                 padding: EdgeInsets.zero,
