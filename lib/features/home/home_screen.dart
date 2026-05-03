@@ -72,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectionType = 'All';
   DateTime? _fromDate;
   DateTime? _toDate;
-  bool _showAdvanced = false;
 
   final _leftController = PageController(viewportFraction: 1);
   final _rightController = PageController(viewportFraction: 1);
@@ -205,6 +204,105 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _showAdvancedFilterSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x26000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _dropdown(
+                    value: _serviceType,
+                    hint: 'Service Type',
+                    items: const ['WORK_PERMIT'],
+                    onChanged: (v) => setState(() => _serviceType = v ?? 'WORK_PERMIT'),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(child: _textField(_minAgeController, 'Min Age')),
+                      const SizedBox(width: 8),
+                      Expanded(child: _textField(_maxAgeController, 'Max Age')),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  _textField(_companyController, 'Company Name'),
+                  const SizedBox(height: 10),
+                  _dropdown(
+                    value: _selectionType,
+                    hint: 'Selection Type',
+                    items: const ['All', 'Direct', 'Lottery'],
+                    onChanged: (v) => setState(() => _selectionType = v ?? 'All'),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _dateButton(
+                          label: _fromDate == null
+                              ? 'From Date'
+                              : '${_fromDate!.year}-${_fromDate!.month.toString().padLeft(2, '0')}-${_fromDate!.day.toString().padLeft(2, '0')}',
+                          onTap: () => _pickDate(isFrom: true),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _dateButton(
+                          label: _toDate == null
+                              ? 'To Date'
+                              : '${_toDate!.year}-${_toDate!.month.toString().padLeft(2, '0')}-${_toDate!.day.toString().padLeft(2, '0')}',
+                          onTap: () => _pickDate(isFrom: false),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _showComingSoon();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _brandBlue,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Search'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -301,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(width: 8),
                           InkWell(
-                            onTap: () => setState(() => _showAdvanced = !_showAdvanced),
+                            onTap: _showAdvancedFilterSheet,
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
@@ -354,85 +452,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                if (_showAdvanced) ...[
-                  const SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x26000000),
-                          blurRadius: 18,
-                          offset: Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        _dropdown(
-                          value: _serviceType,
-                          hint: 'Service Type',
-                          items: const ['WORK_PERMIT'],
-                          onChanged: (v) => setState(() => _serviceType = v ?? 'WORK_PERMIT'),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(child: _textField(_minAgeController, 'Min Age')),
-                            const SizedBox(width: 8),
-                            Expanded(child: _textField(_maxAgeController, 'Max Age')),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        _textField(_companyController, 'Company Name'),
-                        const SizedBox(height: 10),
-                        _dropdown(
-                          value: _selectionType,
-                          hint: 'Selection Type',
-                          items: const ['All', 'Direct', 'Lottery'],
-                          onChanged: (v) => setState(() => _selectionType = v ?? 'All'),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _dateButton(
-                                label: _fromDate == null
-                                    ? 'From Date'
-                                    : '${_fromDate!.year}-${_fromDate!.month.toString().padLeft(2, '0')}-${_fromDate!.day.toString().padLeft(2, '0')}',
-                                onTap: () => _pickDate(isFrom: true),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _dateButton(
-                                label: _toDate == null
-                                    ? 'To Date'
-                                    : '${_toDate!.year}-${_toDate!.month.toString().padLeft(2, '0')}-${_toDate!.day.toString().padLeft(2, '0')}',
-                                onTap: () => _pickDate(isFrom: false),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _showComingSoon,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _brandBlue,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('Search'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
