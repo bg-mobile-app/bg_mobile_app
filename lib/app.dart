@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'common/theme/app_theme.dart';
 import 'routes/app_routes.dart';
 
@@ -11,7 +12,6 @@ class BideshgamiApp extends StatelessWidget {
       title: 'Bideshgami',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const SingleScreenPage(),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -19,7 +19,7 @@ class BideshgamiApp extends StatelessWidget {
       ],
       supportedLocales: const [Locale('en', 'US')],
       initialRoute: AppRoutes.home,
-      routes: {AppRoutes.home: (_) => const AppHomePage()},
+      routes: {AppRoutes.home: (_) => const SingleScreenPage()},
     );
   }
 }
@@ -38,7 +38,7 @@ class SingleScreenPage extends StatelessWidget {
         centerTitle: false,
         elevation: 0,
       ),
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
@@ -98,7 +98,7 @@ class SingleScreenPage extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Search by country, service, or work type',
               filled: true,
-              fillColor: theme.colorScheme.background,
+              fillColor: theme.colorScheme.surface,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 14,
@@ -144,7 +144,7 @@ class SingleScreenPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.08),
+            color: theme.shadowColor.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
