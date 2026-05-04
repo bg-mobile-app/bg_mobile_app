@@ -145,7 +145,7 @@ class _SignInScreenState extends State<SignInScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: _brandBlue,
               foregroundColor: Colors.white,

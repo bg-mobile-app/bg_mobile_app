@@ -35,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _leftIndex = 0;
   int _rightIndex = 0;
 
+  bool _isLoggedIn = false;
+
   final List<String> _countries = const ['Bangladesh', 'Malaysia', 'Japan', 'Romania'];
   final List<String> _workTypes = const ['Factory', 'Construction', 'Hospitality', 'Agriculture'];
   final List<String> _bannerLeft = const [
@@ -272,17 +274,35 @@ class _HomeScreenState extends State<HomeScreen> {
           fit: BoxFit.contain,
         ),
         actions: [
-          HeaderActionButton(
-            label: 'Sign In',
-            onTap: () => Navigator.pushNamed(context, '/login'),
-            brandBlue: _brandBlue,
-          ),
-          const SizedBox(width: 8),
-          HeaderActionButton(
-            label: 'Sign Up',
-            onTap: () => Navigator.pushNamed(context, '/sign-up/customer'),
-            brandBlue: _brandBlue,
-          ),
+          if (_isLoggedIn) ...[
+            IconButton(
+              onPressed: _showComingSoon,
+              icon: const Icon(Icons.notifications_none, color: Colors.black87),
+              tooltip: 'Notifications',
+            ),
+            IconButton(
+              onPressed: _showComingSoon,
+              icon: const Icon(Icons.person_outline, color: Colors.black87),
+              tooltip: 'Profile',
+            ),
+          ] else ...[
+            HeaderActionButton(
+              label: 'Sign In',
+              onTap: () async {
+                final result = await Navigator.pushNamed(context, '/login');
+                if (result == true && mounted) {
+                  setState(() => _isLoggedIn = true);
+                }
+              },
+              brandBlue: _brandBlue,
+            ),
+            const SizedBox(width: 8),
+            HeaderActionButton(
+              label: 'Sign Up',
+              onTap: () => Navigator.pushNamed(context, '/sign-up/customer'),
+              brandBlue: _brandBlue,
+            ),
+          ],
           const SizedBox(width: 16),
         ],
       ),
