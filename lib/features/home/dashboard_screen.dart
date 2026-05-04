@@ -112,10 +112,7 @@ class DashboardSmallCard extends StatelessWidget {
               Container(
                 width: 30,
                 height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2563EB),
-                  borderRadius: BorderRadius.all(Radius.circular(4)),
-                ),
+                decoration: const BoxDecoration(color: _brandBlue, borderRadius: BorderRadius.all(Radius.circular(4))),
                 child: Icon(icon, color: red ? Colors.orange : Colors.white, size: 18),
               ),
               const SizedBox(width: 8),
