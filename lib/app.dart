@@ -5,6 +5,8 @@ import 'features/auth/sign_in_screen.dart';
 import 'features/auth/sign_up_screen.dart';
 import 'features/auth/partner_sign_up_screen.dart';
 import 'features/auth/agent_sign_up_screen.dart';
+import 'features/auth/agency_sign_up_screen.dart';
+import 'features/auth/recruiting_sign_up_screen.dart';
 import 'features/home/home_screen.dart';
 import 'routes/app_routes.dart';
 
@@ -30,6 +32,8 @@ class BideshgamiApp extends StatelessWidget {
         AppRoutes.signUpCustomer: (_) => const SignUpScreen(),
         AppRoutes.signUpPartner: (_) => const PartnerSignUpScreen(),
         AppRoutes.agentSignUp: (_) => const AgentSignUpScreen(),
+        AppRoutes.agencySignUp: (_) => const AgencySignUpScreen(),
+        AppRoutes.recruitingSignUp: (_) => const RecruitingSignUpScreen(),
       },
     );
   }

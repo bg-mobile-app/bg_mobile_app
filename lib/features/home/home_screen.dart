@@ -2,54 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-class NavLinkItem {
-  const NavLinkItem({
-    required this.name,
-    required this.href,
-    required this.icon,
-  });
-
-  final String name;
-  final String href;
-  final IconData icon;
-}
-
-class WorkPermitItem {
-  const WorkPermitItem({
-    required this.title,
-    required this.slug,
-    required this.image,
-    required this.customerPrice,
-    required this.agentPrice,
-    required this.countryName,
-    required this.countryFlag,
-    required this.workType,
-    required this.selectionType,
-    required this.createdAt,
-  });
-
-  final String title;
-  final String slug;
-  final String image;
-  final int customerPrice;
-  final int agentPrice;
-  final String countryName;
-  final String countryFlag;
-  final String workType;
-  final String selectionType;
-  final DateTime createdAt;
-}
-
-const List<NavLinkItem> navLinkData = [
-  NavLinkItem(name: 'Home', href: '/', icon: Icons.home),
-  NavLinkItem(name: 'Flight Booking', href: '', icon: Icons.flight_takeoff),
-  NavLinkItem(name: 'Work Abroad', href: '/filter?service_type=WORK_PERMIT', icon: Icons.handshake_outlined),
-  NavLinkItem(name: 'Study Abroad', href: '', icon: Icons.school_outlined),
-  NavLinkItem(name: 'Hajj & Umrah', href: '', icon: Icons.mosque_outlined),
-  NavLinkItem(name: 'Visa Services', href: '', icon: Icons.volunteer_activism_outlined),
-  NavLinkItem(name: 'Tour Packages', href: '', icon: Icons.public_outlined),
-  NavLinkItem(name: 'Hotel Booking', href: '', icon: Icons.hotel_outlined),
-];
+import 'models/home_models.dart';
+import 'widgets/home_common_widgets.dart';
+import 'widgets/work_permit_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -317,14 +272,16 @@ class _HomeScreenState extends State<HomeScreen> {
           fit: BoxFit.contain,
         ),
         actions: [
-          _headerButton(
+          HeaderActionButton(
             label: 'Sign In',
             onTap: () => Navigator.pushNamed(context, '/login'),
+            brandBlue: _brandBlue,
           ),
           const SizedBox(width: 8),
-          _headerButton(
+          HeaderActionButton(
             label: 'Sign Up',
             onTap: () => Navigator.pushNamed(context, '/sign-up/customer'),
+            brandBlue: _brandBlue,
           ),
           const SizedBox(width: 16),
         ],
@@ -592,158 +549,8 @@ class _HomeScreenState extends State<HomeScreen> {
               childAspectRatio: childAspectRatio,
             ),
             itemBuilder: (context, index) {
-              return _buildWorkPermitCard(_workPermits[index]);
+              return WorkPermitCard(item: _workPermits[index], brandBlue: _brandBlue, onViewDetails: _showComingSoon, formatBdt: _formatBdt, timeAgo: _timeAgo);
             },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWorkPermitCard(WorkPermitItem item) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x26000000),
-            blurRadius: 16,
-            offset: Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Image.asset(item.image, fit: BoxFit.cover),
-                ),
-              ),
-              Positioned(
-                bottom: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .7),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    item.selectionType.replaceAll('_', ' '),
-                    style: const TextStyle(
-                      color: _brandBlue,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${_formatBdt(item.customerPrice)} BDT',
-                    style: const TextStyle(
-                      color: _brandBlue,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 14,
-                        child: Image.asset(item.countryFlag, fit: BoxFit.contain),
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          item.countryName,
-                          style: const TextStyle(fontSize: 10),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            const Icon(Icons.construction, size: 12),
-                            const SizedBox(width: 3),
-                            Expanded(
-                              child: Text(
-                                item.workType,
-                                style: const TextStyle(fontSize: 10),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _timeAgo(item.createdAt),
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Center(
-                    child: TextButton(
-                      onPressed: _showComingSoon,
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'View Details',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(width: 4),
-                          Icon(Icons.arrow_right_alt, color: _brandBlue),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: _brandBlue,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
@@ -873,22 +680,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _headerButton({required String label, required VoidCallback onTap}) {
-    return SizedBox(
-      height: 36,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _brandBlue,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: Text(label),
-      ),
-    );
-  }
 }
