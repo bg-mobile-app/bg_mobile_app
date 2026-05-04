@@ -7,7 +7,8 @@ import 'features/auth/partner_sign_up_screen.dart';
 import 'features/auth/agent_sign_up_screen.dart';
 import 'features/auth/agency_sign_up_screen.dart';
 import 'features/auth/recruiting_sign_up_screen.dart';
-import 'features/home/home_screen.dart';
+import 'common/widgets/layout/app_scaffold.dart';
+import 'features/onboarding/get_started_screen.dart';
 import 'routes/app_routes.dart';
 
 class BideshgamiApp extends StatelessWidget {
@@ -25,9 +26,10 @@ class BideshgamiApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en', 'US')],
-      initialRoute: AppRoutes.home,
+      initialRoute: AppRoutes.getStarted,
       routes: {
-        AppRoutes.home: (_) => const HomeScreen(),
+        AppRoutes.getStarted: (_) => const GetStartedScreen(),
+        AppRoutes.home: (_) => const AppScaffold(),
         AppRoutes.login: (_) => const SignInScreen(),
         AppRoutes.signUpCustomer: (_) => const SignUpScreen(),
         AppRoutes.signUpPartner: (_) => const PartnerSignUpScreen(),
