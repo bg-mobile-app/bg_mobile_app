@@ -67,6 +67,7 @@ class PartnerSignUpScreen extends StatelessWidget {
                           _AccountTypeCard(
                             label: 'Agency',
                             imagePath: 'assets/img/sign-up/agency.jpg',
+                            onTapRoute: AppRoutes.agencySignUp,
                           ),
                         ],
                       );
