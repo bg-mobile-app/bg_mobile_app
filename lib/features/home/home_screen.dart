@@ -37,8 +37,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isLoggedIn = false;
 
-  final List<String> _countries = const ['Bangladesh', 'Malaysia', 'Japan', 'Romania'];
-  final List<String> _workTypes = const ['Factory', 'Construction', 'Hospitality', 'Agriculture'];
+  final List<String> _countries = const [
+    'Bangladesh',
+    'Malaysia',
+    'Japan',
+    'Romania',
+  ];
+  final List<String> _workTypes = const [
+    'Factory',
+    'Construction',
+    'Hospitality',
+    'Agriculture',
+  ];
   final List<String> _bannerLeft = const [
     'assets/img/ads/1.png',
     'assets/img/ads/2.png',
@@ -103,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _leftTimer = Timer.periodic(const Duration(milliseconds: 1300), (_) {
+    _leftTimer = Timer.periodic(const Duration(milliseconds: 2000), (_) {
       if (!_leftController.hasClients) return;
       _leftIndex = (_leftIndex + 1) % _bannerLeft.length;
       _leftController.animateToPage(
@@ -113,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     });
 
-    _rightTimer = Timer.periodic(const Duration(milliseconds: 1600), (_) {
+    _rightTimer = Timer.periodic(const Duration(milliseconds: 2200), (_) {
       if (!_rightController.hasClients) return;
       _rightIndex = (_rightIndex + 1) % _bannerRight.length;
       _rightController.animateToPage(
@@ -138,9 +148,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Working on this page')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Working on this page')));
   }
 
   Future<void> _pickDate({required bool isFrom}) async {
@@ -178,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x26000000),
@@ -195,7 +205,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: _serviceType,
                     hint: 'Service Type',
                     items: const ['WORK_PERMIT'],
-                    onChanged: (v) => setState(() => _serviceType = v ?? 'WORK_PERMIT'),
+                    onChanged: (v) =>
+                        setState(() => _serviceType = v ?? 'WORK_PERMIT'),
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -212,7 +223,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: _selectionType,
                     hint: 'Selection Type',
                     items: const ['All', 'Direct', 'Lottery'],
-                    onChanged: (v) => setState(() => _selectionType = v ?? 'All'),
+                    onChanged: (v) =>
+                        setState(() => _selectionType = v ?? 'All'),
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -263,14 +275,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F8FF),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF5F8FF),
         elevation: 0,
         titleSpacing: 16,
         title: Image.asset(
           'assets/img/logo/logo_black.png',
-          height: 34,
+          height: 32,
           fit: BoxFit.contain,
         ),
         actions: [
@@ -307,205 +319,193 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildSearchBox(),
-              _buildServices(),
-              _buildOfferBanner(),
-              _buildWorkPermitSection(),
-              const SizedBox(height: 20),
-            ],
-          ),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeroSection()),
+            SliverToBoxAdapter(child: _buildOfferBanner()),
+            SliverToBoxAdapter(child: _buildServices()),
+            SliverToBoxAdapter(child: _buildWorkPermitSection()),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildSearchBox() {
-    return AspectRatio(
-      aspectRatio: 5 / 2,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/img/hero.png',
-              fit: BoxFit.cover,
+  Widget _buildHeroSection() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: _buildSearchFilters(),
+    );
+  }
+
+  Widget _buildSearchFilters() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _dropdown(
+                value: _country,
+                hint: 'Country Name',
+                items: _countries,
+                onChanged: (v) => setState(() => _country = v),
+              ),
             ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _dropdown(
+                value: _workType,
+                hint: 'Type of Work',
+                items: _workTypes,
+                onChanged: (v) => setState(() => _workType = v),
+              ),
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: _showAdvancedFilterSheet,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: _brandBlue,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x332563EB),
+                      blurRadius: 14,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.tune, color: Colors.white, size: 20),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF4FF),
+            border: Border.all(color: const Color(0xFFD6E3FF)),
+            borderRadius: BorderRadius.circular(12),
           ),
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: -100,
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x26000000),
-                        blurRadius: 18,
-                        offset: Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _dropdown(
-                              value: _country,
-                              hint: 'Country Name',
-                              items: _countries,
-                              onChanged: (v) => setState(() => _country = v),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _dropdown(
-                              value: _workType,
-                              hint: 'Type of Work',
-                              items: _workTypes,
-                              onChanged: (v) => setState(() => _workType = v),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          InkWell(
-                            onTap: _showAdvancedFilterSheet,
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: _brandBlue,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(Icons.tune, color: Colors.white, size: 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                style: const TextStyle(color: Colors.black),
-                                decoration: const InputDecoration(
-                                  hintText: 'search in bideshgami',
-                                  hintStyle: TextStyle(color: Colors.black54),
-                                  border: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  filled: false,
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: _showComingSoon,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                  color: _brandBlue,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.search, size: 18, color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  style: const TextStyle(color: Colors.black),
+                  decoration: const InputDecoration(
+                    fillColor: Color(0xFFEFF4FF),
+                    hintText: 'Search in bideshgami',
+                    hintStyle: TextStyle(color: Color(0xFF64748B)),
+                    border: InputBorder.none,
+
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
                   ),
                 ),
-              ],
-            ),
+              ),
+              InkWell(
+                onTap: _showComingSoon,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: _brandBlue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.search,
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildServices() {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(top: 150),
+      margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 860),
-        child: GridView.builder(
-          itemCount: navLinkData.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 10,
-            childAspectRatio: .85,
-          ),
-          itemBuilder: (context, index) {
-            final item = navLinkData[index];
-            return InkWell(
-              onTap: item.href.isEmpty ? _showComingSoon : _showComingSoon,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: const BoxDecoration(
-                      color: _brandBlue,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(item.icon, color: Colors.white, size: 22),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    item.name,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+      child: GridView.builder(
+        itemCount: navLinkData.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: .78,
+        ),
+        itemBuilder: (context, index) {
+          final item = navLinkData[index];
+          return InkWell(
+            onTap: item.href.isEmpty ? _showComingSoon : _showComingSoon,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x14000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 6),
                   ),
                 ],
               ),
-            );
-          },
-        ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF2563EB),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(item.icon, color: Colors.white, size: 40),
+                    ),
+                  const SizedBox(height: 8),
+                  Text(
+                    item.name,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildOfferBanner() {
-    final isWide = MediaQuery.of(context).size.width >= 768;
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1100),
-        child: isWide
-            ? Row(
-                children: [
-                  Expanded(child: _carousel(_leftController, _bannerLeft)),
-                  const SizedBox(width: 16),
-                  Expanded(child: _carousel(_rightController, _bannerRight)),
-                ],
-              )
-            : Column(
-                children: [
-                  _carousel(_leftController, _bannerLeft),
-                  const SizedBox(height: 14),
-                  _carousel(_rightController, _bannerRight),
-                ],
-              ),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
+      child: Column(
+        children: [
+          _carousel(_leftController, _bannerLeft),
+          const SizedBox(height: 10),
+          _carousel(_rightController, _bannerRight),
+        ],
       ),
     );
   }
@@ -516,48 +516,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final width = MediaQuery.of(context).size.width;
-    final crossAxisCount = width >= 1024 ? 4 : (width >= 768 ? 3 : 2);
-    final childAspectRatio = width >= 1024
-        ? 0.66
-        : (width >= 768 ? 0.62 : (width >= 420 ? 0.56 : 0.5));
+    final crossAxisCount = width >= 768 ? 3 : 2;
+    final childAspectRatio = width >= 768 ? 0.63 : (width >= 410 ? 0.57 : 0.53);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Work Permit',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
-              ),
-              ElevatedButton(
-                onPressed: _showComingSoon,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _brandBlue,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('See More'),
-                    SizedBox(width: 4),
-                    Icon(Icons.keyboard_double_arrow_right, size: 18),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
+          _sectionHeader('Work Permit', actionLabel: 'See More'),
+          const SizedBox(height: 14),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -569,11 +536,40 @@ class _HomeScreenState extends State<HomeScreen> {
               childAspectRatio: childAspectRatio,
             ),
             itemBuilder: (context, index) {
-              return WorkPermitCard(item: _workPermits[index], brandBlue: _brandBlue, onViewDetails: _showComingSoon, formatBdt: _formatBdt, timeAgo: _timeAgo);
+              return WorkPermitCard(
+                item: _workPermits[index],
+                brandBlue: _brandBlue,
+                onViewDetails: _showComingSoon,
+                formatBdt: _formatBdt,
+                timeAgo: _timeAgo,
+              );
             },
           ),
         ],
       ),
+    );
+  }
+
+  Widget _sectionHeader(String title, {required String actionLabel}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+        ),
+        TextButton.icon(
+          onPressed: _showComingSoon,
+          style: TextButton.styleFrom(
+            foregroundColor: _brandBlue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+          label: Text(actionLabel),
+        ),
+      ],
     );
   }
 
@@ -605,18 +601,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _carousel(PageController controller, List<String> images) {
-    return AspectRatio(
-      aspectRatio: 3 / 1,
+    return SizedBox(
+      height: 124,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: PageView.builder(
           controller: controller,
           itemCount: images.length,
           itemBuilder: (context, index) {
-            return Image.asset(
-              images[index],
-              fit: BoxFit.cover,
-            );
+            return Image.asset(images[index], fit: BoxFit.cover);
           },
         ),
       ),
@@ -639,25 +632,30 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: InputDecoration(
         isDense: true,
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black54),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        hintStyle: const TextStyle(color: Color(0xFF64748B)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: const Color(0xFFEFF4FF),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xE2E8F0FF)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFD6E3FF)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFD6E3FF)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _brandBlue),
         ),
       ),
       items: items
-          .map((item) => DropdownMenuItem<String>(value: item, child: Text(item)))
+          .map(
+            (item) => DropdownMenuItem<String>(value: item, child: Text(item)),
+          )
           .toList(),
     );
   }
@@ -670,12 +668,13 @@ class _HomeScreenState extends State<HomeScreen> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.black54),
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
         filled: true,
         fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
@@ -699,5 +698,4 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Text(label),
     );
   }
-
 }

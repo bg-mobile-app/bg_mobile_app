@@ -227,10 +227,10 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
               const Divider(),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.logout, color: _brandBlue),
+                leading: const Icon(Icons.logout, color: Color(0xFF475569),),
                 title: const Text(
                   'Logout',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: _brandBlue),
+                  style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF475569)),
                 ),
                 onTap: () {
                   Navigator.pop(context);

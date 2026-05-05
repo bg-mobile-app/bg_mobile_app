@@ -23,23 +23,26 @@ class WorkPermitCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 16, offset: Offset(0, 6))],
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE4EDFF)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x1F000000), blurRadius: 16, offset: Offset(0, 8)),
+        ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Stack(alignment: Alignment.bottomCenter, children: [
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
             child: AspectRatio(aspectRatio: 1, child: Image.asset(item.image, fit: BoxFit.cover)),
           ),
           Positioned(
             bottom: 10,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha: .7), borderRadius: BorderRadius.circular(999)),
-              child: Text(item.selectionType.replaceAll('_', ' '), style: TextStyle(color: brandBlue, fontSize: 11, fontWeight: FontWeight.w600)),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(999)),
+                child: Text(item.selectionType.replaceAll('_', ' '), style: TextStyle(color: brandBlue, fontSize: 11, fontWeight: FontWeight.w600)),
+              ),
             ),
-          ),
         ]),
         Expanded(
           child: Padding(
@@ -65,7 +68,11 @@ class WorkPermitCard extends StatelessWidget {
                 child: TextButton(
                   onPressed: onViewDetails,
                   style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [const Text('View Details', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)), const SizedBox(width: 4), Icon(Icons.arrow_right_alt, color: brandBlue)]),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Text('View Details', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
+                    const SizedBox(width: 4),
+                    Icon(Icons.arrow_right_alt, color: brandBlue),
+                  ]),
                 ),
               ),
               Container(height: 3, decoration: BoxDecoration(color: brandBlue, borderRadius: BorderRadius.circular(99))),
