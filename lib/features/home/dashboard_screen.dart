@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'customer_profile_screen.dart';
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -185,6 +187,28 @@ class CustomerSidebarDrawer extends StatefulWidget {
 class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
   String? _openKey;
 
+  void _handleNavigation(SidebarLink link) {
+    Navigator.pop(context);
+
+    final href = link.href ?? '';
+    if (href == '/dashboard/customer') {
+      return;
+    }
+
+    if (href == '/dashboard/customer/profile') {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const CustomerProfileScreen(),
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Navigate to ${link.name}')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -214,12 +238,7 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
                           _openKey = _openKey == link.name ? null : link.name;
                         });
                       },
-                      onTap: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Navigate to ${link.name}')),
-                        );
-                      },
+                      onTap: _handleNavigation,
                     );
                   },
                 ),
@@ -288,7 +307,7 @@ class _SidebarNavTile extends StatelessWidget {
   final SidebarLink link;
   final bool isOpen;
   final VoidCallback onExpandToggle;
-  final VoidCallback onTap;
+  final ValueChanged<SidebarLink> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +323,7 @@ class _SidebarNavTile extends StatelessWidget {
               (child) => ListTile(
                 contentPadding: const EdgeInsets.only(left: 40, right: 0),
                 title: Text(child.name),
-                onTap: onTap,
+                onTap: () => onTap(child),
               ),
             )
             .toList(),
@@ -315,7 +334,7 @@ class _SidebarNavTile extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       leading: Icon(link.icon ?? Icons.circle, size: 20),
       title: Text(link.name, style: const TextStyle(fontWeight: FontWeight.w500)),
-      onTap: onTap,
+      onTap: () => onTap(link),
     );
   }
 }
