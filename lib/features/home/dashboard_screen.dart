@@ -5,10 +5,42 @@ class DashboardScreen extends StatelessWidget {
 
   static const Color _brandBlue = Color(0xFF2563EB);
 
+  static const List<SidebarLink> _sidebarLinks = [
+    SidebarLink(name: 'Dashboard', icon: Icons.dashboard, href: '/dashboard/customer'),
+    SidebarLink(name: 'My Profile', icon: Icons.person, href: '/dashboard/customer/profile'),
+    SidebarLink(name: 'My Favourite', icon: Icons.favorite_border, href: '/dashboard/customer/favourite'),
+    SidebarLink(
+      name: 'My Booking',
+      icon: Icons.grid_view,
+      children: [
+        SidebarLink(name: 'My Booking', href: '/dashboard/booking/my'),
+        SidebarLink(name: 'Success File', href: '/dashboard/booking/my/success-file'),
+        SidebarLink(name: 'Return Passport', href: '/dashboard/booking/my/return-passport'),
+      ],
+    ),
+    SidebarLink(
+      name: 'Appointment Booking',
+      icon: Icons.calendar_month,
+      href: '/dashboard/booking/appointment',
+    ),
+    SidebarLink(name: 'Check Status', icon: Icons.radio_button_checked, href: '/dashboard/customer/check-status'),
+    SidebarLink(name: 'Payment', icon: Icons.payment, href: '/dashboard/my-payments'),
+    SidebarLink(name: 'Notifications', icon: Icons.notifications_none, href: '/dashboard/notifications'),
+    SidebarLink(name: 'Change Password', icon: Icons.swap_horiz, href: '/dashboard/customer/change-password'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      endDrawer: const CustomerSidebarDrawer(
+        fullName: 'Demo User',
+        userId: 'BG-1024',
+        email: 'demo.user@example.com',
+        phone: '+1 555 0102',
+        profileImage: 'assets/img/logo/logo_black.png',
+        links: _sidebarLinks,
+      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -19,10 +51,12 @@ class DashboardScreen extends StatelessWidget {
           fit: BoxFit.contain,
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.menu, color: Colors.black87),
-            tooltip: 'Sidebar',
+          Builder(
+            builder: (context) => IconButton(
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              icon: const Icon(Icons.menu, color: Colors.black87),
+              tooltip: 'Sidebar',
+            ),
           ),
           const SizedBox(width: 8),
         ],
@@ -124,6 +158,180 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class CustomerSidebarDrawer extends StatefulWidget {
+  const CustomerSidebarDrawer({
+    super.key,
+    required this.fullName,
+    required this.userId,
+    required this.email,
+    required this.phone,
+    required this.profileImage,
+    required this.links,
+  });
+
+  final String fullName;
+  final String userId;
+  final String email;
+  final String phone;
+  final String profileImage;
+  final List<SidebarLink> links;
+
+  @override
+  State<CustomerSidebarDrawer> createState() => _CustomerSidebarDrawerState();
+}
+
+class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
+  String? _openKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _SidebarUserInfo(
+                fullName: widget.fullName,
+                userId: widget.userId,
+                email: widget.email,
+                phone: widget.phone,
+                profileImage: widget.profileImage,
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.links.length,
+                  itemBuilder: (context, index) {
+                    final link = widget.links[index];
+                    return _SidebarNavTile(
+                      link: link,
+                      isOpen: _openKey == link.name,
+                      onExpandToggle: () {
+                        setState(() {
+                          _openKey = _openKey == link.name ? null : link.name;
+                        });
+                      },
+                      onTap: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Navigate to ${link.name}')),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              const Divider(),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.logout, color: _brandBlue),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(fontWeight: FontWeight.w600, color: _brandBlue),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Logout clicked')),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SidebarUserInfo extends StatelessWidget {
+  const _SidebarUserInfo({
+    required this.fullName,
+    required this.userId,
+    required this.email,
+    required this.phone,
+    required this.profileImage,
+  });
+
+  final String fullName;
+  final String userId;
+  final String email;
+  final String phone;
+  final String profileImage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CircleAvatar(radius: 40, backgroundImage: AssetImage(profileImage)),
+        const SizedBox(height: 8),
+        Text(
+          fullName.toUpperCase(),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 4),
+        Text('User ID: $userId', style: const TextStyle(fontSize: 12, color: Color(0xFF475569))),
+        Text('User Email: $email', style: const TextStyle(fontSize: 12, color: Color(0xFF475569))),
+        Text('User Phone: $phone', style: const TextStyle(fontSize: 12, color: Color(0xFF475569))),
+      ],
+    );
+  }
+}
+
+class _SidebarNavTile extends StatelessWidget {
+  const _SidebarNavTile({required this.link, required this.isOpen, required this.onExpandToggle, required this.onTap});
+
+  final SidebarLink link;
+  final bool isOpen;
+  final VoidCallback onExpandToggle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    if (link.children.isNotEmpty) {
+      return ExpansionTile(
+        tilePadding: EdgeInsets.zero,
+        initiallyExpanded: isOpen,
+        onExpansionChanged: (_) => onExpandToggle(),
+        leading: Icon(link.icon ?? Icons.circle, size: 20),
+        title: Text(link.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+        children: link.children
+            .map(
+              (child) => ListTile(
+                contentPadding: const EdgeInsets.only(left: 40, right: 0),
+                title: Text(child.name),
+                onTap: onTap,
+              ),
+            )
+            .toList(),
+      );
+    }
+
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(link.icon ?? Icons.circle, size: 20),
+      title: Text(link.name, style: const TextStyle(fontWeight: FontWeight.w500)),
+      onTap: onTap,
+    );
+  }
+}
+
+class SidebarLink {
+  const SidebarLink({
+    required this.name,
+    this.href,
+    this.icon,
+    this.children = const [],
+  });
+
+  final String name;
+  final String? href;
+  final IconData? icon;
+  final List<SidebarLink> children;
 }
 
 class DashboardSmallCard extends StatelessWidget {
