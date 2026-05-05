@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'customer_profile_edit_screen.dart';
+
 class CustomerProfileScreen extends StatelessWidget {
   const CustomerProfileScreen({super.key});
 
@@ -14,7 +16,7 @@ class CustomerProfileScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               _ProfileHeader(),
               SizedBox(height: 16),
               _SectionTitle(
@@ -95,7 +97,7 @@ class _ProfileHeader extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text('Demo User', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
                 Text('demo.user@example.com', style: TextStyle(color: Color(0xFF475569))),
@@ -103,7 +105,13 @@ class _ProfileHeader extends StatelessWidget {
             ),
           ),
           OutlinedButton.icon(
-            onPressed: null,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const CustomerProfileEditScreen(),
+                ),
+              );
+            },
             icon: const Icon(Icons.edit),
             label: const Text('Edit'),
           ),
