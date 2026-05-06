@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'customer_profile_screen.dart';
+import '../booking/success_flight_screen.dart';
+import '../booking/return_passport_screen.dart';
+import '../booking/appointment_booking_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -199,6 +202,33 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => const CustomerProfileScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (href == '/dashboard/booking/my/success-file') {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const SuccessFlightScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (href == '/dashboard/booking/my/return-passport') {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const ReturnPassportScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (href == '/dashboard/booking/appointment') {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const AppointmentBookingScreen(),
         ),
       );
       return;
