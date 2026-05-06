@@ -1,15 +1,67 @@
 import 'package:flutter/material.dart';
 
 import 'customer_profile_edit_screen.dart';
+import 'dashboard_screen.dart';
 
 class CustomerProfileScreen extends StatelessWidget {
   const CustomerProfileScreen({super.key});
 
+
+  static const List<SidebarLink> _sidebarLinks = [
+    SidebarLink(name: 'Dashboard', icon: Icons.dashboard, href: '/dashboard/customer'),
+    SidebarLink(name: 'My Profile', icon: Icons.person, href: '/dashboard/customer/profile'),
+    SidebarLink(name: 'My Favourite', icon: Icons.favorite_border, href: '/dashboard/customer/favourite'),
+    SidebarLink(
+      name: 'My Booking',
+      icon: Icons.grid_view,
+      children: [
+        SidebarLink(name: 'My Booking', href: '/dashboard/booking/my'),
+        SidebarLink(name: 'Success File', href: '/dashboard/booking/my/success-file'),
+        SidebarLink(name: 'Return Passport', href: '/dashboard/booking/my/return-passport'),
+      ],
+    ),
+    SidebarLink(
+      name: 'Appointment Booking',
+      icon: Icons.calendar_month,
+      href: '/dashboard/booking/appointment',
+    ),
+    SidebarLink(name: 'Check Status', icon: Icons.radio_button_checked, href: '/dashboard/customer/check-status'),
+    SidebarLink(name: 'Payment', icon: Icons.payment, href: '/dashboard/my-payments'),
+    SidebarLink(name: 'Notifications', icon: Icons.notifications_none, href: '/dashboard/notifications'),
+    SidebarLink(name: 'Change Password', icon: Icons.swap_horiz, href: '/dashboard/customer/change-password'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      endDrawer: const CustomerSidebarDrawer(
+        fullName: 'Demo User',
+        userId: 'BG-1024',
+        email: 'demo.user@example.com',
+        phone: '+1 555 0102',
+        profileImage: 'assets/img/logo/logo_black.png',
+        links: _sidebarLinks,
+      ),
       appBar: AppBar(
-        title: const Text('My Profile'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        titleSpacing: 16,
+        title: Image.asset(
+          'assets/img/logo/logo_black.png',
+          height: 34,
+          fit: BoxFit.contain,
+        ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              icon: const Icon(Icons.menu, color: Colors.black87),
+              tooltip: 'Sidebar',
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
