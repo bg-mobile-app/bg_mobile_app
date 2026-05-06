@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../features/home/dashboard_screen.dart';
 import '../../../features/home/home_screen.dart';
+import '../../../features/booking/my_booking_screen.dart';
 import 'app_bottom_nav.dart';
 
 class AppScaffold extends StatefulWidget {
@@ -17,7 +18,7 @@ class _AppScaffoldState extends State<AppScaffold> {
   final List<Widget> _screens = const [
     HomeScreen(),
     _DummyScreen(title: 'Search'),
-    _DummyScreen(title: 'My Booking'),
+    MyBookingScreen(),
     _DummyScreen(title: 'Chat'),
     DashboardScreen(),
   ];
