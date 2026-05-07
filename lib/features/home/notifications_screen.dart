@@ -90,21 +90,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 920),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-                            Row(children: [Icon(Icons.notifications, color: Color(0xFF2563EB)), SizedBox(width: 8), Text('Notifications', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold))]),
-                            SizedBox(height: 4),
-                            Text('Manage your latest activity and alerts', style: TextStyle(color: Color(0xFF64748B))),
-                          ]),
-                          if (_notifications.any((n) => !n.isRead))
-                            TextButton.icon(
-                              onPressed: _loading ? null : _markAllRead,
-                              icon: const Icon(Icons.done_all),
-                              label: const Text('Mark all as read'),
-                            ),
-                        ],
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isCompact = constraints.maxWidth < 640;
+                          return Flex(
+                            direction: isCompact ? Axis.vertical : Axis.horizontal,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: isCompact ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+                            children: [
+                              const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Row(children: [Icon(Icons.notifications, color: Color(0xFF2563EB)), SizedBox(width: 8), Text('Notifications', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold))]),
+                                SizedBox(height: 4),
+                                Text('Manage your latest activity and alerts', style: TextStyle(color: Color(0xFF64748B))),
+                              ]),
+                              if (_notifications.any((n) => !n.isRead)) ...[
+                                if (isCompact) const SizedBox(height: 12),
+                                TextButton.icon(
+                                  onPressed: _loading ? null : _markAllRead,
+                                  icon: const Icon(Icons.done_all),
+                                  label: const Text('Mark all as read'),
+                                ),
+                              ],
+                            ],
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
                       Container(
@@ -160,33 +169,55 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    n.title,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? const Color(0xFF64748B) : const Color(0xFF0F172A)),
-                  ),
-                ),
-                Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 420;
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        n.title,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? const Color(0xFF64748B) : const Color(0xFF0F172A)),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        n.title,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? const Color(0xFF64748B) : const Color(0xFF0F172A)),
+                      ),
+                    ),
+                    Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 6),
             Text(n.message, style: const TextStyle(color: Color(0xFF64748B))),
             const SizedBox(height: 10),
-            Row(children: [
-              if (n.linkUrl != null)
-                TextButton.icon(
-                  onPressed: () => _markRead(n.id),
-                  icon: const Icon(Icons.open_in_new, size: 16),
-                  label: const Text('Take Action'),
-                ),
-              if (!n.isRead)
-                TextButton(
-                  onPressed: () => _markRead(n.id),
-                  child: const Text('Mark as read'),
-                ),
-            ]),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                if (n.linkUrl != null)
+                  TextButton.icon(
+                    onPressed: () => _markRead(n.id),
+                    icon: const Icon(Icons.open_in_new, size: 16),
+                    label: const Text('Take Action'),
+                  ),
+                if (!n.isRead)
+                  TextButton(
+                    onPressed: () => _markRead(n.id),
+                    child: const Text('Mark as read'),
+                  ),
+              ],
+            ),
           ]),
         ),
       ]),
