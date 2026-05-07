@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../home/dashboard_screen.dart';
+
 import 'appointment_ticket_screen.dart';
 
 class AppointmentBookingScreen extends StatefulWidget {
@@ -19,16 +21,16 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+    return DashboardPageScaffold(
+      currentHref: '/dashboard/booking/appointment',
+      child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               const Text('Appointment Booking', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               IconButton(
-                onPressed: () => Scaffold.maybeOf(context)?.openEndDrawer(),
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
                 icon: const Icon(Icons.menu, color: Colors.black87),
                 tooltip: 'Sidebar',
               ),

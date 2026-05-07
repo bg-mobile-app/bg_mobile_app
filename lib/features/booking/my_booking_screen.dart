@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../home/dashboard_screen.dart';
+
 class MyBookingScreen extends StatefulWidget {
   const MyBookingScreen({super.key});
 
@@ -48,9 +50,9 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+    return DashboardPageScaffold(
+      currentHref: '/dashboard/booking/my',
+      child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -64,7 +66,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    onPressed: () => Scaffold.maybeOf(context)?.openEndDrawer(),
+                    onPressed: () => Scaffold.of(context).openEndDrawer(),
                     icon: const Icon(Icons.menu, color: Colors.black87),
                     tooltip: 'Sidebar',
                   ),
