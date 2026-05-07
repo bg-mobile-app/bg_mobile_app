@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../home/models/home_models.dart';
+import 'work_permit_details_screen.dart';
 import 'widgets/filter_bottom_sheet.dart';
 import 'widgets/filter_results.dart';
 import 'widgets/filter_sidebar.dart';
@@ -52,6 +53,13 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     });
   }
 
+
+  void _openDetailsBySlug(WorkPermitItem item) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => WorkPermitDetailsScreen(item: item)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -85,7 +93,13 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
                       SizedBox(width: 320, child: FilterSidebar(onApply: _applyFilters)),
                       const SizedBox(width: 24),
                     ],
-                    Expanded(child: FilterResults(items: _filteredItems, brandBlue: _brandBlue)),
+                    Expanded(
+                      child: FilterResults(
+                        items: _filteredItems,
+                        brandBlue: _brandBlue,
+                        onViewDetails: _openDetailsBySlug,
+                      ),
+                    ),
                   ],
                 ),
               ],
