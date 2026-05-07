@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../../features/booking/appointment_booking_screen.dart';
 import '../../../features/home/dashboard_screen.dart';
 import '../../../features/home/home_screen.dart';
 import '../../../features/booking/my_booking_screen.dart';
+import '../../../features/booking/return_passport_screen.dart';
+import '../../../features/booking/success_flight_screen.dart';
+import '../../../features/home/customer_profile_screen.dart';
 import 'app_bottom_nav.dart';
+import 'navigation_state.dart';
 
 class AppScaffold extends StatefulWidget {
   const AppScaffold({super.key});
@@ -15,13 +20,31 @@ class AppScaffold extends StatefulWidget {
 class _AppScaffoldState extends State<AppScaffold> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    _DummyScreen(title: 'Search'),
-    MyBookingScreen(),
-    _DummyScreen(title: 'Chat'),
-    DashboardScreen(),
-  ];
+  List<Widget> get _screens => const [
+        HomeScreen(),
+        _DummyScreen(title: 'Search'),
+        MyBookingScreen(),
+        _DummyScreen(title: 'Chat'),
+        _DashboardHostScreen(),
+      ];
+
+  @override
+  void initState() {
+    super.initState();
+    bottomNavIndexNotifier.value = _currentIndex;
+    bottomNavIndexNotifier.addListener(_syncBottomNav);
+  }
+
+  void _syncBottomNav() {
+    if (!mounted) return;
+    setState(() => _currentIndex = bottomNavIndexNotifier.value);
+  }
+
+  @override
+  void dispose() {
+    bottomNavIndexNotifier.removeListener(_syncBottomNav);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +55,40 @@ class _AppScaffoldState extends State<AppScaffold> {
       ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+          bottomNavIndexNotifier.value = index;
+        },
       ),
+    );
+  }
+}
+
+class _DashboardHostScreen extends StatelessWidget {
+  const _DashboardHostScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: dashboardRouteNotifier,
+      builder: (_, route, __) {
+        switch (route) {
+          case '/dashboard/customer':
+            return const DashboardScreen();
+          case '/dashboard/customer/profile':
+            return const CustomerProfileScreen();
+          case '/dashboard/booking/my/success-file':
+            return const SuccessFlightScreen();
+          case '/dashboard/booking/my/return-passport':
+            return const ReturnPassportScreen();
+          case '/dashboard/booking/appointment':
+            return const AppointmentBookingScreen();
+          default:
+            return DashboardDummyScreen(
+              title: route.split('/').last.replaceAll('-', ' '),
+            );
+        }
+      },
     );
   }
 }

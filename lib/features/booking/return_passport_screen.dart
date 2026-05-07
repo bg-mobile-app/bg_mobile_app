@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../home/dashboard_screen.dart';
+
 class ReturnPassportScreen extends StatefulWidget {
   const ReturnPassportScreen({super.key});
 
@@ -17,26 +19,14 @@ class _ReturnPassportScreenState extends State<ReturnPassportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+    return DashboardPageScaffold(
+      currentHref: '/dashboard/booking/my/return-passport',
+      child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () => Scaffold.maybeOf(context)?.openEndDrawer(),
-                    icon: const Icon(Icons.menu, color: Colors.black87),
-                    tooltip: 'Sidebar',
-                  ),
-                  const Text('Return Passport', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

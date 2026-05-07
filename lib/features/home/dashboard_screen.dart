@@ -1,72 +1,15 @@
 import 'package:flutter/material.dart';
 
-import 'customer_profile_screen.dart';
-import '../booking/success_flight_screen.dart';
-import '../booking/return_passport_screen.dart';
-import '../booking/appointment_booking_screen.dart';
+import '../../common/widgets/layout/navigation_state.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
-  static const Color _brandBlue = Color(0xFF2563EB);
-
-  static const List<SidebarLink> _sidebarLinks = [
-    SidebarLink(name: 'Dashboard', icon: Icons.dashboard, href: '/dashboard/customer'),
-    SidebarLink(name: 'My Profile', icon: Icons.person, href: '/dashboard/customer/profile'),
-    SidebarLink(name: 'My Favourite', icon: Icons.favorite_border, href: '/dashboard/customer/favourite'),
-    SidebarLink(
-      name: 'My Booking',
-      icon: Icons.grid_view,
-      children: [
-        SidebarLink(name: 'My Booking', href: '/dashboard/booking/my'),
-        SidebarLink(name: 'Success File', href: '/dashboard/booking/my/success-file'),
-        SidebarLink(name: 'Return Passport', href: '/dashboard/booking/my/return-passport'),
-      ],
-    ),
-    SidebarLink(
-      name: 'Appointment Booking',
-      icon: Icons.calendar_month,
-      href: '/dashboard/booking/appointment',
-    ),
-    SidebarLink(name: 'Check Status', icon: Icons.radio_button_checked, href: '/dashboard/customer/check-status'),
-    SidebarLink(name: 'Payment', icon: Icons.payment, href: '/dashboard/my-payments'),
-    SidebarLink(name: 'Notifications', icon: Icons.notifications_none, href: '/dashboard/notifications'),
-    SidebarLink(name: 'Change Password', icon: Icons.swap_horiz, href: '/dashboard/customer/change-password'),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      endDrawer: const CustomerSidebarDrawer(
-        fullName: 'Demo User',
-        userId: 'BG-1024',
-        email: 'demo.user@example.com',
-        phone: '+1 555 0102',
-        profileImage: 'assets/img/logo/logo_black.png',
-        links: _sidebarLinks,
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        titleSpacing: 16,
-        title: Image.asset(
-          'assets/img/logo/logo_black.png',
-          height: 34,
-          fit: BoxFit.contain,
-        ),
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
-              icon: const Icon(Icons.menu, color: Colors.black87),
-              tooltip: 'Sidebar',
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
+    return DashboardPageScaffold(
+      currentHref: '/dashboard/customer',
+      child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -108,53 +51,15 @@ class DashboardScreen extends StatelessWidget {
                 mainAxisSpacing: 10,
                 childAspectRatio: 1.35,
                 children: const [
-                  DashboardSmallCard(
-                    label: 'Total Applied Job',
-                    icon: Icons.menu_book,
-                    value: '৳0',
-                  ),
-                  DashboardSmallCard(
-                    label: 'Under Processing',
-                    icon: Icons.hourglass_top,
-                    value: '৳0',
-                  ),
-                  DashboardSmallCard(
-                    label: 'Success Flight',
-                    icon: Icons.flight_takeoff,
-                    value: '৳0',
-                  ),
-                  DashboardSmallCard(
-                    label: 'Reject Flight',
-                    icon: Icons.flight_land,
-                    value: '৳0',
-                    red: true,
-                  ),
-                  DashboardSmallCard(
-                    label: 'Return Passport',
-                    icon: Icons.badge_outlined,
-                    value: '৳0',
-                  ),
-                  DashboardSmallCard(
-                    label: 'Total Appointment',
-                    icon: Icons.event_note,
-                    value: '৳0',
-                  ),
-                  DashboardSmallCard(
-                    label: 'Total Amount',
-                    icon: Icons.payments_outlined,
-                    value: '৳0',
-                  ),
-                  DashboardSmallCard(
-                    label: 'Paid Amount',
-                    icon: Icons.account_balance_wallet_outlined,
-                    value: '৳0',
-                  ),
-                  DashboardSmallCard(
-                    label: 'Due Amount',
-                    icon: Icons.money_off_csred_outlined,
-                    value: '৳0',
-                    red: true,
-                  ),
+                  DashboardSmallCard(label: 'Total Applied Job', icon: Icons.menu_book, value: '৳0'),
+                  DashboardSmallCard(label: 'Under Processing', icon: Icons.hourglass_top, value: '৳0'),
+                  DashboardSmallCard(label: 'Success Flight', icon: Icons.flight_takeoff, value: '৳0'),
+                  DashboardSmallCard(label: 'Reject Flight', icon: Icons.flight_land, value: '৳0', red: true),
+                  DashboardSmallCard(label: 'Return Passport', icon: Icons.badge_outlined, value: '৳0'),
+                  DashboardSmallCard(label: 'Total Appointment', icon: Icons.event_note, value: '৳0'),
+                  DashboardSmallCard(label: 'Total Amount', icon: Icons.payments_outlined, value: '৳0'),
+                  DashboardSmallCard(label: 'Paid Amount', icon: Icons.account_balance_wallet_outlined, value: '৳0'),
+                  DashboardSmallCard(label: 'Due Amount', icon: Icons.money_off_csred_outlined, value: '৳0', red: true),
                 ],
               ),
             ],
@@ -165,9 +70,78 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
+const List<SidebarLink> kDashboardSidebarLinks = [
+  SidebarLink(name: 'Dashboard', icon: Icons.dashboard, href: '/dashboard/customer'),
+  SidebarLink(name: 'My Profile', icon: Icons.person, href: '/dashboard/customer/profile'),
+  SidebarLink(name: 'My Favourite', icon: Icons.favorite_border, href: '/dashboard/customer/favourite'),
+    SidebarLink(
+      name: 'My Booking',
+      icon: Icons.grid_view,
+      children: [
+        SidebarLink(name: 'My Booking', href: '/dashboard/booking/my'),
+        SidebarLink(name: 'Success File', href: '/dashboard/booking/my/success-file'),
+        SidebarLink(name: 'Return Passport', href: '/dashboard/booking/my/return-passport'),
+      ],
+    ),
+    SidebarLink(
+      name: 'Appointment Booking',
+      icon: Icons.calendar_month,
+      href: '/dashboard/booking/appointment',
+    ),
+    SidebarLink(name: 'Check Status', icon: Icons.radio_button_checked, href: '/dashboard/customer/check-status'),
+    SidebarLink(name: 'Payment', icon: Icons.payment, href: '/dashboard/my-payments'),
+    SidebarLink(name: 'Notifications', icon: Icons.notifications_none, href: '/dashboard/notifications'),
+    SidebarLink(name: 'Change Password', icon: Icons.swap_horiz, href: '/dashboard/customer/change-password'),
+];
+
+class DashboardPageScaffold extends StatelessWidget {
+  const DashboardPageScaffold({super.key, required this.child, required this.currentHref});
+
+  final Widget child;
+  final String currentHref;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      endDrawer: CustomerSidebarDrawer(
+        currentHref: currentHref,
+        fullName: 'Demo User',
+        userId: 'BG-1024',
+        email: 'demo.user@example.com',
+        phone: '+1 555 0102',
+        profileImage: 'assets/img/logo/logo_black.png',
+        links: kDashboardSidebarLinks,
+      ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        titleSpacing: 16,
+        title: Image.asset(
+          'assets/img/logo/logo_black.png',
+          height: 34,
+          fit: BoxFit.contain,
+        ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              icon: const Icon(Icons.menu, color: Colors.black87),
+              tooltip: 'Sidebar',
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: child,
+    );
+  }
+}
+
 class CustomerSidebarDrawer extends StatefulWidget {
   const CustomerSidebarDrawer({
     super.key,
+    required this.currentHref,
     required this.fullName,
     required this.userId,
     required this.email,
@@ -177,6 +151,7 @@ class CustomerSidebarDrawer extends StatefulWidget {
   });
 
   final String fullName;
+  final String currentHref;
   final String userId;
   final String email;
   final String phone;
@@ -192,51 +167,14 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
 
   void _handleNavigation(SidebarLink link) {
     Navigator.pop(context);
-
-    final href = link.href ?? '';
-    if (href == '/dashboard/customer') {
+    final href = link.href;
+    if (href == null || href == widget.currentHref) return;
+    if (href == '/dashboard/booking/my') {
+      bottomNavIndexNotifier.value = 2;
       return;
     }
-
-    if (href == '/dashboard/customer/profile') {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => const CustomerProfileScreen(),
-        ),
-      );
-      return;
-    }
-
-    if (href == '/dashboard/booking/my/success-file') {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => const SuccessFlightScreen(),
-        ),
-      );
-      return;
-    }
-
-    if (href == '/dashboard/booking/my/return-passport') {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => const ReturnPassportScreen(),
-        ),
-      );
-      return;
-    }
-
-    if (href == '/dashboard/booking/appointment') {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => const AppointmentBookingScreen(),
-        ),
-      );
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Navigate to ${link.name}')),
-    );
+    dashboardRouteNotifier.value = href;
+    bottomNavIndexNotifier.value = 4;
   }
 
   @override
@@ -381,6 +319,20 @@ class SidebarLink {
   final String? href;
   final IconData? icon;
   final List<SidebarLink> children;
+}
+
+class DashboardDummyScreen extends StatelessWidget {
+  const DashboardDummyScreen({super.key, required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return DashboardPageScaffold(
+      currentHref: '/dashboard/dummy/$title',
+      child: Center(child: Text('$title screen (Coming Soon)')),
+    );
+  }
 }
 
 class DashboardSmallCard extends StatelessWidget {

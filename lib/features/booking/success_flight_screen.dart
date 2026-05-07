@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../home/dashboard_screen.dart';
+
 class SuccessFlightScreen extends StatefulWidget {
   const SuccessFlightScreen({super.key});
 
@@ -17,24 +19,12 @@ class _SuccessFlightScreenState extends State<SuccessFlightScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+    return DashboardPageScaffold(
+      currentHref: '/dashboard/booking/my/success-file',
+      child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Success Flight', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                IconButton(
-                  onPressed: () => Scaffold.maybeOf(context)?.openEndDrawer(),
-                  icon: const Icon(Icons.menu, color: Colors.black87),
-                  tooltip: 'Sidebar',
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
