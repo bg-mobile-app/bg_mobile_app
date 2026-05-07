@@ -13,13 +13,13 @@ class WorkPermitListScreen extends StatefulWidget {
 }
 
 class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
-  static const Color _ink = Color(0xFF1F2937);
-  static const Color _mutedBlue = Color(0xFF4B5563);
-  static const Color _surfaceTint = Color(0x0D111827);
+  static const Color _brandBlue = Color(0xFF2563EB);
+  static const Color _ink = Color(0xFF111827);
+  static const Color _surfaceTint = Color(0x0D2563EB);
+
   final _searchController = TextEditingController();
 
   final List<WorkPermitItem> _allItems = [
-    // existing demo data
     WorkPermitItem(title: 'Factory Worker Visa - Malaysia', slug: 'factory-worker-malaysia', image: 'assets/img/work-permit/1.jpg', customerPrice: 420000, agentPrice: 390000, countryName: 'Malaysia', countryFlag: 'assets/img/customer/appointment/world.png', workType: 'Factory', selectionType: 'DIRECT', createdAt: DateTime.now().subtract(const Duration(hours: 10))),
     WorkPermitItem(title: 'Construction Helper - Romania', slug: 'construction-helper-romania', image: 'assets/img/work-permit/1.jpg', customerPrice: 560000, agentPrice: 520000, countryName: 'Romania', countryFlag: 'assets/img/customer/appointment/world.png', workType: 'Construction', selectionType: 'LOTTERY', createdAt: DateTime.now().subtract(const Duration(days: 1))),
     WorkPermitItem(title: 'Hotel Staff - Japan', slug: 'hotel-staff-japan', image: 'assets/img/work-permit/1.jpg', customerPrice: 680000, agentPrice: 640000, countryName: 'Japan', countryFlag: 'assets/img/customer/appointment/world.png', workType: 'Hospitality', selectionType: 'DIRECT', createdAt: DateTime.now().subtract(const Duration(days: 2))),
@@ -54,44 +54,75 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width >= 1024;
+    final size = MediaQuery.of(context).size;
+    final isDesktop = size.width >= 1024;
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
-      appBar: AppBar(title: const Text('Work Permit Search')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Discover Work Permits', style: theme.textTheme.displayMedium?.copyWith(letterSpacing: -0.5, color: _ink, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              Text('Find the right destination and opportunity with curated listings.', style: theme.textTheme.bodyMedium?.copyWith(height: 1.5, color: const Color(0xFF6B7280))),
-              const SizedBox(height: 24),
-              _searchBar(theme),
-              const SizedBox(height: 24),
-              _buildServices(theme),
-              const SizedBox(height: 32),
-              SizedBox(
-                height: isDesktop ? 920 : 860,
-                child: Row(
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text('Work Permit Search'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _heroSection(theme),
+                const SizedBox(height: 20),
+                _searchBar(theme),
+                const SizedBox(height: 20),
+                _buildServices(theme),
+                const SizedBox(height: 24),
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (isDesktop) ...[
                       SizedBox(width: 320, child: FilterSidebar(onApply: _applyFilters)),
                       const SizedBox(width: 24),
                     ],
-                    Expanded(child: FilterResults(items: _filteredItems, brandBlue: _mutedBlue)),
+                    Expanded(child: FilterResults(items: _filteredItems, brandBlue: _brandBlue)),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
       floatingActionButton: isDesktop ? null : FilterBottomSheet(onApply: _applyFilters),
+    );
+  }
+
+  Widget _heroSection(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(color: Color(0x292563EB), blurRadius: 20, offset: Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Discover Work Permits', style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          Text(
+            'Find the right destination and opportunity with curated listings.',
+            style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFFE0EAFF), height: 1.4),
+          ),
+        ],
+      ),
     );
   }
 
@@ -100,7 +131,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: const Color(0xFFE5E7EB), width: 0.5),
+        border: Border.all(color: const Color(0xFFDCE3F3)),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 20, offset: Offset(0, 8))],
       ),
@@ -120,39 +151,55 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   }
 
   Widget _buildServices(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFDFE3E8), width: 0.5),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Build Service', style: theme.textTheme.titleLarge?.copyWith(color: _ink, letterSpacing: -0.2)),
-        const SizedBox(height: 24),
-        GridView.builder(
-          itemCount: navLinkData.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, mainAxisSpacing: 16, crossAxisSpacing: 16, childAspectRatio: .82),
-          itemBuilder: (context, index) {
-            final item = navLinkData[index];
-            return Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _surfaceTint,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFD1D5DB), width: 0.5),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = 2;
+        if (constraints.maxWidth >= 900) {
+          crossAxisCount = 4;
+        } else if (constraints.maxWidth >= 600) {
+          crossAxisCount = 3;
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFDCE3F3)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Build Service', style: theme.textTheme.titleLarge?.copyWith(color: _ink, letterSpacing: -0.2, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 16),
+            GridView.builder(
+              itemCount: navLinkData.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: constraints.maxWidth < 420 ? 0.92 : 1,
               ),
-              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Container(width: 46, height: 46, decoration: const BoxDecoration(color: Color(0xFF374151), shape: BoxShape.circle), child: Icon(item.icon, color: Colors.white, size: 24)),
-                const SizedBox(height: 12),
-                Text(item.name, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall?.copyWith(height: 1.5, color: _ink, fontWeight: FontWeight.w600)),
-              ]),
-            );
-          },
-        ),
-      ]),
+              itemBuilder: (context, index) {
+                final item = navLinkData[index];
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _surfaceTint,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFD6E2FF), width: 0.8),
+                  ),
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Container(width: 46, height: 46, decoration: const BoxDecoration(color: _brandBlue, shape: BoxShape.circle), child: Icon(item.icon, color: Colors.white, size: 24)),
+                    const SizedBox(height: 10),
+                    Text(item.name, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall?.copyWith(height: 1.4, color: _ink, fontWeight: FontWeight.w600)),
+                  ]),
+                );
+              },
+            ),
+          ]),
+        );
+      },
     );
   }
 }
