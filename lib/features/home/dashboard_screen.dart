@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'customer_profile_screen.dart';
-import '../booking/success_flight_screen.dart';
-import '../booking/return_passport_screen.dart';
-import '../booking/appointment_booking_screen.dart';
+import '../../common/widgets/layout/navigation_state.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -172,33 +169,12 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
     Navigator.pop(context);
     final href = link.href;
     if (href == null || href == widget.currentHref) return;
-    final screen = _screenFromHref(href);
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => screen,
-        transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
-        transitionDuration: const Duration(milliseconds: 220),
-      ),
-    );
-  }
-
-  Widget _screenFromHref(String href) {
-    switch (href) {
-      case '/dashboard/customer':
-        return const DashboardScreen();
-      case '/dashboard/customer/profile':
-        return const CustomerProfileScreen();
-      case '/dashboard/booking/my':
-        return const _DashboardDummyScreen(title: 'My Booking');
-      case '/dashboard/booking/my/success-file':
-        return const SuccessFlightScreen();
-      case '/dashboard/booking/my/return-passport':
-        return const ReturnPassportScreen();
-      case '/dashboard/booking/appointment':
-        return const AppointmentBookingScreen();
-      default:
-        return _DashboardDummyScreen(title: href.split('/').last.replaceAll('-', ' '));
+    if (href == '/dashboard/booking/my') {
+      bottomNavIndexNotifier.value = 2;
+      return;
     }
+    dashboardRouteNotifier.value = href;
+    bottomNavIndexNotifier.value = 4;
   }
 
   @override
@@ -345,8 +321,8 @@ class SidebarLink {
   final List<SidebarLink> children;
 }
 
-class _DashboardDummyScreen extends StatelessWidget {
-  const _DashboardDummyScreen({required this.title});
+class DashboardDummyScreen extends StatelessWidget {
+  const DashboardDummyScreen({super.key, required this.title});
 
   final String title;
 
@@ -354,9 +330,7 @@ class _DashboardDummyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
       currentHref: '/dashboard/dummy/$title',
-      child: Center(
-        child: Text('$title screen (Coming Soon)'),
-      ),
+      child: Center(child: Text('$title screen (Coming Soon)')),
     );
   }
 }

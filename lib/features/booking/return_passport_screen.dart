@@ -28,18 +28,6 @@ class _ReturnPassportScreenState extends State<ReturnPassportScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () => Scaffold.of(context).openEndDrawer(),
-                    icon: const Icon(Icons.menu, color: Colors.black87),
-                    tooltip: 'Sidebar',
-                  ),
-                  const Text('Return Passport', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
