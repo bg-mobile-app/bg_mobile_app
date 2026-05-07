@@ -4,9 +4,14 @@ import '../../../features/booking/appointment_booking_screen.dart';
 import '../../../features/home/dashboard_screen.dart';
 import '../../../features/home/home_screen.dart';
 import '../../../features/booking/my_booking_screen.dart';
+import '../../../features/search/work_permit_list_screen.dart';
 import '../../../features/booking/return_passport_screen.dart';
 import '../../../features/booking/success_flight_screen.dart';
 import '../../../features/home/customer_profile_screen.dart';
+import '../../../features/home/change_password_screen.dart';
+import '../../../features/home/check_status_screen.dart';
+import '../../../features/home/payments_screen.dart';
+import '../../../features/home/notifications_screen.dart';
 import 'app_bottom_nav.dart';
 import 'navigation_state.dart';
 
@@ -22,7 +27,7 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   List<Widget> get _screens => const [
         HomeScreen(),
-        _DummyScreen(title: 'Search'),
+        WorkPermitListScreen(),
         MyBookingScreen(),
         _DummyScreen(title: 'Chat'),
         _DashboardHostScreen(),
@@ -83,6 +88,14 @@ class _DashboardHostScreen extends StatelessWidget {
             return const ReturnPassportScreen();
           case '/dashboard/booking/appointment':
             return const AppointmentBookingScreen();
+          case '/dashboard/customer/change-password':
+            return const ChangePasswordScreen();
+          case '/dashboard/customer/check-status':
+            return const CheckStatusScreen();
+          case '/dashboard/my-payments':
+            return const PaymentsScreen();
+          case '/dashboard/notifications':
+            return const NotificationsScreen();
           default:
             return DashboardDummyScreen(
               title: route.split('/').last.replaceAll('-', ' '),
