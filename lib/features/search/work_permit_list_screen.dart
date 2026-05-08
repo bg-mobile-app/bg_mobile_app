@@ -20,10 +20,54 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   bool _isLoggedIn = false;
 
   final List<WorkPermitItem> _allItems = [
-    WorkPermitItem(title: 'Factory Worker Visa - Malaysia', slug: 'factory-worker-malaysia', image: 'assets/img/work-permit/1.jpg', customerPrice: 420000, agentPrice: 390000, countryName: 'Malaysia', countryFlag: 'assets/img/customer/appointment/world.png', workType: 'Factory', selectionType: 'DIRECT', createdAt: DateTime.now().subtract(const Duration(hours: 10))),
-    WorkPermitItem(title: 'Construction Helper - Romania', slug: 'construction-helper-romania', image: 'assets/img/work-permit/1.jpg', customerPrice: 560000, agentPrice: 520000, countryName: 'Romania', countryFlag: 'assets/img/customer/appointment/world.png', workType: 'Construction', selectionType: 'LOTTERY', createdAt: DateTime.now().subtract(const Duration(days: 1))),
-    WorkPermitItem(title: 'Hotel Staff - Japan', slug: 'hotel-staff-japan', image: 'assets/img/work-permit/1.jpg', customerPrice: 680000, agentPrice: 640000, countryName: 'Japan', countryFlag: 'assets/img/customer/appointment/world.png', workType: 'Hospitality', selectionType: 'DIRECT', createdAt: DateTime.now().subtract(const Duration(days: 2))),
-    WorkPermitItem(title: 'Agriculture Worker - Poland', slug: 'agriculture-worker-poland', image: 'assets/img/work-permit/1.jpg', customerPrice: 470000, agentPrice: 435000, countryName: 'Poland', countryFlag: 'assets/img/customer/appointment/world.png', workType: 'Agriculture', selectionType: 'DELEGATE', createdAt: DateTime.now().subtract(const Duration(days: 4))),
+    WorkPermitItem(
+      title: 'Factory Worker Visa - Malaysia',
+      slug: 'factory-worker-malaysia',
+      image: 'assets/img/work-permit/1.jpg',
+      customerPrice: 420000,
+      agentPrice: 390000,
+      countryName: 'Malaysia',
+      countryFlag: 'assets/img/customer/appointment/world.png',
+      workType: 'Factory',
+      selectionType: 'DIRECT',
+      createdAt: DateTime.now().subtract(const Duration(hours: 10)),
+    ),
+    WorkPermitItem(
+      title: 'Construction Helper - Romania',
+      slug: 'construction-helper-romania',
+      image: 'assets/img/work-permit/1.jpg',
+      customerPrice: 560000,
+      agentPrice: 520000,
+      countryName: 'Romania',
+      countryFlag: 'assets/img/customer/appointment/world.png',
+      workType: 'Construction',
+      selectionType: 'LOTTERY',
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    WorkPermitItem(
+      title: 'Hotel Staff - Japan',
+      slug: 'hotel-staff-japan',
+      image: 'assets/img/work-permit/1.jpg',
+      customerPrice: 680000,
+      agentPrice: 640000,
+      countryName: 'Japan',
+      countryFlag: 'assets/img/customer/appointment/world.png',
+      workType: 'Hospitality',
+      selectionType: 'DIRECT',
+      createdAt: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    WorkPermitItem(
+      title: 'Agriculture Worker - Poland',
+      slug: 'agriculture-worker-poland',
+      image: 'assets/img/work-permit/1.jpg',
+      customerPrice: 470000,
+      agentPrice: 435000,
+      countryName: 'Poland',
+      countryFlag: 'assets/img/customer/appointment/world.png',
+      workType: 'Agriculture',
+      selectionType: 'DELEGATE',
+      createdAt: DateTime.now().subtract(const Duration(days: 4)),
+    ),
   ];
 
   List<WorkPermitItem> _filteredItems = [];
@@ -41,23 +85,33 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   }
 
   void _showComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Working on this page')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Working on this page')));
   }
 
   void _applyFilters(FilterValue value) {
     setState(() {
       _filteredItems = _allItems.where((item) {
-        final queryOk = value.query.isEmpty || item.title.toLowerCase().contains(value.query.toLowerCase());
-        final countryOk = value.country == null || item.countryName == value.country;
-        final workTypeOk = value.workType == null || item.workType == value.workType;
-        final selectionOk = value.selectionType == null || item.selectionType == value.selectionType;
+        final queryOk =
+            value.query.isEmpty ||
+            item.title.toLowerCase().contains(value.query.toLowerCase());
+        final countryOk =
+            value.country == null || item.countryName == value.country;
+        final workTypeOk =
+            value.workType == null || item.workType == value.workType;
+        final selectionOk =
+            value.selectionType == null ||
+            item.selectionType == value.selectionType;
         return queryOk && countryOk && workTypeOk && selectionOk;
       }).toList();
     });
   }
 
   void _openDetailsBySlug(WorkPermitItem item) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => WorkPermitDetailsScreen(item: item)));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => WorkPermitDetailsScreen(item: item)),
+    );
   }
 
   @override
@@ -80,7 +134,10 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16, vertical: 12),
+            padding: EdgeInsets.symmetric(
+              horizontal: isDesktop ? 24 : 16,
+              vertical: 12,
+            ),
             child: Column(
               children: [
                 _searchBar(),
@@ -91,7 +148,9 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
           ),
         ),
       ),
-      floatingActionButton: isDesktop ? null : FilterBottomSheet(onApply: _applyFilters),
+      floatingActionButton: isDesktop
+          ? null
+          : FilterBottomSheet(onApply: _applyFilters),
     );
   }
 
@@ -117,7 +176,8 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
               ),
-              onChanged: (query) => _applyFilters(FilterValue(query: query.trim())),
+              onChanged: (query) =>
+                  _applyFilters(FilterValue(query: query.trim())),
             ),
           ),
           InkWell(
@@ -125,7 +185,10 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
             borderRadius: BorderRadius.circular(20),
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(color: _brandBlue, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                color: _brandBlue,
+                shape: BoxShape.circle,
+              ),
               child: const Icon(Icons.search, size: 18, color: Colors.white),
             ),
           ),
@@ -135,18 +198,29 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   }
 
   Widget _buildWorkPermitSection() {
-    if (_filteredItems.isEmpty) return const Padding(padding: EdgeInsets.only(top: 30), child: Text('No work permits found.'));
+    if (_filteredItems.isEmpty)
+      return const Padding(
+        padding: EdgeInsets.only(top: 30),
+        child: Text('No work permits found.'),
+      );
     final width = MediaQuery.of(context).size.width;
-    final crossAxisCount = width >= 768 ? 3 : 2;
-    final childAspectRatio = width >= 768 ? 0.63 : (width >= 410 ? 0.57 : 0.53);
+    final crossAxisCount = 1;
+    final childAspectRatio = width >= 768 ? 3.0 : 1.5;
 
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Work Permit', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20)),
-            TextButton.icon(onPressed: _showComingSoon, icon: const Icon(Icons.arrow_forward_rounded, size: 18), label: const Text('See More')),
+            const Text(
+              'Work Permit',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+            ),
+            TextButton.icon(
+              onPressed: _showComingSoon,
+              icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+              label: const Text('See More'),
+            ),
           ],
         ),
         const SizedBox(height: 14),
@@ -156,7 +230,10 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (width >= 1024) ...[
-                  SizedBox(width: 320, child: FilterSidebar(onApply: _applyFilters)),
+                  SizedBox(
+                    width: 320,
+                    child: FilterSidebar(onApply: _applyFilters),
+                  ),
                   const SizedBox(width: 16),
                 ],
                 Expanded(
@@ -173,7 +250,8 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
                     itemBuilder: (context, index) => WorkPermitCard(
                       item: _filteredItems[index],
                       brandBlue: _brandBlue,
-                      onViewDetails: () => _openDetailsBySlug(_filteredItems[index]),
+                      onViewDetails: () =>
+                          _openDetailsBySlug(_filteredItems[index]),
                       formatBdt: _formatBdt,
                       timeAgo: _timeAgo,
                     ),
