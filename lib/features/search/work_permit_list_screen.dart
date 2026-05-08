@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../home/models/home_models.dart';
+import '../home/widgets/home_common_widgets.dart';
+import '../home/widgets/work_permit_card.dart';
 import 'work_permit_details_screen.dart';
 import 'widgets/filter_bottom_sheet.dart';
-import 'widgets/filter_results.dart';
 import 'widgets/filter_sidebar.dart';
 
 class WorkPermitListScreen extends StatefulWidget {
@@ -15,10 +16,8 @@ class WorkPermitListScreen extends StatefulWidget {
 
 class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   static const Color _brandBlue = Color(0xFF2563EB);
-  static const Color _ink = Color(0xFF111827);
-  static const Color _surfaceTint = Color(0x0D2563EB);
-
   final _searchController = TextEditingController();
+  bool _isLoggedIn = false;
 
   final List<WorkPermitItem> _allItems = [
     WorkPermitItem(title: 'Factory Worker Visa - Malaysia', slug: 'factory-worker-malaysia', image: 'assets/img/work-permit/1.jpg', customerPrice: 420000, agentPrice: 390000, countryName: 'Malaysia', countryFlag: 'assets/img/customer/appointment/world.png', workType: 'Factory', selectionType: 'DIRECT', createdAt: DateTime.now().subtract(const Duration(hours: 10))),
@@ -41,6 +40,10 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     super.dispose();
   }
 
+  void _showComingSoon() {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Working on this page')));
+  }
+
   void _applyFilters(FilterValue value) {
     setState(() {
       _filteredItems = _allItems.where((item) {
@@ -53,55 +56,36 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     });
   }
 
-
   void _openDetailsBySlug(WorkPermitItem item) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => WorkPermitDetailsScreen(item: item)),
-    );
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => WorkPermitDetailsScreen(item: item)));
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isDesktop = size.width >= 1024;
-    final theme = Theme.of(context);
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text('Work Permit Search'),
+      backgroundColor: const Color(0xFFF5F8FF),
+      appBar: AppBrandHeader(
+        brandBlue: _brandBlue,
+        isLoggedIn: _isLoggedIn,
+        onSignIn: () async {
+          final result = await Navigator.pushNamed(context, '/login');
+          if (result == true && mounted) setState(() => _isLoggedIn = true);
+        },
+        onSignUp: () => Navigator.pushNamed(context, '/sign-up/customer'),
+        onNotifications: _showComingSoon,
+        onProfile: _showComingSoon,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16, vertical: 12),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _heroSection(theme),
+                _searchBar(),
                 const SizedBox(height: 20),
-                _searchBar(theme),
-                const SizedBox(height: 20),
-                _buildServices(theme),
-                const SizedBox(height: 24),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (isDesktop) ...[
-                      SizedBox(width: 320, child: FilterSidebar(onApply: _applyFilters)),
-                      const SizedBox(width: 24),
-                    ],
-                    Expanded(
-                      child: FilterResults(
-                        items: _filteredItems,
-                        brandBlue: _brandBlue,
-                        onViewDetails: _openDetailsBySlug,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildWorkPermitSection(),
               ],
             ),
           ),
@@ -111,109 +95,114 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     );
   }
 
-  Widget _heroSection(ThemeData theme) {
+  Widget _searchBar() {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(color: Color(0x292563EB), blurRadius: 20, offset: Offset(0, 10)),
-        ],
+        color: const Color(0xFFEFF4FF),
+        border: Border.all(color: const Color(0xFFD6E3FF)),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text('Discover Work Permits', style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          Text(
-            'Find the right destination and opportunity with curated listings.',
-            style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFFE0EAFF), height: 1.4),
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              style: const TextStyle(color: Colors.black),
+              decoration: const InputDecoration(
+                fillColor: Color(0xFFEFF4FF),
+                hintText: 'Search in bideshgami',
+                hintStyle: TextStyle(color: Color(0xFF64748B)),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+              onChanged: (query) => _applyFilters(FilterValue(query: query.trim())),
+            ),
+          ),
+          InkWell(
+            onTap: _showComingSoon,
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(color: _brandBlue, shape: BoxShape.circle),
+              child: const Icon(Icons.search, size: 18, color: Colors.white),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _searchBar(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFDCE3F3)),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 20, offset: Offset(0, 8))],
-      ),
-      child: Row(children: [
-        const Icon(Icons.search, color: Color(0xFF9CA3AF), size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: TextField(
-            controller: _searchController,
-            style: theme.textTheme.bodyMedium?.copyWith(height: 1.5, color: _ink),
-            decoration: const InputDecoration(hintText: 'Search in bideshgami', border: InputBorder.none),
-            onSubmitted: (query) => _applyFilters(FilterValue(query: query.trim().toLowerCase())),
-          ),
+  Widget _buildWorkPermitSection() {
+    if (_filteredItems.isEmpty) return const Padding(padding: EdgeInsets.only(top: 30), child: Text('No work permits found.'));
+    final width = MediaQuery.of(context).size.width;
+    final crossAxisCount = width >= 768 ? 3 : 2;
+    final childAspectRatio = width >= 768 ? 0.63 : (width >= 410 ? 0.57 : 0.53);
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Work Permit', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20)),
+            TextButton.icon(onPressed: _showComingSoon, icon: const Icon(Icons.arrow_forward_rounded, size: 18), label: const Text('See More')),
+          ],
         ),
-      ]),
+        const SizedBox(height: 14),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (width >= 1024) ...[
+                  SizedBox(width: 320, child: FilterSidebar(onApply: _applyFilters)),
+                  const SizedBox(width: 16),
+                ],
+                Expanded(
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _filteredItems.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 14,
+                      crossAxisSpacing: 14,
+                      childAspectRatio: childAspectRatio,
+                    ),
+                    itemBuilder: (context, index) => WorkPermitCard(
+                      item: _filteredItems[index],
+                      brandBlue: _brandBlue,
+                      onViewDetails: () => _openDetailsBySlug(_filteredItems[index]),
+                      formatBdt: _formatBdt,
+                      timeAgo: _timeAgo,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildServices(ThemeData theme) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossAxisCount = 2;
-        if (constraints.maxWidth >= 900) {
-          crossAxisCount = 4;
-        } else if (constraints.maxWidth >= 600) {
-          crossAxisCount = 3;
-        }
+  String _formatBdt(int value) {
+    final raw = value.toString();
+    final chars = raw.split('').reversed.toList();
+    final buffer = StringBuffer();
+    for (var i = 0; i < chars.length; i++) {
+      if (i != 0 && i % 3 == 0) buffer.write(',');
+      buffer.write(chars[i]);
+    }
+    return buffer.toString().split('').reversed.join();
+  }
 
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFDCE3F3)),
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Build Service', style: theme.textTheme.titleLarge?.copyWith(color: _ink, letterSpacing: -0.2, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 16),
-            GridView.builder(
-              itemCount: navLinkData.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: constraints.maxWidth < 420 ? 0.92 : 1,
-              ),
-              itemBuilder: (context, index) {
-                final item = navLinkData[index];
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: _surfaceTint,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFD6E2FF), width: 0.8),
-                  ),
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Container(width: 46, height: 46, decoration: const BoxDecoration(color: _brandBlue, shape: BoxShape.circle), child: Icon(item.icon, color: Colors.white, size: 24)),
-                    const SizedBox(height: 10),
-                    Text(item.name, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall?.copyWith(height: 1.4, color: _ink, fontWeight: FontWeight.w600)),
-                  ]),
-                );
-              },
-            ),
-          ]),
-        );
-      },
-    );
+  String _timeAgo(DateTime dateTime) {
+    final diff = DateTime.now().difference(dateTime);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${(diff.inDays / 7).floor()}w ago';
   }
 }
