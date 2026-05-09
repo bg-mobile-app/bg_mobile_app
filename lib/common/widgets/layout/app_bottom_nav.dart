@@ -16,72 +16,118 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       minimum: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-      child: DecoratedBox(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFFFFFFF), Color(0xFFF7FAFF)],
-          ),
-          border: Border.all(color: const Color(0xFFE3ECFF)),
+          color: const Color(0xFFFFFFFF),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: const Color(0xFFE5EAF3)),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x26000000),
-              blurRadius: 20,
-              offset: Offset(0, 8),
+              color: Color(0x18000000),
+              blurRadius: 24,
+              offset: Offset(0, 10),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: NavigationBarTheme(
-            data: NavigationBarThemeData(
-              iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
-                if (states.contains(WidgetState.selected)) {
-                  return IconThemeData(color: primaryColor);
-                }
-                return const IconThemeData(color: Color(0xFF7C8BA1));
-              }),
-            ),
-            child: NavigationBar(
-              height: 66,
-              backgroundColor: Colors.transparent,
-              indicatorColor: const Color(0x1F2563EB),
-              selectedIndex: currentIndex,
-              onDestinationSelected: onTap,
-              labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.home_outlined),
-                  selectedIcon: Icon(Icons.home_rounded),
-                  label: 'Home',
+        child: Row(
+          children: List.generate(_items.length, (index) {
+            final item = _items[index];
+            final isSelected = index == currentIndex;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => onTap(index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOut,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSelected ? 12 : 0,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0x1A2563EB)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isSelected ? item.selectedIcon : item.icon,
+                            size: 33,
+                            color: isSelected
+                                ? primaryColor
+                                : const Color(0xFF98A1AF),
+                          ),
+                          if (isSelected) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              item.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                NavigationDestination(
-                  icon: Icon(Icons.search_rounded),
-                  selectedIcon: Icon(Icons.search_rounded),
-                  label: 'Search',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.calendar_month_outlined),
-                  selectedIcon: Icon(Icons.calendar_month_rounded),
-                  label: 'Booking',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.chat_bubble_outline_rounded),
-                  selectedIcon: Icon(Icons.chat_bubble_rounded),
-                  label: 'Chat',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.person_outline_rounded),
-                  selectedIcon: Icon(Icons.person_rounded),
-                  label: 'Profile',
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          }),
         ),
       ),
     );
   }
 }
+
+class _BottomNavItem {
+  const _BottomNavItem({
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+  });
+
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+}
+
+const List<_BottomNavItem> _items = [
+  _BottomNavItem(
+    label: 'Home',
+    icon: Icons.home_outlined,
+    selectedIcon: Icons.home_outlined,
+  ),
+  _BottomNavItem(
+    label: 'Search',
+    icon: Icons.search_rounded,
+    selectedIcon: Icons.search_rounded,
+  ),
+  _BottomNavItem(
+    label: 'Booking',
+    icon: Icons.calendar_month_outlined,
+    selectedIcon: Icons.calendar_month_outlined,
+  ),
+  _BottomNavItem(
+    label: 'Chat',
+    icon: Icons.chat_bubble_outline_rounded,
+    selectedIcon: Icons.chat_bubble_outline_rounded,
+  ),
+  _BottomNavItem(
+    label: 'Profile',
+    icon: Icons.person_outline_rounded,
+    selectedIcon: Icons.person_outline_rounded,
+  ),
+];

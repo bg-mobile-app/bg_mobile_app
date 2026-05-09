@@ -275,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8FF),
+      backgroundColor: const Color(0xFFF0F2F6),
       appBar: AppBrandHeader(
         brandBlue: _brandBlue,
         isLoggedIn: _isLoggedIn,
@@ -332,16 +332,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 onChanged: (v) => setState(() => _workType = v),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             InkWell(
               onTap: _showAdvancedFilterSheet,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(22),
               child: Container(
-                height: 50,
-                width: 50,
+                height: 82,
+                width: 82,
                 decoration: BoxDecoration(
                   color: _brandBlue,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(24),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x332563EB),
@@ -350,18 +350,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.tune, color: Colors.white, size: 20),
+                child: const Icon(Icons.tune, color: Colors.white, size: 30),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 14),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFFEFF4FF),
-            border: Border.all(color: const Color(0xFFD6E3FF)),
-            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+            borderRadius: BorderRadius.circular(24),
           ),
           child: Row(
             children: [
@@ -370,9 +370,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   controller: _searchController,
                   style: const TextStyle(color: Colors.black),
                   decoration: const InputDecoration(
-                    fillColor: Color(0xFFEFF4FF),
+                    fillColor: Colors.white,
                     hintText: 'Search in bideshgami',
-                    hintStyle: TextStyle(color: Color(0xFF64748B)),
+                    hintStyle: TextStyle(color: Color(0xFF9CA3AF), fontSize: 38/2),
                     border: InputBorder.none,
 
                     enabledBorder: InputBorder.none,
@@ -382,16 +382,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               InkWell(
                 onTap: _showComingSoon,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(18),
                 child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
                     color: _brandBlue,
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: const Icon(
-                    Icons.search,
-                    size: 18,
+                    Icons.search_rounded,
+                    size: 28,
                     color: Colors.white,
                   ),
                 ),
@@ -425,37 +425,28 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x14000000),
-                    blurRadius: 12,
-                    offset: Offset(0, 6),
-                  ),
-                ],
-              ),
+              decoration: const BoxDecoration(color: Colors.transparent),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                     Container(
-                      width: 56,
-                      height: 56,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF2563EB),
-                        shape: BoxShape.circle,
+                      width: 62,
+                      height: 62,
+                      decoration: BoxDecoration(
+                        color: index == 0 ? _brandBlue : Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: index == 0 ? const [BoxShadow(color: Color(0x332563EB), blurRadius: 16, offset: Offset(0, 8))] : const [BoxShadow(color: Color(0x14000000), blurRadius: 12, offset: Offset(0, 4))],
                       ),
-                      child: Icon(item.icon, color: Colors.white, size: 40),
+                      child: Icon(item.icon, color: index == 0 ? Colors.white : _brandBlue, size: 34),
                     ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 14),
                   Text(
                     item.name,
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 10.5,
+                      fontSize: 10,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -469,14 +460,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildOfferBanner() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
-      child: Column(
-        children: [
-          _carousel(_leftController, _bannerLeft),
-          const SizedBox(height: 10),
-          _carousel(_rightController, _bannerRight),
-        ],
+    final banners = [..._bannerLeft, ..._bannerRight];
+    return SizedBox(
+      height: 294,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) => ClipRRect(
+          borderRadius: BorderRadius.circular(42),
+          child: Image.asset(
+            banners[index],
+            width: MediaQuery.of(context).size.width * 0.78,
+            fit: BoxFit.cover,
+          ),
+        ),
+        separatorBuilder: (_, __) => const SizedBox(width: 14),
+        itemCount: banners.length,
       ),
     );
   }
@@ -518,7 +517,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Text(
           title,
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 50/2, color: Color(0xFF111827)),
         ),
         TextButton.icon(
           onPressed: _showComingSoon,
@@ -600,14 +599,14 @@ class _HomeScreenState extends State<HomeScreen> {
           vertical: 10,
         ),
         filled: true,
-        fillColor: const Color(0xFFEFF4FF),
+        fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFD6E3FF)),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFD6E3FF)),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
