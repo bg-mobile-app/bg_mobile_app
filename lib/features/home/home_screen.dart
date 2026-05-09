@@ -257,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F6),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBrandHeader(
         brandBlue: _brandBlue,
         isLoggedIn: _isLoggedIn,
@@ -375,7 +375,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: index == 0 ? const [BoxShadow(color: Color(0x332563EB), blurRadius: 16, offset: Offset(0, 8))] : const [BoxShadow(color: Color(0x14000000), blurRadius: 12, offset: Offset(0, 4))],
                       ),
-                      child: FUI(item.icon, color: index == 0 ? Colors.white : _brandBlue, height: 34),
+                      child: Center(
+                        child: FUI(
+                          item.icon,
+                          color: index == 0 ? Colors.white : _brandBlue,
+                          width: 24,
+                          height: 24,
+                        ),
+                      ),
                     ),
                   const SizedBox(height: 14),
                   Text(
@@ -510,41 +517,45 @@ class _HomeScreenState extends State<HomeScreen> {
     required List<String> items,
     required ValueChanged<String?> onChanged,
   }) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      onChanged: onChanged,
-      isExpanded: true,
-      style: const TextStyle(color: Colors.black),
-      dropdownColor: Colors.white,
-      iconEnabledColor: Colors.black87,
-      decoration: InputDecoration(
-        isDense: true,
-        hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF64748B)),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _brandBlue),
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFDBEAFE)),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D2563EB),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
-      items: items
-          .map(
-            (item) => DropdownMenuItem<String>(value: item, child: Text(item)),
-          )
-          .toList(),
+      child: DropdownButtonFormField<String>(
+        initialValue: value,
+        onChanged: onChanged,
+        isExpanded: true,
+        style: const TextStyle(color: Colors.black),
+        dropdownColor: Colors.white,
+        iconEnabledColor: Colors.black87,
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xFF64748B)),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+        ),
+        items: items
+            .map(
+              (item) =>
+                  DropdownMenuItem<String>(value: item, child: Text(item)),
+            )
+            .toList(),
+      ),
     );
   }
 

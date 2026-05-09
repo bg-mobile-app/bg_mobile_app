@@ -39,12 +39,12 @@ class WorkPermitItem {
 }
 
 const List<NavLinkItem> navLinkData = [
-  NavLinkItem(name: 'Home', href: '/', icon: RegularRounded.HOME_2),
+  NavLinkItem(name: 'Home', href: '/', icon: RegularRounded.HOME),
   NavLinkItem(name: 'Flight Booking', href: '', icon: RegularRounded.PLANE),
   NavLinkItem(name: 'Work Abroad', href: '/filter?service_type=WORK_PERMIT', icon: RegularRounded.BRIEFCASE),
-  NavLinkItem(name: 'Study Abroad', href: '', icon: RegularRounded.BOOK_2),
-  NavLinkItem(name: 'Hajj & Umrah', href: '', icon: RegularRounded.MOSQUE),
-  NavLinkItem(name: 'Visa Services', href: '', icon: RegularRounded.PASSPORT),
+  NavLinkItem(name: 'Study Abroad', href: '', icon: RegularRounded.BOOK),
+  NavLinkItem(name: 'Hajj & Umrah', href: '', icon: RegularRounded.PYRAMID),
+  NavLinkItem(name: 'Visa Services', href: '', icon: RegularRounded.ID_BADGE),
   NavLinkItem(name: 'Tour Packages', href: '', icon: RegularRounded.GLOBE),
-  NavLinkItem(name: 'Hotel Booking', href: '', icon: RegularRounded.BUILDING_3),
+  NavLinkItem(name: 'Hotel Booking', href: '', icon: RegularRounded.BUILDING),
 ];

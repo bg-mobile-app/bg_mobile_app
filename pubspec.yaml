@@ -39,7 +39,7 @@ dependencies:
   pdf: ^3.11.0
   printing: ^5.14.0
   font_awesome_flutter: ^10.7.0
-  fui_kit: ^0.1.4
+  fui_kit: ^2.0.2
 
 dev_dependencies:
   

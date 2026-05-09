@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fui_kit/fui_kit.dart';
 
 import '../home/models/home_models.dart';
 import '../home/widgets/home_common_widgets.dart';
 import '../home/widgets/work_permit_card.dart';
 import 'work_permit_details_screen.dart';
-import 'widgets/filter_bottom_sheet.dart';
 import 'widgets/filter_sidebar.dart';
 
 class WorkPermitListScreen extends StatefulWidget {
@@ -114,6 +114,25 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     );
   }
 
+  Future<void> _openFiltersBottomSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => FractionallySizedBox(
+        heightFactor: 0.85,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: FilterSidebar(
+            onApply: (value) {
+              _applyFilters(value);
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -141,6 +160,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
             child: Column(
               children: [
                 _searchBar(),
+                _buildServices(),
                 const SizedBox(height: 20),
                 _buildWorkPermitSection(),
               ],
@@ -148,9 +168,6 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
           ),
         ),
       ),
-      floatingActionButton: isDesktop
-          ? null
-          : FilterBottomSheet(onApply: _applyFilters),
     );
   }
 
@@ -212,11 +229,12 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   }
 
   Widget _buildWorkPermitSection() {
-    if (_filteredItems.isEmpty)
+    if (_filteredItems.isEmpty) {
       return const Padding(
         padding: EdgeInsets.only(top: 30),
         child: Text('No work permits found.'),
       );
+    }
     final width = MediaQuery.of(context).size.width;
     final crossAxisCount = 1;
     final childAspectRatio = width >= 768 ? 1.25 : 0.95;
@@ -230,11 +248,27 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
               'Work Permit',
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
             ),
-            TextButton.icon(
-              onPressed: _showComingSoon,
-              icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-              label: const Text('See More'),
-            ),
+            if (width < 1024)
+              InkWell(
+                onTap: _openFiltersBottomSheet,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 42,
+                  width: 42,
+                  decoration: BoxDecoration(
+                    color: _brandBlue,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x332563EB),
+                        blurRadius: 14,
+                        offset: Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.tune, color: Colors.white, size: 20),
+                ),
+              ),
           ],
         ),
         const SizedBox(height: 14),
@@ -276,6 +310,82 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildServices() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 16),
+      child: GridView.builder(
+        itemCount: navLinkData.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: .78,
+        ),
+        itemBuilder: (context, index) {
+          final item = navLinkData[index];
+          return InkWell(
+            onTap: _showComingSoon,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              decoration: const BoxDecoration(color: Colors.transparent),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 62,
+                    height: 62,
+                    decoration: BoxDecoration(
+                      color: index == 0 ? _brandBlue : Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: index == 0
+                          ? const [
+                              BoxShadow(
+                                color: Color(0x332563EB),
+                                blurRadius: 16,
+                                offset: Offset(0, 8),
+                              ),
+                            ]
+                          : const [
+                              BoxShadow(
+                                color: Color(0x14000000),
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                    ),
+                    child: Center(
+                      child: FUI(
+                        item.icon,
+                        color: index == 0 ? Colors.white : _brandBlue,
+                        width: 24,
+                        height: 24,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    item.name,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 

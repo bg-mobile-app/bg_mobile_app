@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fui_kit/fui_kit.dart';
 
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
@@ -58,26 +59,57 @@ class AppBottomNav extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            isSelected ? item.selectedIcon : item.icon,
-                            size: 33,
-                            color: isSelected
-                                ? primaryColor
-                                : const Color(0xFF98A1AF),
-                          ),
-                          if (isSelected) ...[
-                            const SizedBox(width: 8),
-                            Text(
-                              item.label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: primaryColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              AnimatedScale(
+                                duration: const Duration(milliseconds: 220),
+                                curve: Curves.easeOutCubic,
+                                scale: isSelected ? 0.88 : 1.0,
+                                child: FUI(
+                                  isSelected ? item.selectedIcon : item.icon,
+                                  width: isSelected ? 21 : 25,
+                                  height: isSelected ? 21 : 25,
+                                  color: isSelected
+                                      ? primaryColor
+                                      : const Color(0xFF98A1AF),
+                                ),
                               ),
-                            ),
-                          ],
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 180),
+                                switchInCurve: Curves.easeOut,
+                                switchOutCurve: Curves.easeIn,
+                                transitionBuilder: (child, animation) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: SizeTransition(
+                                      sizeFactor: animation,
+                                      axis: Axis.vertical,
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child: isSelected
+                                    ? Padding(
+                                        key: ValueKey(item.label),
+                                        padding: const EdgeInsets.only(top: 4),
+                                        child: Text(
+                                          item.label,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: primaryColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(
+                                        key: ValueKey('no-label'),
+                                      ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -100,34 +132,34 @@ class _BottomNavItem {
   });
 
   final String label;
-  final IconData icon;
-  final IconData selectedIcon;
+  final String icon;
+  final String selectedIcon;
 }
 
 const List<_BottomNavItem> _items = [
   _BottomNavItem(
     label: 'Home',
-    icon: Icons.home_outlined,
-    selectedIcon: Icons.home_outlined,
+    icon: RegularStraight.HOME,
+    selectedIcon: RegularStraight.HOME,
   ),
   _BottomNavItem(
     label: 'Search',
-    icon: Icons.search_rounded,
-    selectedIcon: Icons.search_rounded,
+    icon: RegularStraight.SEARCH,
+    selectedIcon: RegularStraight.SEARCH,
   ),
   _BottomNavItem(
     label: 'Booking',
-    icon: Icons.calendar_month_outlined,
-    selectedIcon: Icons.calendar_month_outlined,
+    icon: RegularStraight.CALENDAR,
+    selectedIcon: RegularStraight.CALENDAR,
   ),
   _BottomNavItem(
     label: 'Chat',
-    icon: Icons.chat_bubble_outline_rounded,
-    selectedIcon: Icons.chat_bubble_outline_rounded,
+    icon: RegularStraight.COMMENT,
+    selectedIcon: RegularStraight.COMMENT,
   ),
   _BottomNavItem(
     label: 'Profile',
-    icon: Icons.person_outline_rounded,
-    selectedIcon: Icons.person_outline_rounded,
+    icon: RegularStraight.USER,
+    selectedIcon: RegularStraight.USER,
   ),
 ];
