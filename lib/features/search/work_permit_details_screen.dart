@@ -623,7 +623,7 @@ class WorkPermitDetailsScreen extends StatelessWidget {
 class _ActionIconButton extends StatelessWidget {
   const _ActionIconButton({required this.icon, required this.semanticLabel, required this.onPressed});
 
-  final IconData icon;
+  final FaIconData icon;
   final String semanticLabel;
   final VoidCallback onPressed;
 
@@ -688,7 +688,7 @@ class _Pill extends StatelessWidget {
 class _IconText extends StatelessWidget {
   const _IconText({required this.icon, required this.label, this.color = WorkPermitDetailsScreen._mutedText, this.bold = false});
 
-  final IconData icon;
+  final FaIconData icon;
   final String label;
   final Color color;
   final bool bold;
@@ -712,7 +712,7 @@ class _IconText extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   const _StatCard({required this.icon, required this.label, required this.value});
 
-  final IconData icon;
+  final FaIconData icon;
   final String label;
   final String value;
 
@@ -741,7 +741,7 @@ class _StatCard extends StatelessWidget {
 class _InfoCard extends StatelessWidget {
   const _InfoCard({required this.icon, required this.label, required this.value, required this.color});
 
-  final IconData icon;
+  final FaIconData icon;
   final String label;
   final String value;
   final Color color;
@@ -779,7 +779,7 @@ class _SpecItem {
 
   final String label;
   final String value;
-  final IconData? icon;
+  final FaIconData? icon;
 }
 
 class _SpecRow extends StatelessWidget {
