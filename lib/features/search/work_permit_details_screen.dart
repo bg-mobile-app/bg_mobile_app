@@ -459,7 +459,7 @@ class WorkPermitDetailsScreen extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      FaIcon(item.icon, size: 14, color: _mutedText),
+                      FaIcon(item.icon!, size: 14, color: _mutedText),
                       const SizedBox(width: 8),
                       Text(
                         item.label,
