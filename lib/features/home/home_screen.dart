@@ -486,26 +486,16 @@ class _HomeScreenState extends State<HomeScreen> {
       return const SizedBox.shrink();
     }
 
-    final width = MediaQuery.of(context).size.width;
-    final crossAxisCount = width >= 768 ? 3 : 2;
-    final childAspectRatio = width >= 768 ? 0.63 : (width >= 410 ? 0.57 : 0.53);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Column(
         children: [
           _sectionHeader('Work Permit', actionLabel: 'See More'),
           const SizedBox(height: 14),
-          GridView.builder(
+          ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _workPermits.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 14,
-              childAspectRatio: childAspectRatio,
-            ),
             itemBuilder: (context, index) {
               return WorkPermitCard(
                 item: _workPermits[index],
@@ -515,6 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 timeAgo: _timeAgo,
               );
             },
+            separatorBuilder: (_, __) => const SizedBox(height: 14),
           ),
         ],
       ),
