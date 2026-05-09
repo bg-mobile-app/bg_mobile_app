@@ -140,7 +140,11 @@ class WorkPermitDetailsScreen extends StatelessWidget {
           children: const [
             _Pill(label: 'Recruitment Open'),
             _IconText(
-              icon: FontAwesomeIcons.circleCheck,
+              icon: FaIcon(
+                FontAwesomeIcons.circleCheck,
+                color: _brandBlue,
+                size: 14,
+              ),
               label: 'Agency Verified',
               color: _brandBlue,
               bold: true,
@@ -162,8 +166,14 @@ class WorkPermitDetailsScreen extends StatelessWidget {
           spacing: 18,
           runSpacing: 8,
           children: [
-            _IconText(icon: FontAwesomeIcons.calendarDays, label: 'Posted: May 04, 2026'),
-            _IconText(icon: FontAwesomeIcons.fingerprint, label: 'Post ID: 6'),
+            _IconText(
+              icon: FaIcon(FontAwesomeIcons.calendarDays, size: 14),
+              label: 'Posted: May 04, 2026',
+            ),
+            _IconText(
+              icon: FaIcon(FontAwesomeIcons.fingerprint, size: 14),
+              label: 'Post ID: 6',
+            ),
           ],
         ),
       ],
@@ -185,10 +195,42 @@ class WorkPermitDetailsScreen extends StatelessWidget {
               mainAxisSpacing: 12,
               childAspectRatio: columns == 4 ? 1.05 : 1.0,
               children: const [
-                _StatCard(icon: FontAwesomeIcons.users, label: 'Quota', value: '150\nPositions'),
-                _StatCard(icon: FontAwesomeIcons.clock, label: 'Work Hours', value: '8h / Day'),
-                _StatCard(icon: FontAwesomeIcons.briefcase, label: 'Experience', value: '2 Years'),
-                _StatCard(icon: FontAwesomeIcons.locationDot, label: 'Age Range', value: '18-45 Years'),
+                _StatCard(
+                  icon: FaIcon(
+                    FontAwesomeIcons.users,
+                    color: WorkPermitDetailsScreen._brandBlue,
+                    size: 20,
+                  ),
+                  label: 'Quota',
+                  value: '150\nPositions',
+                ),
+                _StatCard(
+                  icon: FaIcon(
+                    FontAwesomeIcons.clock,
+                    color: WorkPermitDetailsScreen._brandBlue,
+                    size: 20,
+                  ),
+                  label: 'Work Hours',
+                  value: '8h / Day',
+                ),
+                _StatCard(
+                  icon: FaIcon(
+                    FontAwesomeIcons.briefcase,
+                    color: WorkPermitDetailsScreen._brandBlue,
+                    size: 20,
+                  ),
+                  label: 'Experience',
+                  value: '2 Years',
+                ),
+                _StatCard(
+                  icon: FaIcon(
+                    FontAwesomeIcons.locationDot,
+                    color: WorkPermitDetailsScreen._brandBlue,
+                    size: 20,
+                  ),
+                  label: 'Age Range',
+                  value: '18-45 Years',
+                ),
               ],
             );
           },
@@ -200,29 +242,60 @@ class WorkPermitDetailsScreen extends StatelessWidget {
           builder: (context, constraints) {
             final wide = constraints.maxWidth > 650;
             final cards = const [
-              _InfoCard(icon: FontAwesomeIcons.hourglassHalf, label: 'Processing Time', value: '45 Days', color: _primary),
-              _InfoCard(icon: FontAwesomeIcons.calendarXmark, label: 'Deadline', value: 'June 10, 2026', color: _error),
-              _InfoCard(icon: FontAwesomeIcons.idBadge, label: 'Selection', value: 'Pushing Process', color: _mutedText),
+              _InfoCard(
+                icon: FaIcon(
+                  FontAwesomeIcons.hourglassHalf,
+                  size: 15,
+                  color: _primary,
+                ),
+                label: 'Processing Time',
+                value: '45 Days',
+                color: _primary,
+              ),
+              _InfoCard(
+                icon: FaIcon(
+                  FontAwesomeIcons.calendarXmark,
+                  size: 15,
+                  color: _error,
+                ),
+                label: 'Deadline',
+                value: 'June 10, 2026',
+                color: _error,
+              ),
+              _InfoCard(
+                icon: FaIcon(
+                  FontAwesomeIcons.idBadge,
+                  size: 15,
+                  color: _mutedText,
+                ),
+                label: 'Selection',
+                value: 'Pushing Process',
+                color: _mutedText,
+              ),
             ];
             if (!wide) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: cards
-                    .map((card) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: card,
-                        ))
+                    .map(
+                      (card) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: card,
+                      ),
+                    )
                     .toList(),
               );
             }
             return Row(
               children: cards
-                  .map((card) => Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: card,
-                        ),
-                      ))
+                  .map(
+                    (card) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: card,
+                      ),
+                    ),
+                  )
                   .toList(),
             );
           },
@@ -250,7 +323,15 @@ class WorkPermitDetailsScreen extends StatelessWidget {
 
   Widget _specificationsCard() {
     final rows = [
-      _SpecItem('Country', item.countryName, FontAwesomeIcons.flag),
+      _SpecItem(
+        'Country',
+        item.countryName,
+        FaIcon(
+          FontAwesomeIcons.flag,
+          color: WorkPermitDetailsScreen._error,
+          size: 14,
+        ),
+      ),
       _SpecItem('Work Type', _jobWorkType),
       _SpecItem('Company Name', 'Port Cleaner Co.'),
       _SpecItem('Accommodation', 'Company Provided'),
@@ -271,7 +352,11 @@ class WorkPermitDetailsScreen extends StatelessWidget {
             ),
             child: const Text(
               'Contract Specifications',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _text),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: _text,
+              ),
             ),
           ),
           LayoutBuilder(
@@ -281,7 +366,9 @@ class WorkPermitDetailsScreen extends StatelessWidget {
                 children: rows
                     .map(
                       (row) => SizedBox(
-                        width: twoColumns ? constraints.maxWidth / 2 : constraints.maxWidth,
+                        width: twoColumns
+                            ? constraints.maxWidth / 2
+                            : constraints.maxWidth,
                         child: _SpecRow(item: row),
                       ),
                     )
@@ -296,11 +383,51 @@ class WorkPermitDetailsScreen extends StatelessWidget {
 
   Widget _packageInclusions() {
     const inclusions = [
-      _SpecItem('Visa', '', FontAwesomeIcons.fileLines),
-      _SpecItem('Ticket', '', FontAwesomeIcons.ticket),
-      _SpecItem('Manpower', '', FontAwesomeIcons.idCard),
-      _SpecItem('Passport', '', FontAwesomeIcons.passport),
-      _SpecItem('Photos', '', FontAwesomeIcons.camera),
+      _SpecItem(
+        'Visa',
+        '',
+        FaIcon(
+          FontAwesomeIcons.fileLines,
+          color: WorkPermitDetailsScreen._error,
+          size: 14,
+        ),
+      ),
+      _SpecItem(
+        'Ticket',
+        '',
+        FaIcon(
+          FontAwesomeIcons.ticket,
+          color: WorkPermitDetailsScreen._error,
+          size: 14,
+        ),
+      ),
+      _SpecItem(
+        'Manpower',
+        '',
+        FaIcon(
+          FontAwesomeIcons.idCard,
+          color: WorkPermitDetailsScreen._error,
+          size: 14,
+        ),
+      ),
+      _SpecItem(
+        'Passport',
+        '',
+        FaIcon(
+          FontAwesomeIcons.passport,
+          color: WorkPermitDetailsScreen._error,
+          size: 14,
+        ),
+      ),
+      _SpecItem(
+        'Photos',
+        '',
+        FaIcon(
+          FontAwesomeIcons.camera,
+          color: WorkPermitDetailsScreen._error,
+          size: 14,
+        ),
+      ),
     ];
 
     return Column(
@@ -308,7 +435,11 @@ class WorkPermitDetailsScreen extends StatelessWidget {
       children: [
         const Text(
           'Included in Package',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _text),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: _text,
+          ),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -317,7 +448,10 @@ class WorkPermitDetailsScreen extends StatelessWidget {
           children: inclusions
               .map(
                 (item) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 9,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFDAE2FD),
                     borderRadius: BorderRadius.circular(8),
@@ -374,9 +508,16 @@ class WorkPermitDetailsScreen extends StatelessWidget {
               Container(
                 width: 48,
                 height: 48,
-                decoration: const BoxDecoration(color: _error, shape: BoxShape.circle),
+                decoration: const BoxDecoration(
+                  color: _error,
+                  shape: BoxShape.circle,
+                ),
                 child: const Center(
-                  child: FaIcon(FontAwesomeIcons.gavel, color: Colors.white, size: 20),
+                  child: FaIcon(
+                    FontAwesomeIcons.gavel,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -386,7 +527,11 @@ class WorkPermitDetailsScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Critical Safety Guidelines',
-                      style: TextStyle(color: Color(0xFF93000A), fontSize: 22, fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                        color: Color(0xFF93000A),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                     SizedBox(height: 4),
                     Text(
@@ -408,19 +553,29 @@ class WorkPermitDetailsScreen extends StatelessWidget {
                 children: tips
                     .map(
                       (tip) => SizedBox(
-                        width: twoColumns ? (constraints.maxWidth - 18) / 2 : constraints.maxWidth,
+                        width: twoColumns
+                            ? (constraints.maxWidth - 18) / 2
+                            : constraints.maxWidth,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Padding(
                               padding: EdgeInsets.only(top: 3),
-                              child: FaIcon(FontAwesomeIcons.circleCheck, size: 16, color: _error),
+                              child: FaIcon(
+                                FontAwesomeIcons.circleCheck,
+                                size: 16,
+                                color: _error,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 tip,
-                                style: const TextStyle(color: _text, fontSize: 14, height: 1.42),
+                                style: const TextStyle(
+                                  color: _text,
+                                  fontSize: 14,
+                                  height: 1.42,
+                                ),
                               ),
                             ),
                           ],
@@ -442,19 +597,35 @@ class WorkPermitDetailsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: _primary,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [BoxShadow(color: Color(0x332563EB), blurRadius: 24, offset: Offset(0, 12))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x332563EB),
+            blurRadius: 24,
+            offset: Offset(0, 12),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             'TOTAL CUSTOMER COST',
-            style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w800),
+            style: TextStyle(
+              color: Color(0xCCFFFFFF),
+              fontSize: 12,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'BDT ${_formatMoney(item.customerPrice)}',
-            style: const TextStyle(color: Colors.white, fontSize: 40, height: 1.05, fontWeight: FontWeight.w900),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 40,
+              height: 1.05,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 22),
           Container(height: 1, color: Colors.white24),
@@ -463,14 +634,27 @@ class WorkPermitDetailsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text('Monthly Salary', style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 14)),
+                child: Text(
+                  'Monthly Salary',
+                  style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 14),
+                ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('280 JOD', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                  Text(
+                    '280 JOD',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                   SizedBox(height: 2),
-                  Text('~ BDT 46,200', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 13)),
+                  Text(
+                    '~ BDT 46,200',
+                    style: TextStyle(color: Color(0x99FFFFFF), fontSize: 13),
+                  ),
                 ],
               ),
             ],
@@ -478,15 +662,26 @@ class WorkPermitDetailsScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(
+              color: Colors.white12,
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: const Row(
               children: [
-                FaIcon(FontAwesomeIcons.moneyBillWave, size: 16, color: Colors.white),
+                FaIcon(
+                  FontAwesomeIcons.moneyBillWave,
+                  size: 16,
+                  color: Colors.white,
+                ),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Standard Overseas Benefits Apply',
-                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],
@@ -499,9 +694,24 @@ class WorkPermitDetailsScreen extends StatelessWidget {
 
   Widget _paymentBreakdown() {
     const steps = [
-      _PaymentStep('Step 1: Booking Advance', 'BDT 78,000', 'Due at initial registration and file opening.', true),
-      _PaymentStep('Step 2: After Visa', 'BDT 150,000', 'Payable once visa confirmation is verified.', false),
-      _PaymentStep('Step 3: Before Flight', 'BDT 80,000', 'Final payment before receiving air ticket.', false),
+      _PaymentStep(
+        'Step 1: Booking Advance',
+        'BDT 78,000',
+        'Due at initial registration and file opening.',
+        true,
+      ),
+      _PaymentStep(
+        'Step 2: After Visa',
+        'BDT 150,000',
+        'Payable once visa confirmation is verified.',
+        false,
+      ),
+      _PaymentStep(
+        'Step 3: Before Flight',
+        'BDT 80,000',
+        'Final payment before receiving air ticket.',
+        false,
+      ),
     ];
 
     return _CardShell(
@@ -510,13 +720,20 @@ class WorkPermitDetailsScreen extends StatelessWidget {
         children: [
           const Text(
             'Payment Breakdown',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _text),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: _text,
+            ),
           ),
           const SizedBox(height: 22),
           Column(
             children: [
               for (var index = 0; index < steps.length; index++)
-                _TimelineStep(step: steps[index], isLast: index == steps.length - 1),
+                _TimelineStep(
+                  step: steps[index],
+                  isLast: index == steps.length - 1,
+                ),
             ],
           ),
         ],
@@ -538,7 +755,11 @@ class WorkPermitDetailsScreen extends StatelessWidget {
               border: Border.all(color: _outline),
             ),
             child: const Center(
-              child: FaIcon(FontAwesomeIcons.buildingCircleCheck, color: _brandBlue, size: 24),
+              child: FaIcon(
+                FontAwesomeIcons.buildingCircleCheck,
+                color: _brandBlue,
+                size: 24,
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -546,9 +767,19 @@ class WorkPermitDetailsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Global Talent Hub', style: TextStyle(color: _text, fontSize: 18, fontWeight: FontWeight.w800)),
+                Text(
+                  'Global Talent Hub',
+                  style: TextStyle(
+                    color: _text,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 SizedBox(height: 4),
-                Text('RL-1452 • Licensed Agency', style: TextStyle(color: _mutedText, fontSize: 13)),
+                Text(
+                  'RL-1452 • Licensed Agency',
+                  style: TextStyle(color: _mutedText, fontSize: 13),
+                ),
               ],
             ),
           ),
@@ -565,33 +796,45 @@ class WorkPermitDetailsScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: _surface.withAlpha(240),
           border: const Border(top: BorderSide(color: _outline)),
-          boxShadow: const [BoxShadow(color: Color(0x1A000000), blurRadius: 18, offset: Offset(0, -4))],
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1A000000),
+              blurRadius: 18,
+              offset: Offset(0, -4),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () => _showMessage(context, 'Application process coming soon'),
+                onPressed: () =>
+                    _showMessage(context, 'Application process coming soon'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _brandBlue,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 icon: const FaIcon(FontAwesomeIcons.paperPlane, size: 16),
-                label: const Text('Apply Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                label: const Text(
+                  'Apply Now',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                ),
               ),
             ),
             const SizedBox(width: 12),
             _ActionIconButton(
-              icon: FontAwesomeIcons.commentDots,
+              icon: const FaIcon(FontAwesomeIcons.commentDots, size: 18),
               semanticLabel: 'Chat',
               onPressed: () => _showMessage(context, 'Chat option coming soon'),
             ),
             const SizedBox(width: 12),
             _ActionIconButton(
-              icon: FontAwesomeIcons.bookmark,
+              icon: const FaIcon(FontAwesomeIcons.bookmark, size: 18),
               semanticLabel: 'Bookmark',
               onPressed: () => _showMessage(context, 'Saved to bookmarks'),
             ),
@@ -602,7 +845,9 @@ class WorkPermitDetailsScreen extends StatelessWidget {
   }
 
   void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   static String _formatMoney(int amount) {
@@ -621,9 +866,13 @@ class WorkPermitDetailsScreen extends StatelessWidget {
 }
 
 class _ActionIconButton extends StatelessWidget {
-  const _ActionIconButton({required this.icon, required this.semanticLabel, required this.onPressed});
+  const _ActionIconButton({
+    required this.icon,
+    required this.semanticLabel,
+    required this.onPressed,
+  });
 
-  final IconData icon;
+  final Widget icon;
   final String semanticLabel;
   final VoidCallback onPressed;
 
@@ -638,16 +887,22 @@ class _ActionIconButton extends StatelessWidget {
           foregroundColor: WorkPermitDetailsScreen._mutedText,
           side: const BorderSide(color: WorkPermitDetailsScreen._outline),
           padding: const EdgeInsets.all(15),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
-        child: FaIcon(icon, size: 18),
+        child: icon,
       ),
     );
   }
 }
 
 class _CardShell extends StatelessWidget {
-  const _CardShell({required this.child, this.padding = const EdgeInsets.all(18), this.color = WorkPermitDetailsScreen._surface});
+  const _CardShell({
+    required this.child,
+    this.padding = const EdgeInsets.all(18),
+    this.color = WorkPermitDetailsScreen._surface,
+  });
 
   final Widget child;
   final EdgeInsets padding;
@@ -676,19 +931,32 @@ class _Pill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(color: const Color(0xFFDBE1FF), borderRadius: BorderRadius.circular(999)),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDBE1FF),
+        borderRadius: BorderRadius.circular(999),
+      ),
       child: Text(
         label.toUpperCase(),
-        style: const TextStyle(color: Color(0xFF00174B), fontSize: 12, letterSpacing: 0.7, fontWeight: FontWeight.w800),
+        style: const TextStyle(
+          color: Color(0xFF00174B),
+          fontSize: 12,
+          letterSpacing: 0.7,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }
 }
 
 class _IconText extends StatelessWidget {
-  const _IconText({required this.icon, required this.label, this.color = WorkPermitDetailsScreen._mutedText, this.bold = false});
+  const _IconText({
+    required this.icon,
+    required this.label,
+    this.color = WorkPermitDetailsScreen._mutedText,
+    this.bold = false,
+  });
 
-  final IconData icon;
+  final Widget icon;
   final String label;
   final Color color;
   final bool bold;
@@ -698,11 +966,15 @@ class _IconText extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        FaIcon(icon, color: color, size: 14),
+        icon,
         const SizedBox(width: 6),
         Text(
           label,
-          style: TextStyle(color: color, fontSize: 13, fontWeight: bold ? FontWeight.w700 : FontWeight.w500),
+          style: TextStyle(
+            color: color,
+            fontSize: 13,
+            fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+          ),
         ),
       ],
     );
@@ -710,9 +982,13 @@ class _IconText extends StatelessWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.icon, required this.label, required this.value});
+  const _StatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
-  final IconData icon;
+  final Widget icon;
   final String label;
   final String value;
 
@@ -723,14 +999,25 @@ class _StatCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FaIcon(icon, color: WorkPermitDetailsScreen._brandBlue, size: 20),
+          icon,
           const SizedBox(height: 10),
-          Text(label, style: const TextStyle(color: WorkPermitDetailsScreen._mutedText, fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: WorkPermitDetailsScreen._mutedText,
+              fontSize: 12,
+            ),
+          ),
           const SizedBox(height: 5),
           Text(
             value,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: WorkPermitDetailsScreen._text, fontSize: 17, fontWeight: FontWeight.w800, height: 1.2),
+            style: const TextStyle(
+              color: WorkPermitDetailsScreen._text,
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+            ),
           ),
         ],
       ),
@@ -739,9 +1026,14 @@ class _StatCard extends StatelessWidget {
 }
 
 class _InfoCard extends StatelessWidget {
-  const _InfoCard({required this.icon, required this.label, required this.value, required this.color});
+  const _InfoCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
-  final IconData icon;
+  final Widget icon;
   final String label;
   final String value;
   final Color color;
@@ -750,24 +1042,39 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: WorkPermitDetailsScreen._surfaceHigh, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(
+        color: WorkPermitDetailsScreen._surfaceHigh,
+        borderRadius: BorderRadius.circular(14),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              FaIcon(icon, size: 15, color: color),
+              icon,
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   label.toUpperCase(),
-                  style: TextStyle(color: color, fontSize: 11, letterSpacing: 0.7, fontWeight: FontWeight.w900),
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 11,
+                    letterSpacing: 0.7,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(value, style: const TextStyle(color: WorkPermitDetailsScreen._text, fontSize: 18, fontWeight: FontWeight.w800)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: WorkPermitDetailsScreen._text,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ],
       ),
     );
@@ -779,7 +1086,7 @@ class _SpecItem {
 
   final String label;
   final String value;
-  final IconData? icon;
+  final Widget? icon;
 }
 
 class _SpecRow extends StatelessWidget {
@@ -791,11 +1098,21 @@ class _SpecRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: WorkPermitDetailsScreen._outline))),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: WorkPermitDetailsScreen._outline),
+        ),
+      ),
       child: Row(
         children: [
           Expanded(
-            child: Text(item.label, style: const TextStyle(color: WorkPermitDetailsScreen._mutedText, fontSize: 14)),
+            child: Text(
+              item.label,
+              style: const TextStyle(
+                color: WorkPermitDetailsScreen._mutedText,
+                fontSize: 14,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Flexible(
@@ -803,14 +1120,18 @@ class _SpecRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (item.icon != null) ...[
-                  FaIcon(item.icon, color: WorkPermitDetailsScreen._error, size: 14),
+                  item.icon!,
                   const SizedBox(width: 8),
                 ],
                 Flexible(
                   child: Text(
                     item.value,
                     textAlign: TextAlign.right,
-                    style: const TextStyle(color: WorkPermitDetailsScreen._text, fontSize: 14, fontWeight: FontWeight.w800),
+                    style: const TextStyle(
+                      color: WorkPermitDetailsScreen._text,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ],
@@ -839,7 +1160,9 @@ class _TimelineStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dotColor = step.active ? WorkPermitDetailsScreen._brandBlue : const Color(0xFFDBE1FF);
+    final dotColor = step.active
+        ? WorkPermitDetailsScreen._brandBlue
+        : const Color(0xFFDBE1FF);
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -849,11 +1172,18 @@ class _TimelineStep extends StatelessWidget {
               Container(
                 width: 18,
                 height: 18,
-                decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 4)),
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 4),
+                ),
               ),
               if (!isLast)
                 Expanded(
-                  child: Container(width: 2, color: WorkPermitDetailsScreen._outline),
+                  child: Container(
+                    width: 2,
+                    color: WorkPermitDetailsScreen._outline,
+                  ),
                 ),
             ],
           ),
@@ -867,16 +1197,32 @@ class _TimelineStep extends StatelessWidget {
                   Text(
                     step.title.toUpperCase(),
                     style: TextStyle(
-                      color: step.active ? WorkPermitDetailsScreen._brandBlue : WorkPermitDetailsScreen._mutedText,
+                      color: step.active
+                          ? WorkPermitDetailsScreen._brandBlue
+                          : WorkPermitDetailsScreen._mutedText,
                       fontSize: 11,
                       letterSpacing: 0.6,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(step.amount, style: const TextStyle(color: WorkPermitDetailsScreen._text, fontSize: 16, fontWeight: FontWeight.w800)),
+                  Text(
+                    step.amount,
+                    style: const TextStyle(
+                      color: WorkPermitDetailsScreen._text,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(step.description, style: const TextStyle(color: WorkPermitDetailsScreen._mutedText, fontSize: 13, height: 1.35)),
+                  Text(
+                    step.description,
+                    style: const TextStyle(
+                      color: WorkPermitDetailsScreen._mutedText,
+                      fontSize: 13,
+                      height: 1.35,
+                    ),
+                  ),
                 ],
               ),
             ),
