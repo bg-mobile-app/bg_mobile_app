@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../common/widgets/layout/navigation_state.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -170,11 +170,10 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
     final href = link.href;
     if (href == null || href == widget.currentHref) return;
     if (href == '/dashboard/booking/my') {
-      bottomNavIndexNotifier.value = 2;
+      context.go('/booking');
       return;
     }
-    dashboardRouteNotifier.value = href;
-    bottomNavIndexNotifier.value = 4;
+    context.go(href);
   }
 
   @override

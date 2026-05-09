@@ -1,22 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'common/theme/app_theme.dart';
-import 'features/auth/sign_in_screen.dart';
-import 'features/auth/sign_up_screen.dart';
-import 'features/auth/partner_sign_up_screen.dart';
-import 'features/auth/agent_sign_up_screen.dart';
-import 'features/auth/agency_sign_up_screen.dart';
-import 'features/auth/recruiting_sign_up_screen.dart';
-import 'common/widgets/layout/app_scaffold.dart';
-import 'features/onboarding/get_started_screen.dart';
-import 'routes/app_routes.dart';
+import 'routes/app_router.dart';
 
 class BideshgamiApp extends StatelessWidget {
   const BideshgamiApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Bideshgami',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
@@ -26,17 +18,7 @@ class BideshgamiApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en', 'US')],
-      initialRoute: AppRoutes.getStarted,
-      routes: {
-        AppRoutes.getStarted: (_) => const GetStartedScreen(),
-        AppRoutes.home: (_) => const AppScaffold(),
-        AppRoutes.login: (_) => const SignInScreen(),
-        AppRoutes.signUpCustomer: (_) => const SignUpScreen(),
-        AppRoutes.signUpPartner: (_) => const PartnerSignUpScreen(),
-        AppRoutes.agentSignUp: (_) => const AgentSignUpScreen(),
-        AppRoutes.agencySignUp: (_) => const AgencySignUpScreen(),
-        AppRoutes.recruitingSignUp: (_) => const RecruitingSignUpScreen(),
-      },
+      routerConfig: appRouter,
     );
   }
 }

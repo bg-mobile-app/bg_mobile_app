@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../routes/app_routes.dart';
 
@@ -180,7 +181,7 @@ class _SignInScreenState extends State<SignInScreen> {
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
-            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.signUpPartner),
+            onPressed: () => context.push(AppRoutes.signUpPartner),
             style: OutlinedButton.styleFrom(
               foregroundColor: _brandBlue,
               side: const BorderSide(color: _brandBlue),
@@ -197,7 +198,7 @@ class _SignInScreenState extends State<SignInScreen> {
             children: [
               const Text('New here? ', style: TextStyle(color: Color(0xFF64748B))),
               TextButton(
-                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.signUpCustomer),
+                onPressed: () => context.push(AppRoutes.signUpCustomer),
                 child: const Text('Create an account', style: TextStyle(fontWeight: FontWeight.w700)),
               ),
             ],
