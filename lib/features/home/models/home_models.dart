@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fui_kit/fui_kit.dart';
 
 class NavLinkItem {
   const NavLinkItem({
@@ -9,7 +9,7 @@ class NavLinkItem {
 
   final String name;
   final String href;
-  final IconData icon;
+  final dynamic icon;
 }
 
 class WorkPermitItem {
@@ -39,12 +39,12 @@ class WorkPermitItem {
 }
 
 const List<NavLinkItem> navLinkData = [
-  NavLinkItem(name: 'Home', href: '/', icon: Icons.home_outlined),
-  NavLinkItem(name: 'Flight Booking', href: '', icon: Icons.flight_takeoff_outlined),
-  NavLinkItem(name: 'Work Abroad', href: '/filter?service_type=WORK_PERMIT', icon: Icons.work_outline),
-  NavLinkItem(name: 'Study Abroad', href: '', icon: Icons.school_outlined),
-  NavLinkItem(name: 'Hajj & Umrah', href: '', icon: Icons.mosque_outlined),
-  NavLinkItem(name: 'Visa Services', href: '', icon: Icons.badge_outlined),
-  NavLinkItem(name: 'Tour Packages', href: '', icon: Icons.public_outlined),
-  NavLinkItem(name: 'Hotel Booking', href: '', icon: Icons.hotel_outlined),
+  NavLinkItem(name: 'Home', href: '/', icon: RegularRounded.HOME_2),
+  NavLinkItem(name: 'Flight Booking', href: '', icon: RegularRounded.PLANE),
+  NavLinkItem(name: 'Work Abroad', href: '/filter?service_type=WORK_PERMIT', icon: RegularRounded.BRIEFCASE),
+  NavLinkItem(name: 'Study Abroad', href: '', icon: RegularRounded.BOOK_2),
+  NavLinkItem(name: 'Hajj & Umrah', href: '', icon: RegularRounded.MOSQUE),
+  NavLinkItem(name: 'Visa Services', href: '', icon: RegularRounded.PASSPORT),
+  NavLinkItem(name: 'Tour Packages', href: '', icon: RegularRounded.GLOBE),
+  NavLinkItem(name: 'Hotel Booking', href: '', icon: RegularRounded.BUILDING_3),
 ];

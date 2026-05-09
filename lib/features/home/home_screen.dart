@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fui_kit/fui_kit.dart';
 
 import 'models/home_models.dart';
 import 'widgets/home_common_widgets.dart';
@@ -374,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: index == 0 ? const [BoxShadow(color: Color(0x332563EB), blurRadius: 16, offset: Offset(0, 8))] : const [BoxShadow(color: Color(0x14000000), blurRadius: 12, offset: Offset(0, 4))],
                       ),
-                      child: Icon(item.icon, color: index == 0 ? Colors.white : _brandBlue, size: 34),
+                      child: FUI(item.icon, color: index == 0 ? Colors.white : _brandBlue, height: 34),
                     ),
                   const SizedBox(height: 14),
                   Text(
