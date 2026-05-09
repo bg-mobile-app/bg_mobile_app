@@ -16,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   static const Color _brandBlue = Color(0xFF2563EB);
 
-  final _searchController = TextEditingController();
   final _companyController = TextEditingController();
   final _minAgeController = TextEditingController();
   final _maxAgeController = TextEditingController();
@@ -28,12 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime? _fromDate;
   DateTime? _toDate;
 
-  final _leftController = PageController(viewportFraction: 1);
-  final _rightController = PageController(viewportFraction: 1);
-  Timer? _leftTimer;
-  Timer? _rightTimer;
-  int _leftIndex = 0;
-  int _rightIndex = 0;
+  final _bannerController = PageController(viewportFraction: 1);
+  Timer? _bannerTimer;
+  int _bannerIndex = 0;
 
   bool _isLoggedIn = false;
 
@@ -49,12 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
     'Hospitality',
     'Agriculture',
   ];
-  final List<String> _bannerLeft = const [
+  final List<String> _banners = const [
     'assets/img/ads/1.png',
     'assets/img/ads/2.png',
     'assets/img/ads/3.png',
-  ];
-  final List<String> _bannerRight = const [
     'assets/img/ads/4.png',
     'assets/img/ads/create/ads_bn.png',
     'assets/img/ads/create/ads_en.png',
@@ -113,21 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _leftTimer = Timer.periodic(const Duration(milliseconds: 2000), (_) {
-      if (!_leftController.hasClients) return;
-      _leftIndex = (_leftIndex + 1) % _bannerLeft.length;
-      _leftController.animateToPage(
-        _leftIndex,
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOut,
-      );
-    });
-
-    _rightTimer = Timer.periodic(const Duration(milliseconds: 2200), (_) {
-      if (!_rightController.hasClients) return;
-      _rightIndex = (_rightIndex + 1) % _bannerRight.length;
-      _rightController.animateToPage(
-        _rightIndex,
+    _bannerTimer = Timer.periodic(const Duration(milliseconds: 2300), (_) {
+      if (!_bannerController.hasClients) return;
+      _bannerIndex = (_bannerIndex + 1) % _banners.length;
+      _bannerController.animateToPage(
+        _bannerIndex,
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeOut,
       );
@@ -136,14 +120,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     _companyController.dispose();
     _minAgeController.dispose();
     _maxAgeController.dispose();
-    _leftController.dispose();
-    _rightController.dispose();
-    _leftTimer?.cancel();
-    _rightTimer?.cancel();
+    _bannerController.dispose();
+    _bannerTimer?.cancel();
     super.dispose();
   }
 
@@ -335,13 +316,13 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 10),
             InkWell(
               onTap: _showAdvancedFilterSheet,
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(12),
               child: Container(
-                height: 82,
-                width: 82,
+                height: 48,
+                width: 48,
                 decoration: BoxDecoration(
                   color: _brandBlue,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x332563EB),
@@ -350,54 +331,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.tune, color: Colors.white, size: 30),
+                child: const Icon(Icons.tune, color: Colors.white, size: 20),
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 14),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  style: const TextStyle(color: Colors.black),
-                  decoration: const InputDecoration(
-                    fillColor: Colors.white,
-                    hintText: 'Search in bideshgami',
-                    hintStyle: TextStyle(color: Color(0xFF9CA3AF), fontSize: 38/2),
-                    border: InputBorder.none,
-
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: _showComingSoon,
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: _brandBlue,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: const Icon(
-                    Icons.search_rounded,
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ],
     );
@@ -460,22 +397,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildOfferBanner() {
-    final banners = [..._bannerLeft, ..._bannerRight];
     return SizedBox(
       height: 294,
-      child: ListView.separated(
+      child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) => ClipRRect(
-          borderRadius: BorderRadius.circular(42),
-          child: Image.asset(
-            banners[index],
-            width: MediaQuery.of(context).size.width * 0.78,
-            fit: BoxFit.cover,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: PageView.builder(
+            controller: _bannerController,
+            itemCount: _banners.length,
+            itemBuilder: (context, index) => Image.asset(
+              _banners[index],
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
           ),
         ),
-        separatorBuilder: (_, __) => const SizedBox(width: 14),
-        itemCount: banners.length,
       ),
     );
   }
@@ -491,20 +428,25 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _sectionHeader('Work Permit', actionLabel: 'See More'),
           const SizedBox(height: 14),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _workPermits.length,
-            itemBuilder: (context, index) {
-              return WorkPermitCard(
-                item: _workPermits[index],
-                brandBlue: _brandBlue,
-                onViewDetails: _showComingSoon,
-                formatBdt: _formatBdt,
-                timeAgo: _timeAgo,
-              );
-            },
-            separatorBuilder: (_, __) => const SizedBox(height: 14),
+          SizedBox(
+            height: 390,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _workPermits.length,
+              itemBuilder: (context, index) {
+                return SizedBox(
+                  width: MediaQuery.of(context).size.width * .84,
+                  child: WorkPermitCard(
+                    item: _workPermits[index],
+                    brandBlue: _brandBlue,
+                    onViewDetails: _showComingSoon,
+                    formatBdt: _formatBdt,
+                    timeAgo: _timeAgo,
+                  ),
+                );
+              },
+              separatorBuilder: (_, __) => const SizedBox(width: 14),
+            ),
           ),
         ],
       ),
@@ -559,22 +501,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return '${diff.inDays}d ago';
     }
     return '${(diff.inDays / 7).floor()}w ago';
-  }
-
-  Widget _carousel(PageController controller, List<String> images) {
-    return SizedBox(
-      height: 124,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: PageView.builder(
-          controller: controller,
-          itemCount: images.length,
-          itemBuilder: (context, index) {
-            return Image.asset(images[index], fit: BoxFit.cover);
-          },
-        ),
-      ),
-    );
   }
 
   Widget _dropdown({

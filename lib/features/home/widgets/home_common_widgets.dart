@@ -62,10 +62,14 @@ class AppBrandHeader extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       toolbarHeight: 74,
       automaticallyImplyLeading: false,
-      leadingWidth: 56,
-      leading: IconButton(
-        onPressed: () => Navigator.of(context).maybePop(),
-        icon: const Icon(Icons.arrow_back, color: Color(0xFF374151), size: 32),
+      leadingWidth: 74,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: CircleAvatar(
+          radius: 24,
+          backgroundColor: const Color(0x142563EB),
+          child: Icon(Icons.travel_explore_rounded, color: brandBlue, size: 28),
+        ),
       ),
       titleSpacing: 0,
       title: const SizedBox.shrink(),

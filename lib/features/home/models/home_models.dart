@@ -1,3 +1,4 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 
 class NavLinkItem {
@@ -39,12 +40,12 @@ class WorkPermitItem {
 }
 
 const List<NavLinkItem> navLinkData = [
-  NavLinkItem(name: 'Home', href: '/', icon: Icons.home_outlined),
-  NavLinkItem(name: 'Flight Booking', href: '', icon: Icons.navigation_outlined),
-  NavLinkItem(name: 'Work Abroad', href: '/filter?service_type=WORK_PERMIT', icon: Icons.front_hand_outlined),
-  NavLinkItem(name: 'Study Abroad', href: '', icon: Icons.school_outlined),
-  NavLinkItem(name: 'Hajj & Umrah', href: '', icon: Icons.home_outlined),
-  NavLinkItem(name: 'Visa Services', href: '', icon: Icons.verified_user_outlined),
-  NavLinkItem(name: 'Tour Packages', href: '', icon: Icons.public_outlined),
-  NavLinkItem(name: 'Hotel Booking', href: '', icon: Icons.apartment_outlined),
+  NavLinkItem(name: 'Home', href: '/', icon: FontAwesomeIcons.house),
+  NavLinkItem(name: 'Flight Booking', href: '', icon: FontAwesomeIcons.planeDeparture),
+  NavLinkItem(name: 'Work Abroad', href: '/filter?service_type=WORK_PERMIT', icon: FontAwesomeIcons.briefcase),
+  NavLinkItem(name: 'Study Abroad', href: '', icon: FontAwesomeIcons.graduationCap),
+  NavLinkItem(name: 'Hajj & Umrah', href: '', icon: FontAwesomeIcons.kaaba),
+  NavLinkItem(name: 'Visa Services', href: '', icon: FontAwesomeIcons.passport),
+  NavLinkItem(name: 'Tour Packages', href: '', icon: FontAwesomeIcons.earthAsia),
+  NavLinkItem(name: 'Hotel Booking', href: '', icon: FontAwesomeIcons.hotel),
 ];
