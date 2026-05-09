@@ -276,47 +276,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F8FF),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F8FF),
-        elevation: 0,
-        titleSpacing: 16,
-        title: Image.asset(
-          'assets/img/logo/logo_black.png',
-          height: 32,
-          fit: BoxFit.contain,
-        ),
-        actions: [
-          if (_isLoggedIn) ...[
-            IconButton(
-              onPressed: _showComingSoon,
-              icon: const Icon(Icons.notifications_none, color: Colors.black87),
-              tooltip: 'Notifications',
-            ),
-            IconButton(
-              onPressed: _showComingSoon,
-              icon: const Icon(Icons.person_outline, color: Colors.black87),
-              tooltip: 'Profile',
-            ),
-          ] else ...[
-            HeaderActionButton(
-              label: 'Sign In',
-              onTap: () async {
-                final result = await Navigator.pushNamed(context, '/login');
-                if (result == true && mounted) {
-                  setState(() => _isLoggedIn = true);
-                }
-              },
-              brandBlue: _brandBlue,
-            ),
-            const SizedBox(width: 8),
-            HeaderActionButton(
-              label: 'Sign Up',
-              onTap: () => Navigator.pushNamed(context, '/sign-up/customer'),
-              brandBlue: _brandBlue,
-            ),
-          ],
-          const SizedBox(width: 16),
-        ],
+      appBar: AppBrandHeader(
+        brandBlue: _brandBlue,
+        isLoggedIn: _isLoggedIn,
+        onSignIn: () async {
+          final result = await Navigator.pushNamed(context, '/login');
+          if (result == true && mounted) {
+            setState(() => _isLoggedIn = true);
+          }
+        },
+        onSignUp: () => Navigator.pushNamed(context, '/sign-up/customer'),
+        onNotifications: _showComingSoon,
+        onProfile: _showComingSoon,
       ),
       body: SafeArea(
         child: CustomScrollView(

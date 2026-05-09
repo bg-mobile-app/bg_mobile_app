@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../routes/app_routes.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -11,8 +12,11 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool _showPassword = false;
+
   static const Color _brandBlue = Color(0xFF2563EB);
+  static const Color _brandNavy = Color(0xFF0F172A);
 
   @override
   void dispose() {
@@ -24,49 +28,89 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isDesktop = constraints.maxWidth >= 768;
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFF8FBFF), Color(0xFFEEF4FF)],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isDesktop = constraints.maxWidth >= 900;
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 20,
-                    ),
-                    constraints: const BoxConstraints(maxWidth: 1200),
-                    child: Form(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1180),
+                    child: IntrinsicHeight(
+                      child: Flex(
+                        direction: isDesktop ? Axis.horizontal : Axis.vertical,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           if (isDesktop)
                             Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 20),
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 24),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x1F0F172A),
+                                      blurRadius: 30,
+                                      offset: Offset(0, 14),
+                                    ),
+                                  ],
+                                ),
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: Image.asset(
-                                    'assets/img/sign-in/login.jpg',
-                                    fit: BoxFit.cover,
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      Image.asset('assets/img/sign-in/login.jpg', fit: BoxFit.cover),
+                                      Container(
+                                        decoration: const BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [Color(0x660F172A), Color(0xAA0F172A)],
+                                          ),
+                                        ),
+                                      ),
+                                      const Positioned(
+                                        left: 30,
+                                        right: 30,
+                                        bottom: 30,
+                                        child: Text(
+                                          'Manage your visa and travel workflow with confidence.',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.3,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                           Expanded(
                             child: Container(
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
                                 boxShadow: const [
                                   BoxShadow(
-                                    color: Color(0x1A000000),
-                                    blurRadius: 14,
-                                    offset: Offset(0, 4),
+                                    color: Color(0x140F172A),
+                                    blurRadius: 30,
+                                    offset: Offset(0, 12),
                                   ),
                                 ],
                               ),
@@ -78,9 +122,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -88,58 +132,35 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Widget _buildLoginCard() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset(
-          'assets/img/logo/logo_black.png',
-          width: 120,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) => const Icon(
-            Icons.language,
-            size: 56,
-            color: _brandBlue,
+        Center(
+          child: Image.asset(
+            'assets/img/logo/logo_black.png',
+            width: 120,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => const Icon(Icons.language, size: 56, color: _brandBlue),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         const Text(
-          'Login to your account',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          'Welcome back',
+          style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: _brandNavy),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         const Text(
-          'Welcome Back to Bideshgami! Please Enter Your Login Details',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w300,
-            color: Colors.black87,
-          ),
+          'Login to continue to your Bideshgami dashboard.',
+          style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
         ),
-        const SizedBox(height: 20),
-        _buildUnderlineInput(
-          controller: _usernameController,
-          hintText: 'Enter your username or phone',
-          autofocus: true,
-        ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
+        _buildInputField(controller: _usernameController, hintText: 'Username or phone', autofocus: true, icon: Icons.person_outline),
+        const SizedBox(height: 14),
         _buildPasswordField(),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF334155),
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: const Text('Forgot Password'),
-          ),
+          child: TextButton(onPressed: () {}, child: const Text('Forgot Password?')),
         ),
         const SizedBox(height: 8),
         SizedBox(
@@ -149,115 +170,80 @@ class _SignInScreenState extends State<SignInScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: _brandBlue,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text(
-              'Login',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
+            child: const Text('Login', style: TextStyle(fontWeight: FontWeight.w700)),
           ),
         ),
         const SizedBox(height: 10),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AppRoutes.signUpPartner),
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.signUpPartner),
             style: OutlinedButton.styleFrom(
               foregroundColor: _brandBlue,
               side: const BorderSide(color: _brandBlue),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text(
-              'Become a Partner',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
+            child: const Text('Become a Partner', style: TextStyle(fontWeight: FontWeight.w700)),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Didn\'t have an account? '),
-            TextButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRoutes.signUpCustomer),
-              style: TextButton.styleFrom(
-                foregroundColor: _brandBlue,
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        const SizedBox(height: 10),
+        Center(
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const Text('New here? ', style: TextStyle(color: Color(0xFF64748B))),
+              TextButton(
+                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.signUpCustomer),
+                child: const Text('Create an account', style: TextStyle(fontWeight: FontWeight.w700)),
               ),
-              child: const Text(
-                'Sign Up!',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildUnderlineInput({
+  Widget _buildInputField({
     required TextEditingController controller,
     required String hintText,
+    required IconData icon,
     bool autofocus = false,
   }) {
     return TextField(
       controller: controller,
       autofocus: autofocus,
       decoration: InputDecoration(
-        isDense: true,
+        prefixIcon: Icon(icon, color: const Color(0xFF64748B)),
         hintText: hintText,
-        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF64748B)),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF64748B)),
-        ),
+        filled: true,
+        fillColor: const Color(0xFFF8FAFC),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: _brandBlue, width: 1.5)),
       ),
     );
   }
 
   Widget _buildPasswordField() {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Color(0xFF64748B)),
+    return TextField(
+      controller: _passwordController,
+      obscureText: !_showPassword,
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF64748B)),
+        hintText: 'Password',
+        filled: true,
+        fillColor: const Color(0xFFF8FAFC),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: _brandBlue, width: 1.5)),
+        suffixIcon: IconButton(
+          onPressed: () => setState(() => _showPassword = !_showPassword),
+          icon: Icon(_showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF475569)),
         ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _passwordController,
-              obscureText: !_showPassword,
-              decoration: const InputDecoration(
-                isDense: true,
-                border: InputBorder.none,
-                hintText: 'Enter your password',
-                hintStyle: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-              ),
-            ),
-          ),
-          IconButton(
-            onPressed: () => setState(() => _showPassword = !_showPassword),
-            icon: Icon(
-              _showPassword
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
-              color: const Color(0xFF475569),
-              size: 20,
-            ),
-          ),
-        ],
       ),
     );
   }
