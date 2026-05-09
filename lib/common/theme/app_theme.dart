@@ -8,6 +8,7 @@ class AppTheme {
   static ThemeData get light {
     return ThemeData(
       brightness: Brightness.light,
+      fontFamily: 'Roboto',
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
       canvasColor: AppColors.surface,
