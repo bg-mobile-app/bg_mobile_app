@@ -383,51 +383,11 @@ class WorkPermitDetailsScreen extends StatelessWidget {
 
   Widget _packageInclusions() {
     const inclusions = [
-      _SpecItem(
-        'Visa',
-        '',
-        FaIcon(
-          FontAwesomeIcons.fileLines,
-          color: WorkPermitDetailsScreen._error,
-          size: 14,
-        ),
-      ),
-      _SpecItem(
-        'Ticket',
-        '',
-        FaIcon(
-          FontAwesomeIcons.ticket,
-          color: WorkPermitDetailsScreen._error,
-          size: 14,
-        ),
-      ),
-      _SpecItem(
-        'Manpower',
-        '',
-        FaIcon(
-          FontAwesomeIcons.idCard,
-          color: WorkPermitDetailsScreen._error,
-          size: 14,
-        ),
-      ),
-      _SpecItem(
-        'Passport',
-        '',
-        FaIcon(
-          FontAwesomeIcons.passport,
-          color: WorkPermitDetailsScreen._error,
-          size: 14,
-        ),
-      ),
-      _SpecItem(
-        'Photos',
-        '',
-        FaIcon(
-          FontAwesomeIcons.camera,
-          color: WorkPermitDetailsScreen._error,
-          size: 14,
-        ),
-      ),
+      _SpecItem('Visa', '', FontAwesomeIcons.fileLines),
+      _SpecItem('Ticket', '', FontAwesomeIcons.ticket),
+      _SpecItem('Manpower', '', FontAwesomeIcons.idCard),
+      _SpecItem('Passport', '', FontAwesomeIcons.passport),
+      _SpecItem('Photos', '', FontAwesomeIcons.camera),
     ];
 
     return Column(
@@ -1086,7 +1046,7 @@ class _SpecItem {
 
   final String label;
   final String value;
-  final Widget? icon;
+  final FaIconData? icon;
 }
 
 class _SpecRow extends StatelessWidget {
@@ -1120,7 +1080,11 @@ class _SpecRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (item.icon != null) ...[
-                  item.icon!,
+                  FaIcon(
+                    item.icon,
+                    size: 14,
+                    color: WorkPermitDetailsScreen._mutedText,
+                  ),
                   const SizedBox(width: 8),
                 ],
                 Flexible(
