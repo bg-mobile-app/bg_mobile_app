@@ -53,23 +53,53 @@ class AppBrandHeader extends StatelessWidget implements PreferredSizeWidget {
   final Color backgroundColor;
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(74);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: backgroundColor,
       elevation: 0,
-      titleSpacing: 16,
-      title: Image.asset('assets/img/logo/logo_black.png', height: 32, fit: BoxFit.contain),
+      toolbarHeight: 74,
+      automaticallyImplyLeading: false,
+      leadingWidth: 56,
+      leading: IconButton(
+        onPressed: () => Navigator.of(context).maybePop(),
+        icon: const Icon(Icons.arrow_back, color: Color(0xFF374151), size: 32),
+      ),
+      titleSpacing: 0,
+      title: const SizedBox.shrink(),
       actions: [
         if (isLoggedIn) ...[
           IconButton(onPressed: onNotifications, icon: const Icon(Icons.notifications_none, color: Colors.black87), tooltip: 'Notifications'),
           IconButton(onPressed: onProfile, icon: const Icon(Icons.person_outline, color: Colors.black87), tooltip: 'Profile'),
         ] else ...[
-          HeaderActionButton(label: 'Sign In', onTap: onSignIn, brandBlue: brandBlue),
-          const SizedBox(width: 8),
-          HeaderActionButton(label: 'Sign Up', onTap: onSignUp, brandBlue: brandBlue),
+          OutlinedButton(
+            onPressed: onSignIn,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: brandBlue,
+              side: const BorderSide(color: Color(0xFFD7E3FF)),
+              backgroundColor: Colors.white,
+              minimumSize: const Size(112, 58),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            ),
+            child: const Text('Sign In'),
+          ),
+          const SizedBox(width: 10),
+          ElevatedButton(
+            onPressed: onSignUp,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: brandBlue,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(112, 58),
+              elevation: 6,
+              shadowColor: const Color(0x552563EB),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            ),
+            child: const Text('Sign Up'),
+          ),
         ],
         const SizedBox(width: 16),
       ],
