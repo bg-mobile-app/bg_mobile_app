@@ -323,15 +323,7 @@ class WorkPermitDetailsScreen extends StatelessWidget {
 
   Widget _specificationsCard() {
     final rows = [
-      _SpecItem(
-        'Country',
-        item.countryName,
-        FaIcon(
-          FontAwesomeIcons.flag,
-          color: WorkPermitDetailsScreen._error,
-          size: 14,
-        ),
-      ),
+      _SpecItem('Country', item.countryName, FontAwesomeIcons.flag),
       _SpecItem('Work Type', _jobWorkType),
       _SpecItem('Company Name', 'Port Cleaner Co.'),
       _SpecItem('Accommodation', 'Company Provided'),
