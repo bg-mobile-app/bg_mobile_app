@@ -41,7 +41,7 @@ class _FilterResultsState extends State<FilterResults> {
             itemCount: visibleItems.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
+            separatorBuilder: (_, _unused) => const SizedBox(height: 16),
             itemBuilder: (_, i) {
               return TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: 1),

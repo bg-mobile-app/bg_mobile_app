@@ -171,7 +171,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
   Widget _statusDropdown() {
     return DropdownButtonFormField<String>(
-      value: _status,
+      initialValue: _status,
       decoration: const InputDecoration(border: OutlineInputBorder()),
       items: [
         const DropdownMenuItem(value: '', child: Text('All Payments')),

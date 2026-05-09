@@ -212,11 +212,12 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   }
 
   Widget _buildWorkPermitSection() {
-    if (_filteredItems.isEmpty)
+    if (_filteredItems.isEmpty) {
       return const Padding(
         padding: EdgeInsets.only(top: 30),
         child: Text('No work permits found.'),
       );
+    }
     final width = MediaQuery.of(context).size.width;
     final crossAxisCount = 1;
     final childAspectRatio = width >= 768 ? 1.25 : 0.95;
