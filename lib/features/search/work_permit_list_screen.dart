@@ -119,7 +119,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     final size = MediaQuery.of(context).size;
     final isDesktop = size.width >= 1024;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8FF),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBrandHeader(
         brandBlue: _brandBlue,
         isLoggedIn: _isLoggedIn,
@@ -156,11 +156,18 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
 
   Widget _searchBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF4FF),
-        border: Border.all(color: const Color(0xFFD6E3FF)),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFDBEAFE)),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D2563EB),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -169,7 +176,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
               controller: _searchController,
               style: const TextStyle(color: Colors.black),
               decoration: const InputDecoration(
-                fillColor: Color(0xFFEFF4FF),
+                fillColor: Colors.white,
                 hintText: 'Search in bideshgami',
                 hintStyle: TextStyle(color: Color(0xFF64748B)),
                 border: InputBorder.none,
@@ -182,14 +189,21 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
           ),
           InkWell(
             onTap: _showComingSoon,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(14),
             child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
                 color: _brandBlue,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x402563EB),
+                    blurRadius: 18,
+                    offset: Offset(0, 8),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.search, size: 18, color: Colors.white),
+              child: const Icon(Icons.search, size: 20, color: Colors.white),
             ),
           ),
         ],
@@ -205,7 +219,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
       );
     final width = MediaQuery.of(context).size.width;
     final crossAxisCount = 1;
-    final childAspectRatio = width >= 768 ? 3.0 : 1.5;
+    final childAspectRatio = width >= 768 ? 1.25 : 0.78;
 
     return Column(
       children: [

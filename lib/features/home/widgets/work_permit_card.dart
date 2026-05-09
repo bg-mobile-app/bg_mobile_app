@@ -18,143 +18,104 @@ class WorkPermitCard extends StatelessWidget {
   final String Function(int) formatBdt;
   final String Function(DateTime) timeAgo;
 
+  bool get _isLottery => item.selectionType.toUpperCase() == 'LOTTERY';
+
   @override
   Widget build(BuildContext context) {
     return Container(
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFDCE8FF)),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x140F172A),
-            blurRadius: 22,
+            blurRadius: 26,
             offset: Offset(0, 12),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildImageHeader(),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Row(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Content section
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 24,
-                            height: 24,
-                            padding: const EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFF),
-                              borderRadius: BorderRadius.circular(999),
-                              border: Border.all(
-                                color: const Color(0xFFDCE8FF),
-                              ),
-                            ),
-                            child: Image.asset(
-                              item.countryFlag,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              item.countryName.toUpperCase(),
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                letterSpacing: 1,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF64748B),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        item.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          height: 1.25,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          _buildInfoItem(
-                            item.workType.toUpperCase(),
-                            'Work Type',
-                          ),
-                          const SizedBox(width: 12),
-                          // Created time as a badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEFF4FF),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              timeAgo(item.createdAt),
-                              style: const TextStyle(
-                                color: Color(0xFF2563EB),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                Text(
+                  item.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F172A),
+                    height: 1.2,
                   ),
                 ),
-                // Image + selectionType (no border radius)
-                Stack(
+                const SizedBox(height: 14),
+                Row(
                   children: [
+                    _buildMetaCell('Industry', item.workType),
                     Container(
-                      width: 110,
-                      height: 110,
-                      child: Image.asset(
-                        item.image,
-                        width: 110,
-                        height: 110,
-                        fit: BoxFit.cover,
+                      width: 1,
+                      height: 34,
+                      margin: const EdgeInsets.symmetric(horizontal: 14),
+                      color: const Color(0xFFE2E8F0),
+                    ),
+                    _buildMetaCell('Posted', timeAgo(item.createdAt), isBlue: true),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Package Price',
+                            style: TextStyle(
+                              fontSize: 10,
+                              letterSpacing: 0.8,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF94A3B8),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'BDT ${formatBdt(item.customerPrice)}',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: Container(
+                    ElevatedButton(
+                      onPressed: onViewDetails,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: brandBlue,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
+                          horizontal: 18,
+                          vertical: 14,
                         ),
-                        decoration: BoxDecoration(
-                          color: brandBlue.withOpacity(0.85),
-                          borderRadius: BorderRadius.circular(999),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Text(
-                          item.selectionType.replaceAll('_', ' '),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'View Details',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ],
@@ -162,145 +123,100 @@ class WorkPermitCard extends StatelessWidget {
               ],
             ),
           ),
-          // Price and button full width, keep original style
-          _buildPriceSection(),
         ],
       ),
     );
   }
 
-  Widget _buildCountryHeader() {
-    return Row(
-      children: [
-        Container(
-          width: 24,
-          height: 24,
-          padding: const EdgeInsets.all(3),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFF),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: const Color(0xFFDCE8FF)),
-          ),
-          child: Image.asset(item.countryFlag, fit: BoxFit.contain),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            item.countryName.toUpperCase(),
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              letterSpacing: 1,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF64748B),
+  Widget _buildImageHeader() {
+    return SizedBox(
+      height: 190,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(item.image, fit: BoxFit.cover),
+          Positioned(
+            left: 14,
+            top: 14,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 16,
+                    height: 16,
+                    decoration: const BoxDecoration(shape: BoxShape.circle),
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.asset(item.countryFlag, fit: BoxFit.cover),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    item.countryName.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      letterSpacing: 1,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF334155),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-          decoration: BoxDecoration(
-            color: brandBlue.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(
-            item.selectionType.replaceAll('_', ' '),
-            style: TextStyle(
-              color: brandBlue,
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
+          Positioned(
+            right: 14,
+            top: 14,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: _isLottery ? const Color(0xFF10B981) : brandBlue,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                item.selectionType,
+                style: const TextStyle(
+                  fontSize: 10,
+                  letterSpacing: 1,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  // _buildInfoGrid is no longer used
-
-  Widget _buildInfoItem(String value, String label) {
-    return Flexible(
+  Widget _buildMetaCell(String label, String value, {bool isBlue = false}) {
+    return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+            label.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 10,
+              letterSpacing: 0.8,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF94A3B8),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCardImage() {
-    return Container(
-      width: 72,
-      height: 72,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        image: DecorationImage(
-          image: AssetImage(item.image),
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceSection() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: brandBlue.withValues(alpha: 0.07),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
-        border: Border(
-          top: BorderSide(color: brandBlue.withValues(alpha: 0.2)),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'BDT ${formatBdt(item.customerPrice)}',
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 2),
-              const Text(
-                'Customer Price',
-                style: TextStyle(fontSize: 10, color: Color(0xFF64748B)),
-              ),
-            ],
-          ),
-          ElevatedButton(
-            onPressed: onViewDetails,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: brandBlue,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(96, 36),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              'View Details',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: isBlue ? brandBlue : const Color(0xFF334155),
             ),
           ),
         ],
