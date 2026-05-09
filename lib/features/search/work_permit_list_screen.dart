@@ -23,11 +23,11 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     WorkPermitItem(
       title: 'Factory Worker Visa - Malaysia',
       slug: 'factory-worker-malaysia',
-      image: 'assets/img/work-permit/1.jpg',
+      image: 'assets/img/work-permit/3.png',
       customerPrice: 420000,
       agentPrice: 390000,
       countryName: 'Malaysia',
-      countryFlag: 'assets/img/customer/appointment/world.png',
+      countryFlag: 'assets/img/customer/appointment/Malaysia.webp',
       workType: 'Factory',
       selectionType: 'DIRECT',
       createdAt: DateTime.now().subtract(const Duration(hours: 10)),
@@ -35,11 +35,11 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     WorkPermitItem(
       title: 'Construction Helper - Romania',
       slug: 'construction-helper-romania',
-      image: 'assets/img/work-permit/1.jpg',
+      image: 'assets/img/work-permit/2.png',
       customerPrice: 560000,
       agentPrice: 520000,
       countryName: 'Romania',
-      countryFlag: 'assets/img/customer/appointment/world.png',
+      countryFlag: 'assets/img/customer/appointment/Romania.png',
       workType: 'Construction',
       selectionType: 'LOTTERY',
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -51,7 +51,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
       customerPrice: 680000,
       agentPrice: 640000,
       countryName: 'Japan',
-      countryFlag: 'assets/img/customer/appointment/world.png',
+      countryFlag: 'assets/img/customer/appointment/Japan.png',
       workType: 'Hospitality',
       selectionType: 'DIRECT',
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -219,7 +219,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
       );
     final width = MediaQuery.of(context).size.width;
     final crossAxisCount = 1;
-    final childAspectRatio = width >= 768 ? 1.25 : 0.78;
+    final childAspectRatio = width >= 768 ? 1.25 : 0.95;
 
     return Column(
       children: [
