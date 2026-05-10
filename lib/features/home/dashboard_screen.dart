@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../common/theme/app_colors.dart';
+import '../../common/theme/app_text_styles.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final crossAxisCount = width >= 960 ? 3 : (width >= 640 ? 2 : 1);
+
     return DashboardPageScaffold(
       currentHref: '/dashboard/customer',
       child: SafeArea(
@@ -15,48 +20,73 @@ class DashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'DASHBOARD OVERVIEW',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF334155),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFF94A3B8)),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      'This Month',
-                      style: TextStyle(fontSize: 13),
-                    ),
-                  ),
-                ],
+              const _DashboardBreadcrumbs(),
+              const SizedBox(height: 14),
+              Text(
+                'DASHBOARD\nOVERVIEW',
+                style: AppTextStyles.headline1.copyWith(
+                  fontSize: 56,
+                  height: 1.03,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.8,
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Text(
+                'Welcome back, your global pipeline is looking healthy.',
+                style: AppTextStyles.body1.copyWith(
+                  color: AppColors.textSecondary,
+                  fontSize: 20,
+                  height: 1.35,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFCBD3E5)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x0F2563EB),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'This Month',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textPrimary),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               GridView.count(
-                crossAxisCount: 2,
+                crossAxisCount: crossAxisCount,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 1.35,
+                crossAxisSpacing: 14,
+                mainAxisSpacing: 14,
+                childAspectRatio: width < 640 ? 2.55 : 2.1,
                 children: const [
-                  DashboardSmallCard(label: 'Total Applied Job', icon: Icons.menu_book, value: '৳0'),
-                  DashboardSmallCard(label: 'Under Processing', icon: Icons.hourglass_top, value: '৳0'),
-                  DashboardSmallCard(label: 'Success Flight', icon: Icons.flight_takeoff, value: '৳0'),
-                  DashboardSmallCard(label: 'Reject Flight', icon: Icons.flight_land, value: '৳0', red: true),
+                  DashboardSmallCard(label: 'Total Applied Job', icon: Icons.menu_book_outlined, value: '৳0'),
+                  DashboardSmallCard(label: 'Under Processing', icon: Icons.hourglass_top_rounded, value: '৳0'),
+                  DashboardSmallCard(label: 'Success Flight', icon: Icons.flight_takeoff_rounded, value: '৳0'),
+                  DashboardSmallCard(label: 'Reject Flight', icon: Icons.flight_land_rounded, value: '৳0', red: true),
                   DashboardSmallCard(label: 'Return Passport', icon: Icons.badge_outlined, value: '৳0'),
-                  DashboardSmallCard(label: 'Total Appointment', icon: Icons.event_note, value: '৳0'),
+                  DashboardSmallCard(label: 'Total Appointment', icon: Icons.event_note_rounded, value: '৳0'),
                   DashboardSmallCard(label: 'Total Amount', icon: Icons.payments_outlined, value: '৳0'),
                   DashboardSmallCard(label: 'Paid Amount', icon: Icons.account_balance_wallet_outlined, value: '৳0'),
                   DashboardSmallCard(label: 'Due Amount', icon: Icons.money_off_csred_outlined, value: '৳0', red: true),
@@ -66,6 +96,25 @@ class DashboardScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DashboardBreadcrumbs extends StatelessWidget {
+  const _DashboardBreadcrumbs();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Icon(Icons.home_outlined, size: 14, color: AppColors.textSecondary),
+        SizedBox(width: 6),
+        Text('Home', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+        SizedBox(width: 6),
+        Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.textDisabled),
+        SizedBox(width: 6),
+        Text('Dashboard', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w700)),
+      ],
     );
   }
 }
@@ -350,54 +399,65 @@ class DashboardSmallCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = red ? const Color(0xFFF6C6C6) : const Color(0xFFC9D1E8);
+    final iconBg = red ? const Color(0xFFF8DDDD) : const Color(0xFFE7EEFF);
+    final iconColor = red ? const Color(0xFFB01414) : AppColors.primary;
+    final labelColor = red ? const Color(0xFFC11212) : const Color(0xFFB3BAD1);
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 8,
-            offset: Offset(0, 2),
+            color: Color(0x0A000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      padding: const EdgeInsets.all(16),
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF3B82F6),
-                  borderRadius: BorderRadius.all(Radius.circular(4)),
-                ),
-                child: Icon(
-                  icon,
-                  color: red ? Colors.orange : Colors.white,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: iconColor, size: 30),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   label,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: labelColor,
+                    height: 1.2,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                const SizedBox(height: 6),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    fontSize: 48,
+                    height: 0.95,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
