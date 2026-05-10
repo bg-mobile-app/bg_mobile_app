@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
+import '../../common/theme/app_palette.dart';
+import '../../common/theme/app_text_styles.dart';
 import 'dashboard_screen.dart';
 
 class CheckStatusScreen extends StatefulWidget {
@@ -80,99 +83,89 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
       currentHref: '/dashboard/customer/check-status',
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            color: Colors.white,
+      child: Container(
+        color: AppPalette.pageBackground,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                RichText(
-                  text: const TextSpan(
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black),
-                    children: [
-                      TextSpan(text: 'Check Your '),
-                      TextSpan(text: 'Application', style: TextStyle(color: Color(0xFF2563EB))),
-                    ],
+                _breadcrumb(),
+                const SizedBox(height: 8),
+                Text('Check Status', style: AppTextStyles.headline2.copyWith(fontSize: 25, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 4),
+                Text('Track your file status using passport and booking ID.', style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted)),
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppPalette.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppPalette.borderSoftBlue),
+                    boxShadow: AppPalette.cardShadow,
                   ),
-                ),
-                const SizedBox(height: 16),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isNarrow = constraints.maxWidth < 700;
-                          if (isNarrow) {
-                            return Column(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isNarrow = constraints.maxWidth < 700;
+                            if (isNarrow) {
+                              return Column(
+                                children: [
+                                  _inputField(label: 'Passport Number', controller: _passportController, autofocus: true),
+                                  const SizedBox(height: 12),
+                                  _inputField(label: 'Booking ID', controller: _bookingIdController),
+                                ],
+                              );
+                            }
+                            return Row(
                               children: [
-                                _inputField(
-                                  label: 'Passport Number',
-                                  controller: _passportController,
-                                  autofocus: true,
-                                ),
-                                const SizedBox(height: 12),
-                                _inputField(
-                                  label: 'Booking ID',
-                                  controller: _bookingIdController,
-                                ),
+                                Expanded(child: _inputField(label: 'Passport Number', controller: _passportController, autofocus: true)),
+                                const SizedBox(width: 12),
+                                Expanded(child: _inputField(label: 'Booking ID', controller: _bookingIdController)),
                               ],
                             );
-                          }
-                          return Row(
-                            children: [
-                              Expanded(
-                                child: _inputField(
-                                  label: 'Passport Number',
-                                  controller: _passportController,
-                                  autofocus: true,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _inputField(
-                                  label: 'Booking ID',
-                                  controller: _bookingIdController,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 10,
-                        children: [
-                          ElevatedButton(
-                            onPressed: _submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2563EB),
-                              foregroundColor: Colors.white,
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 10,
+                          children: [
+                            FilledButton(
+                              onPressed: _submit,
+                              style: FilledButton.styleFrom(backgroundColor: AppPalette.brandBlue),
+                              child: const Text('Submit'),
                             ),
-                            child: const Text('Submit'),
-                          ),
-                          ElevatedButton(
-                            onPressed: _clear,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFD1D5DB),
-                              foregroundColor: Colors.black,
+                            OutlinedButton(
+                              onPressed: _clear,
+                              style: OutlinedButton.styleFrom(side: const BorderSide(color: AppPalette.borderSoftBlue)),
+                              child: const Text('Clear'),
                             ),
-                            child: const Text('Clear'),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 if (_submitted) ...[
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   if (_data.isEmpty)
-                    const Text(
-                      'No application found for given Passport Number and Booking ID.',
-                      style: TextStyle(color: Color(0xFF64748B)),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppPalette.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppPalette.borderSoftBlue),
+                      ),
+                      child: const Text(
+                        'No application found for given Passport Number and Booking ID.',
+                        style: TextStyle(color: AppPalette.textMuted),
+                      ),
                     )
                   else
                     Column(
@@ -192,6 +185,18 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
     );
   }
 
+  Widget _breadcrumb() {
+    return BreadCrumb(
+      items: <BreadCrumbItem>[
+        BreadCrumbItem(content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
+        BreadCrumbItem(
+          content: Text('Check Status', style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700)),
+        ),
+      ],
+      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+    );
+  }
+
   Widget _inputField({required String label, required TextEditingController controller, bool autofocus = false}) {
     return TextFormField(
       controller: controller,
@@ -199,7 +204,10 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
       decoration: InputDecoration(
         labelText: label,
         hintText: label,
-        border: const OutlineInputBorder(),
+        filled: true,
+        fillColor: AppPalette.surface,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppPalette.borderSoftBlue)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppPalette.borderSoftBlue)),
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
@@ -213,8 +221,10 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
   Widget _statusCard({required BookingStatusItem item}) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        borderRadius: BorderRadius.circular(8),
+        color: AppPalette.surface,
+        border: Border.all(color: AppPalette.borderSoftBlue),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: AppPalette.softShadow,
       ),
       child: Column(
         children: [
@@ -223,9 +233,9 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: const BoxDecoration(
               color: Color(0x1A2563EB),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
             ),
-            child: Text('Booking ID #${item.id}', style: const TextStyle(fontWeight: FontWeight.w600)),
+            child: Text('Booking ID #${item.id}', style: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textStrongBlue)),
           ),
           _tableRow('Full Name', item.name),
           _tableRow('Passport Number', item.passportNo),
@@ -246,7 +256,7 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
   Widget _tableRow(String label, String value, {bool isLast = false}) {
     return Container(
       decoration: BoxDecoration(
-        border: isLast ? null : const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+        border: isLast ? null : const Border(bottom: BorderSide(color: AppPalette.borderNeutral)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -255,11 +265,11 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
           children: [
             Expanded(
               flex: 3,
-              child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF475569))),
+              child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textMuted)),
             ),
             Expanded(
               flex: 7,
-              child: Text(value, style: const TextStyle(color: Color(0xFF1F2937))),
+              child: Text(value, style: const TextStyle(color: AppPalette.textPrimary)),
             ),
           ],
         ),

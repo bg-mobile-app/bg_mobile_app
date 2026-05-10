@@ -188,87 +188,223 @@ class _SuccessFlightScreenState extends State<SuccessFlightScreen> {
   );
 
   Widget _buildCardView() => Column(
-    children: _items.map((item) => Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppPalette.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppPalette.borderSoftBlue),
-        boxShadow: AppPalette.cardShadow,
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Expanded(
-            child: Text(
-              item.serviceType,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppPalette.textPrimary),
+        children: _items.map((item) {
+          final dueAmount = item.packagePrice - item.paidAmount;
+          return Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFFFF),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFBBC1D6)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0D000000),
+                  blurRadius: 15,
+                  offset: Offset(0, 8),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(width: 10),
-          _statusPill(item.statusLabel, const Color(0xFFD1FAE5), const Color(0xFF166534)),
-        ]),
-        const SizedBox(height: 4),
-        Text(
-          " • ",
-          style: const TextStyle(color: AppPalette.textMuted, fontSize: 13),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppPalette.borderNeutral),
-          ),
-          child: Column(children: [
-            _row("Post ID", item.postId),
-            _row("Booking ID", item.bookingId.toString()),
-            _row("Date", item.date),
-            _row("Customer", item.customerName),
-            _row("Passport", item.passportNo, isLast: true),
-          ]),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFEAF8EE),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFBBF7D0)),
-          ),
-          child: Row(children: [
-            Expanded(child: _priceCol("Package Price", item.packagePrice)),
-            Container(width: 1, height: 34, color: const Color(0xFFBBF7D0)),
-            Expanded(child: _priceCol("Paid Amount", item.paidAmount)),
-          ]),
-        ),
-      ]),
-    )).toList(),
-  );
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF1F3FF),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD1FAE5),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Icon(
+                          Icons.flight_takeoff_rounded,
+                          color: Color(0xFF166534),
+                          size: 34,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.customerName,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF191B24),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFD8E6FF),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    item.postId,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF38485D),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  '•',
+                                  style: TextStyle(color: Color(0xFF737687), fontSize: 12),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    item.serviceType,
+                                    style: const TextStyle(fontSize: 15, color: Color(0xFF434655)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      _statusPill(item.statusLabel, const Color(0xFFD1FAE5), const Color(0xFF166534)),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(child: _detailTile('BOOKING ID', item.bookingId.toString(), Icons.confirmation_num_outlined)),
+                          const SizedBox(width: 14),
+                          Expanded(child: _detailTile('STATUS', item.statusLabel, Icons.groups_outlined)),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Expanded(child: _detailTile('DATE', _displayDate(item.date), Icons.calendar_today_outlined)),
+                          const SizedBox(width: 14),
+                          Expanded(child: _detailTile('SERVICE TYPE', item.serviceType, Icons.article_outlined)),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F3FF),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFBBC1D6)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.flight, color: Color(0xFF434655), size: 30),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'PASSPORT NUMBER',
+                                    style: TextStyle(fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687)),
+                                  ),
+                                  Text(item.passportNo, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.verified, color: Color(0xFF737687), size: 28),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      const Divider(color: Color(0xFFBBC1D6)),
+                      const SizedBox(height: 12),
+                      _amountRow('Package Price', '${_money(item.packagePrice)} BDT', const Color(0xFF191B24), false),
+                      const SizedBox(height: 12),
+                      _amountRow('Paid Amount', '${_money(item.paidAmount)} BDT', AppPalette.brandBlue, true),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(color: const Color(0xFFD1FAE5), borderRadius: BorderRadius.circular(14)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('DUE AMOUNT', style: TextStyle(color: Color(0xFF166534), fontWeight: FontWeight.w700, fontSize: 14)),
+                            Text('${_money(dueAmount)} BDT', style: const TextStyle(color: Color(0xFF166534), fontWeight: FontWeight.w800, fontSize: 20)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      );
 
-  Widget _row(String label, String value, {bool isLast = false}) => Container(
-    padding: const EdgeInsets.symmetric(vertical: 7),
-    decoration: BoxDecoration(
-      border: Border(bottom: BorderSide(color: isLast ? Colors.transparent : AppPalette.borderNeutral)),
-    ),
-    child: Row(children: [
-      SizedBox(width: 96, child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: AppPalette.textMuted, fontSize: 12))),
-      Expanded(child: Text(value, style: const TextStyle(color: AppPalette.textPrimary, fontWeight: FontWeight.w600))),
-    ]),
-  );
+  Widget _detailTile(String label, String value, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Icon(icon, size: 22, color: AppPalette.brandBlue),
+            const SizedBox(width: 8),
+            Expanded(child: Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
+          ],
+        ),
+      ],
+    );
+  }
 
-  Widget _priceCol(String label, int amount) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(label, style: const TextStyle(fontSize: 11, color: AppPalette.textMuted, fontWeight: FontWeight.w700)),
-      const SizedBox(height: 4),
-      Text("৳ ", style: const TextStyle(fontSize: 16, color: AppPalette.textPrimary, fontWeight: FontWeight.w800)),
-    ],
-  );
+  Widget _amountRow(String label, String value, Color color, bool bold) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 15, color: Color(0xFF434655))),
+        Text(value, style: TextStyle(fontSize: 19, fontWeight: bold ? FontWeight.w700 : FontWeight.w600, color: color)),
+      ],
+    );
+  }
+
+  String _displayDate(String iso) {
+    final parts = iso.split('-');
+    if (parts.length != 3) return iso;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${months[int.parse(parts[1]) - 1]} ${parts[2]}, ${parts[0]}';
+  }
+
+  String _money(int amount) {
+    final s = amount.toString();
+    final chars = s.split('').reversed.toList();
+    final parts = <String>[];
+    for (int i = 0; i < chars.length; i += 3) {
+      parts.add(chars.sublist(i, (i + 3).clamp(0, chars.length)).join());
+    }
+    return parts.join(',').split('').reversed.join();
+  }
 
   Widget _statusPill(String label, Color bg, Color fg) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../common/theme/app_colors.dart';
+import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -14,85 +15,74 @@ class DashboardScreen extends StatelessWidget {
 
     return DashboardPageScaffold(
       currentHref: '/dashboard/customer',
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _DashboardBreadcrumbs(),
-              const SizedBox(height: 14),
-              Text(
-                'DASHBOARD\nOVERVIEW',
-                style: AppTextStyles.headline1.copyWith(
-                  fontSize: 56,
-                  height: 1.03,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.8,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Welcome back, your global pipeline is looking healthy.',
-                style: AppTextStyles.body1.copyWith(
-                  color: AppColors.textSecondary,
-                  fontSize: 20,
-                  height: 1.35,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFCBD3E5)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x0F2563EB),
-                      blurRadius: 12,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Row(
+      child: Container(
+        color: AppPalette.pageBackground,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1080),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        'This Month',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
+                    const _DashboardBreadcrumbs(),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Dashboard Overview',
+                      style: AppTextStyles.headline1.copyWith(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w800,
+                        height: 1.08,
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textPrimary),
+                    const SizedBox(height: 6),
+                    const SizedBox(height: 18),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppPalette.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppPalette.borderSoftBlue),
+                        boxShadow: AppPalette.softShadow,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'This Month',
+                              style: AppTextStyles.subtitle1.copyWith(fontSize: 17),
+                            ),
+                          ),
+                          const Icon(Icons.keyboard_arrow_down_rounded, color: AppPalette.textPrimary),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    GridView.count(
+                      crossAxisCount: crossAxisCount,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisSpacing: 14,
+                      mainAxisSpacing: 14,
+                      childAspectRatio: width < 640 ? 2.45 : 2.0,
+                      children: const [
+                        DashboardSmallCard(label: 'Total Applied Job', icon: Icons.menu_book_outlined, value: '0'),
+                        DashboardSmallCard(label: 'Under Processing', icon: Icons.hourglass_top_rounded, value: '0'),
+                        DashboardSmallCard(label: 'Success Flight', icon: Icons.flight_takeoff_rounded, value: '0'),
+                        DashboardSmallCard(label: 'Reject Flight', icon: Icons.flight_land_rounded, value: '0', red: true),
+                        DashboardSmallCard(label: 'Return Passport', icon: Icons.badge_outlined, value: '0'),
+                        DashboardSmallCard(label: 'Total Appointment', icon: Icons.event_note_rounded, value: '0'),
+                        DashboardSmallCard(label: 'Total Amount', icon: Icons.payments_outlined, value: '৳0'),
+                        DashboardSmallCard(label: 'Paid Amount', icon: Icons.account_balance_wallet_outlined, value: '৳0'),
+                        DashboardSmallCard(label: 'Due Amount', icon: Icons.money_off_csred_outlined, value: '৳0', red: true),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              GridView.count(
-                crossAxisCount: crossAxisCount,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                childAspectRatio: width < 640 ? 2.55 : 2.1,
-                children: const [
-                  DashboardSmallCard(label: 'Total Applied Job', icon: Icons.menu_book_outlined, value: '৳0'),
-                  DashboardSmallCard(label: 'Under Processing', icon: Icons.hourglass_top_rounded, value: '৳0'),
-                  DashboardSmallCard(label: 'Success Flight', icon: Icons.flight_takeoff_rounded, value: '৳0'),
-                  DashboardSmallCard(label: 'Reject Flight', icon: Icons.flight_land_rounded, value: '৳0', red: true),
-                  DashboardSmallCard(label: 'Return Passport', icon: Icons.badge_outlined, value: '৳0'),
-                  DashboardSmallCard(label: 'Total Appointment', icon: Icons.event_note_rounded, value: '৳0'),
-                  DashboardSmallCard(label: 'Total Amount', icon: Icons.payments_outlined, value: '৳0'),
-                  DashboardSmallCard(label: 'Paid Amount', icon: Icons.account_balance_wallet_outlined, value: '৳0'),
-                  DashboardSmallCard(label: 'Due Amount', icon: Icons.money_off_csred_outlined, value: '৳0', red: true),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -107,13 +97,13 @@ class _DashboardBreadcrumbs extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: const [
-        Icon(Icons.home_outlined, size: 14, color: AppColors.textSecondary),
+        Icon(Icons.home_outlined, size: 14, color: AppPalette.textMuted),
         SizedBox(width: 6),
-        Text('Home', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+        Text('Home', style: TextStyle(fontSize: 12, color: AppPalette.textMuted, fontWeight: FontWeight.w500)),
         SizedBox(width: 6),
-        Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.textDisabled),
+        Icon(Icons.chevron_right_rounded, size: 16, color: AppPalette.textMuted),
         SizedBox(width: 6),
-        Text('Dashboard', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w700)),
+        Text('Dashboard', style: TextStyle(fontSize: 12, color: AppPalette.brandBlue, fontWeight: FontWeight.w700)),
       ],
     );
   }
@@ -440,7 +430,7 @@ class DashboardSmallCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: labelColor,
                     height: 1.2,

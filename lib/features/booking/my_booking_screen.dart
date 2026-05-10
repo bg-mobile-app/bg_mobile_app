@@ -320,193 +320,379 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
   );
 
   Widget _buildCardList() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Text(
-        'All Booking File • 3 total entries',
-        style: TextStyle(color: AppPalette.textMuted, fontSize: 14),
-      ),
-      const SizedBox(height: 10),
-      ..._bookings.map((item) {
-        final style = _styleFor(item.statusLabel);
-        final progress = ((item.paidAmount / item.packagePrice) * 100).round();
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppPalette.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppPalette.borderSoftBlue),
-            boxShadow: AppPalette.cardShadow,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'All Booking File • ${_bookings.length} total entries',
+            style: const TextStyle(color: AppPalette.textMuted, fontSize: 14),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 10),
+          ..._bookings.map((item) {
+            final style = _styleFor(item.statusLabel);
+            final dueAmount = item.packagePrice - item.paidAmount;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFBBC1D6)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x0D000000),
+                    blurRadius: 15,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(9),
-                    decoration: BoxDecoration(
-                      color: style.iconBg,
-                      borderRadius: BorderRadius.circular(10),
+                    padding: const EdgeInsets.all(20),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF1F3FF),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
                     ),
-                    child: Icon(style.icon, color: style.iconColor),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: style.badgeBg,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Text(
-                      item.statusLabel,
-                      style: TextStyle(color: style.badgeText, fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    item.serviceType,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppPalette.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    item.postId,
-                    style: const TextStyle(color: AppPalette.textMuted),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_today_outlined,
-                    size: 16,
-                    color: AppPalette.textMuted,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    _displayDate(item.date),
-                    style: const TextStyle(color: AppPalette.textMuted),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _row('Customer', item.customerName),
-              _row('Passport', item.passportNo),
-              _row(
-                'Total Price',
-                '৳ ${_money(item.packagePrice)}',
-                valueStyle: const TextStyle(
-                  color: AppPalette.textStrongBlue,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: style.progressBg,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Row(
                       children: [
-                        Text(
-                          style.progressLabel,
-                          style: TextStyle(color: style.progressText),
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: style.iconBg,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Icon(style.icon, color: style.iconColor, size: 34),
                         ),
-                        Text(
-                          '$progress%',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.customerName,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF191B24),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFD8E6FF),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      item.postId,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF38485D),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    '•',
+                                    style: TextStyle(
+                                      color: Color(0xFF737687),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      item.serviceType,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Color(0xFF434655),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: LinearProgressIndicator(
-                        value: progress / 100,
-                        minHeight: 4,
-                        backgroundColor: style.progressTrack,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          style.progressColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Paid: ৳ ${_money(item.paidAmount)}',
-                      style: TextStyle(
-                        color: style.progressText,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              FilledButton.icon(
-                onPressed: () {},
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(46),
-                  backgroundColor: AppPalette.borderSoftBlue,
-                  foregroundColor: AppPalette.brandBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-                icon: Icon(style.ctaIcon, size: 18),
-                label: Text(style.ctaLabel),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _detailTile(
+                                'BOOKING ID',
+                                item.bookingId.toString(),
+                                Icons.confirmation_num_outlined,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: _detailTile(
+                                'STATUS',
+                                item.statusLabel,
+                                Icons.groups_outlined,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _detailTile(
+                                'DATE',
+                                _displayDate(item.date),
+                                Icons.calendar_today_outlined,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: _detailTile(
+                                'SERVICE TYPE',
+                                item.serviceType,
+                                Icons.article_outlined,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F3FF),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: const Color(0xFFBBC1D6)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.flight,
+                                color: Color(0xFF434655),
+                                size: 30,
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'PASSPORT NUMBER',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        letterSpacing: 1,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF737687),
+                                      ),
+                                    ),
+                                    Text(
+                                      item.passportNo,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: style.badgeBg,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  item.statusLabel,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: style.badgeText,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        const Divider(color: Color(0xFFBBC1D6)),
+                        const SizedBox(height: 12),
+                        _amountRow(
+                          'Package Price',
+                          '${_money(item.packagePrice)} BDT',
+                          const Color(0xFF191B24),
+                          false,
+                        ),
+                        const SizedBox(height: 12),
+                        _amountRow(
+                          'Paid Amount',
+                          '${_money(item.paidAmount)} BDT',
+                          AppPalette.brandBlue,
+                          true,
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFAD6D6),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'DUE AMOUNT',
+                                style: TextStyle(
+                                  color: Color(0xFF9F0E0E),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                '${_money(dueAmount)} BDT',
+                                style: const TextStyle(
+                                  color: Color(0xFF9F0E0E),
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: () {},
+                            icon: Icon(style.ctaIcon, size: 18),
+                            label: Text(
+                              style.ctaLabel,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size.fromHeight(56),
+                              backgroundColor: AppPalette.borderSoftBlue,
+                              foregroundColor: AppPalette.textMuted,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF1F3FF),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: Color(0xFF737687),
+                          size: 18,
+                        ),
+                        SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'PLEASE ARRIVE 15 MINUTES BEFORE YOUR SCHEDULED TIME.',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF434655),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-      }),
-    ],
-  );
+            );
+          }),
+        ],
+      );
 
-  Widget _row(String label, String value, {TextStyle? valueStyle}) => Container(
-    padding: const EdgeInsets.only(bottom: 8, top: 2),
-    margin: const EdgeInsets.only(bottom: 2),
-    decoration: const BoxDecoration(
-      border: Border(bottom: BorderSide(color: AppPalette.borderNeutral)),
-    ),
-    child: Row(
+  Widget _detailTile(String label, String value, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: AppPalette.textMuted,
-              letterSpacing: 0.4,
-            ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            letterSpacing: 1,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF737687),
           ),
         ),
-        Text(
-          value,
-          style: valueStyle ?? const TextStyle(fontSize: 16),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Icon(icon, size: 22, color: AppPalette.brandBlue),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
         ),
       ],
-    ),
-  );
+    );
+  }
+
+  Widget _amountRow(String label, String value, Color color, bool bold) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 15, color: Color(0xFF434655))),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 19,
+            fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
 
   String _displayDate(String iso) {
     final parts = iso.split('-');

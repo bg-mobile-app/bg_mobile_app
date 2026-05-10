@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
 import '../../common/theme/app_colors.dart';
+import '../../common/theme/app_palette.dart';
 import '../home/dashboard_screen.dart';
 import 'appointment_ticket_screen.dart';
 
@@ -32,8 +33,6 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
       avatarText: 'SH',
       avatarColor: Color(0xFF2563EB),
       actionLabel: 'Download Ticket',
-      packagePrice: 85000,
-      paidAmount: 45000,
     ),
     AppointmentBookingItem(
       postId: 'EP-8200',
@@ -51,8 +50,6 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
       avatarColor: Color(0xFFC7D2FE),
       avatarTextColor: Color(0xFF475569),
       actionLabel: 'Join Meeting',
-      packagePrice: 78000,
-      paidAmount: 38000,
     ),
     AppointmentBookingItem(
       postId: 'SK-4412',
@@ -69,8 +66,6 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
       avatarText: 'DK',
       avatarColor: Color(0xFF6B7280),
       actionLabel: 'Download Ticket',
-      packagePrice: 85000,
-      paidAmount: 45000,
     ),
   ];
 
@@ -354,7 +349,7 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(item.fullName, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color(0xFF191B24))),
+                          Text(item.fullName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Color(0xFF191B24))),
                           const SizedBox(height: 4),
                           Row(children: [
                             Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: const Color(0xFFD8E6FF), borderRadius: BorderRadius.circular(8)), child: Text(item.postId, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF38485D)))),
@@ -390,8 +385,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                         const Icon(Icons.flight, color: Color(0xFF434655), size: 30),
                         const SizedBox(width: 14),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          const Text('PASSPORT NUMBER', style: TextStyle(fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
-                          Text(item.passportNo, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                          const Text('PASSPORT NUMBER', style: TextStyle(fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
+                          Text(item.passportNo, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                         ])),
                         const Icon(Icons.verified, color: Color(0xFF737687), size: 28),
                       ]),
@@ -407,8 +402,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(color: const Color(0xFFFAD6D6), borderRadius: BorderRadius.circular(14)),
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text('DUE AMOUNT', style: TextStyle(color: Color(0xFF9F0E0E), fontWeight: FontWeight.w700, fontSize: 16)),
-                        Text('${_formatMoney(dueAmount)} BDT', style: const TextStyle(color: Color(0xFF9F0E0E), fontWeight: FontWeight.w800, fontSize: 24)),
+                        const Text('DUE AMOUNT', style: TextStyle(color: Color(0xFF9F0E0E), fontWeight: FontWeight.w700, fontSize: 14)),
+                        Text('${_formatMoney(dueAmount)} BDT', style: const TextStyle(color: Color(0xFF9F0E0E), fontWeight: FontWeight.w800, fontSize: 16)),
                       ]),
                     ),
                     const SizedBox(height: 16),
@@ -417,8 +412,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                       child: FilledButton.icon(
                         onPressed: () => _openTicket(item),
                         icon: const Icon(Icons.download, size: 22),
-                        label: const Text('Download Ticket', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                        style: FilledButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, minimumSize: const Size.fromHeight(56), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                        label: const Text('Download Ticket', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                        style: FilledButton.styleFrom(backgroundColor: AppPalette.borderSoftBlue, foregroundColor: AppPalette.textMuted, minimumSize: const Size.fromHeight(56), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                       ),
                     ),
                   ]),
@@ -443,14 +438,14 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label, style: const TextStyle(fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
       const SizedBox(height: 6),
-      Row(children: [Icon(icon, size: 22, color: AppColors.primary), const SizedBox(width: 8), Expanded(child: Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)))]),
+      Row(children: [Icon(icon, size: 22, color: AppColors.primary), const SizedBox(width: 8), Expanded(child: Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)))]),
     ]);
   }
 
   Widget _amountRow(String label, String value, Color color, bool bold) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: const TextStyle(fontSize: 18, color: Color(0xFF434655))),
-      Text(value, style: TextStyle(fontSize: 24, fontWeight: bold ? FontWeight.w700 : FontWeight.w600, color: color)),
+      Text(label, style: const TextStyle(fontSize: 15, color: Color(0xFF434655))),
+      Text(value, style: TextStyle(fontSize: 19, fontWeight: bold ? FontWeight.w700 : FontWeight.w600, color: color)),
     ]);
   }
 
@@ -629,7 +624,5 @@ class AppointmentBookingItem {
     required this.avatarColor,
     this.avatarTextColor = Colors.white,
     required this.actionLabel,
-    required this.packagePrice,
-    required this.paidAmount,
   });
 }

@@ -289,7 +289,7 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
         Text('$label *', style: const TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           items: items
               .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
               .toList(),

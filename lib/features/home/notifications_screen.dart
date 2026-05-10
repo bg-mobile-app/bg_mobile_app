@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
+import '../../common/theme/app_palette.dart';
+import '../../common/theme/app_text_styles.dart';
 import 'dashboard_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -81,146 +84,163 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
       currentHref: '/dashboard/notifications',
-      child: SafeArea(
-        child: _loading && _notifications.isEmpty
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 920),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isCompact = constraints.maxWidth < 640;
-                          return Flex(
-                            direction: isCompact ? Axis.vertical : Axis.horizontal,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: isCompact ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-                            children: [
-                              const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                Row(children: [Icon(Icons.notifications, color: Color(0xFF2563EB)), SizedBox(width: 8), Text('Notifications', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold))]),
-                                SizedBox(height: 4),
-                                Text('Manage your latest activity and alerts', style: TextStyle(color: Color(0xFF64748B))),
-                              ]),
-                              if (_notifications.any((n) => !n.isRead)) ...[
-                                if (isCompact) const SizedBox(height: 12),
-                                TextButton.icon(
-                                  onPressed: _loading ? null : _markAllRead,
-                                  icon: const Icon(Icons.done_all),
-                                  label: const Text('Mark all as read'),
-                                ),
-                              ],
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                        ),
-                        child: _notifications.isEmpty
-                            ? const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 80),
-                                child: Center(
-                                  child: Column(
-                                    children: [
-                                      Icon(Icons.inbox_outlined, size: 48, color: Color(0xFF94A3B8)),
-                                      SizedBox(height: 12),
-                                      Text('Your inbox is empty', style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF64748B))),
-                                      SizedBox(height: 6),
-                                      Text("We'll notify you when something happens.", style: TextStyle(color: Color(0xFF94A3B8))),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Column(
-                                children: _notifications.map((n) => _notificationItem(n)).toList(),
+      child: Container(
+        color: AppPalette.pageBackground,
+        child: SafeArea(
+          child: _loading && _notifications.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 980),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _breadcrumb(),
+                          const SizedBox(height: 8),
+                          Text('Notifications', style: AppTextStyles.headline2.copyWith(fontSize: 25, fontWeight: FontWeight.w800)),
+                          const SizedBox(height: 4),
+                          Text('Manage your latest activity and alerts.', style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted)),
+                          const SizedBox(height: 14),
+                          if (_notifications.any((n) => !n.isRead))
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: OutlinedButton.icon(
+                                onPressed: _loading ? null : _markAllRead,
+                                style: OutlinedButton.styleFrom(side: const BorderSide(color: AppPalette.borderSoftBlue)),
+                                icon: const Icon(Icons.done_all),
+                                label: const Text('Mark all as read'),
                               ),
+                            ),
+                          const SizedBox(height: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppPalette.surface,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppPalette.borderSoftBlue),
+                              boxShadow: AppPalette.cardShadow,
+                            ),
+                            child: _notifications.isEmpty
+                                ? const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 80),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Icon(Icons.inbox_outlined, size: 48, color: Color(0xFF94A3B8)),
+                                          SizedBox(height: 12),
+                                          Text('Your inbox is empty', style: TextStyle(fontWeight: FontWeight.w600, color: AppPalette.textMuted)),
+                                          SizedBox(height: 6),
+                                          Text("We'll notify you when something happens.", style: TextStyle(color: Color(0xFF94A3B8))),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : Column(
+                                    children: _notifications.map((n) => _notificationItem(n)).toList(),
+                                  ),
+                          ),
+                        ],
                       ),
-                    ]),
+                    ),
                   ),
                 ),
-              ),
+        ),
       ),
+    );
+  }
+
+  Widget _breadcrumb() {
+    return BreadCrumb(
+      items: <BreadCrumbItem>[
+        BreadCrumbItem(content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
+        BreadCrumbItem(
+          content: Text('Notifications', style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700)),
+        ),
+      ],
+      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
     );
   }
 
   Widget _notificationItem(AppNotificationItem n) {
     return Container(
       decoration: BoxDecoration(
-        color: n.isRead ? Colors.white : const Color(0x050B61FF),
+        color: n.isRead ? AppPalette.surface : const Color(0x050B61FF),
         border: const Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
       ),
       padding: const EdgeInsets.all(16),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: n.isRead ? const Color(0xFFF1F5F9) : const Color(0xFF2563EB),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(Icons.notifications, size: 18, color: n.isRead ? const Color(0xFF94A3B8) : Colors.white),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isCompact = constraints.maxWidth < 420;
-                if (isCompact) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        n.title,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? const Color(0xFF64748B) : const Color(0xFF0F172A)),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
-                    ],
-                  );
-                }
-                return Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        n.title,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? const Color(0xFF64748B) : const Color(0xFF0F172A)),
-                      ),
-                    ),
-                    Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
-                  ],
-                );
-              },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: n.isRead ? const Color(0xFFF1F5F9) : AppPalette.brandBlue,
+              shape: BoxShape.circle,
             ),
-            const SizedBox(height: 6),
-            Text(n.message, style: const TextStyle(color: Color(0xFF64748B))),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 4,
+            child: Icon(Icons.notifications, size: 18, color: n.isRead ? const Color(0xFF94A3B8) : Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (n.linkUrl != null)
-                  TextButton.icon(
-                    onPressed: () => _markRead(n.id),
-                    icon: const Icon(Icons.open_in_new, size: 16),
-                    label: const Text('Take Action'),
-                  ),
-                if (!n.isRead)
-                  TextButton(
-                    onPressed: () => _markRead(n.id),
-                    child: const Text('Mark as read'),
-                  ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isCompact = constraints.maxWidth < 420;
+                    if (isCompact) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            n.title,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? AppPalette.textMuted : const Color(0xFF0F172A)),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                        ],
+                      );
+                    }
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            n.title,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? AppPalette.textMuted : const Color(0xFF0F172A)),
+                          ),
+                        ),
+                        Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 6),
+                Text(n.message, style: const TextStyle(color: AppPalette.textMuted)),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    if (n.linkUrl != null)
+                      OutlinedButton.icon(
+                        onPressed: () => _markRead(n.id),
+                        style: OutlinedButton.styleFrom(side: const BorderSide(color: AppPalette.borderSoftBlue)),
+                        icon: const Icon(Icons.open_in_new, size: 16),
+                        label: const Text('Take Action'),
+                      ),
+                    if (!n.isRead)
+                      TextButton(
+                        onPressed: () => _markRead(n.id),
+                        child: const Text('Mark as read'),
+                      ),
+                  ],
+                ),
               ],
             ),
-          ]),
-        ),
-      ]),
+          ),
+        ],
+      ),
     );
   }
 }

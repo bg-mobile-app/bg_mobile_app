@@ -16,8 +16,9 @@ class AuthFormGrid extends StatelessWidget {
     return LayoutBuilder(builder: (context, constraints) {
       final columns = columnsOverride ?? (constraints.maxWidth >= 700 ? 2 : 1);
       return Wrap(spacing: 14, runSpacing: 14, children: children.map((w) {
-        final spanTwo = w is _SpanTwoColumn;
-        if (spanTwo && columns > 1) return SizedBox(width: constraints.maxWidth, child: (w as _SpanTwoColumn).child);
+        if (w is _SpanTwoColumn && columns > 1) {
+          return SizedBox(width: constraints.maxWidth, child: w.child);
+        }
         final width = (constraints.maxWidth - (columns - 1) * 14) / columns;
         return SizedBox(width: width, child: w);
       }).toList());
