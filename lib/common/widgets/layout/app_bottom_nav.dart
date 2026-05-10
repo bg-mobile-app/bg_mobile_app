@@ -48,7 +48,7 @@ class AppBottomNav extends StatelessWidget {
                       curve: Curves.easeOut,
                       padding: EdgeInsets.symmetric(
                         horizontal: isSelected ? 12 : 0,
-                        vertical: 10,
+                        vertical: isSelected ? 7 : 10,
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
@@ -68,8 +68,8 @@ class AppBottomNav extends StatelessWidget {
                                 scale: isSelected ? 0.88 : 1.0,
                                 child: FUI(
                                   isSelected ? item.selectedIcon : item.icon,
-                                  width: isSelected ? 21 : 25,
-                                  height: isSelected ? 21 : 25,
+                                  width: isSelected ? 19 : 24,
+                                  height: isSelected ? 19 : 24,
                                   color: isSelected
                                       ? primaryColor
                                       : const Color(0xFF98A1AF),
@@ -92,15 +92,16 @@ class AppBottomNav extends StatelessWidget {
                                 child: isSelected
                                     ? Padding(
                                         key: ValueKey(item.label),
-                                        padding: const EdgeInsets.only(top: 4),
+                                        padding: const EdgeInsets.only(top: 1),
                                         child: Text(
                                           item.label,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             color: primaryColor,
-                                            fontSize: 12,
+                                            fontSize: 10,
                                             fontWeight: FontWeight.w700,
+                                            height: 1.0,
                                           ),
                                         ),
                                       )

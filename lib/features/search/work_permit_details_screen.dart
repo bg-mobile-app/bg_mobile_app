@@ -756,41 +756,53 @@ class WorkPermitDetailsScreen extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () =>
-                    _showMessage(context, 'Application process coming soon'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _brandBlue,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < 390;
+            return Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () =>
+                        _showMessage(context, 'Application process coming soon'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _brandBlue,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      minimumSize: const Size(0, 48),
+                      padding: EdgeInsets.symmetric(
+                        vertical: compact ? 12 : 15,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const FaIcon(FontAwesomeIcons.paperPlane, size: 16),
+                    label: const Text(
+                      'Apply Now',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   ),
                 ),
-                icon: const FaIcon(FontAwesomeIcons.paperPlane, size: 16),
-                label: const Text(
-                  'Apply Now',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                SizedBox(width: compact ? 8 : 12),
+                _ActionIconButton(
+                  icon: const FaIcon(FontAwesomeIcons.commentDots, size: 18),
+                  semanticLabel: 'Chat',
+                  onPressed: () =>
+                      _showMessage(context, 'Chat option coming soon'),
                 ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            _ActionIconButton(
-              icon: const FaIcon(FontAwesomeIcons.commentDots, size: 18),
-              semanticLabel: 'Chat',
-              onPressed: () => _showMessage(context, 'Chat option coming soon'),
-            ),
-            const SizedBox(width: 12),
-            _ActionIconButton(
-              icon: const FaIcon(FontAwesomeIcons.bookmark, size: 18),
-              semanticLabel: 'Bookmark',
-              onPressed: () => _showMessage(context, 'Saved to bookmarks'),
-            ),
-          ],
+                SizedBox(width: compact ? 8 : 12),
+                _ActionIconButton(
+                  icon: const FaIcon(FontAwesomeIcons.bookmark, size: 18),
+                  semanticLabel: 'Bookmark',
+                  onPressed: () => _showMessage(context, 'Saved to bookmarks'),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -838,7 +850,10 @@ class _ActionIconButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: WorkPermitDetailsScreen._mutedText,
           side: const BorderSide(color: WorkPermitDetailsScreen._outline),
-          padding: const EdgeInsets.all(15),
+          minimumSize: const Size(48, 48),
+          fixedSize: const Size(48, 48),
+          padding: EdgeInsets.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1038,7 +1053,7 @@ class _SpecItem {
 
   final String label;
   final String value;
-  final FaIconData? icon;
+  final IconData? icon;
 }
 
 class _SpecRow extends StatelessWidget {

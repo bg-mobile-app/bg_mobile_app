@@ -41,6 +41,7 @@ dependencies:
   printing: ^5.14.0
   font_awesome_flutter: ^10.7.0
   fui_kit: ^2.0.2
+  flutter_breadcrumb: ^1.0.1
 
 dev_dependencies:
   
@@ -103,4 +104,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-

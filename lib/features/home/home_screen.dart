@@ -158,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       builder: (context) {
         return Padding(
           padding: EdgeInsets.only(
@@ -525,37 +525,51 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0D2563EB),
-            blurRadius: 20,
-            offset: Offset(0, 8),
+            color: Color(0x120F172A),
+            blurRadius: 8,
+            offset: Offset(0, 3),
           ),
         ],
       ),
-      child: DropdownButtonFormField<String>(
-        initialValue: value,
-        onChanged: onChanged,
-        isExpanded: true,
-        style: const TextStyle(color: Colors.black),
-        dropdownColor: Colors.white,
-        iconEnabledColor: Colors.black87,
-        decoration: InputDecoration(
-          isDense: true,
-          hintText: hint,
-          hintStyle: const TextStyle(color: Color(0xFF64748B)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: DropdownButtonFormField<String>(
+          initialValue: value,
+          onChanged: onChanged,
+          isExpanded: true,
+          style: const TextStyle(color: Colors.black),
+          dropdownColor: Colors.white,
+          iconEnabledColor: Colors.black87,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            hintText: hint,
+            hintStyle: const TextStyle(color: Color(0xFF64748B)),
+            constraints: const BoxConstraints(minHeight: 56),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 18,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide.none,
+            ),
           ),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
+          items: items
+              .map(
+                (item) =>
+                    DropdownMenuItem<String>(value: item, child: Text(item)),
+              )
+              .toList(),
         ),
-        items: items
-            .map(
-              (item) =>
-                  DropdownMenuItem<String>(value: item, child: Text(item)),
-            )
-            .toList(),
       ),
     );
   }

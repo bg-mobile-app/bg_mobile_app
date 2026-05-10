@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
+import '../../common/theme/app_palette.dart';
 import 'customer_profile_edit_screen.dart';
 import 'dashboard_screen.dart';
 
@@ -10,31 +12,37 @@ class CustomerProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
       currentHref: '/dashboard/customer/profile',
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              _TopBar(),
-              SizedBox(height: 18),
-              _ProfileHeaderCard(),
-              SizedBox(height: 24),
-              _SectionTitle(
-                title: 'Personal Details',
-                subtitle: 'As mentioned on your passport or government approved IDs',
-              ),
-              SizedBox(height: 14),
-              _BasicInfoCard(),
-              SizedBox(height: 14),
-              _ContactInfoCard(),
-              SizedBox(height: 14),
-              _PassportInfoCard(),
-              SizedBox(height: 14),
-              _PersonalizedInfoCard(),
-              SizedBox(height: 22),
-              _LogoutButton(),
-            ],
+      child: Container(
+        color: AppPalette.pageBackground,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                _Breadcrumb(),
+                SizedBox(height: 8),
+                _PageHeading(),
+                SizedBox(height: 16),
+                _ProfileHeaderCard(),
+                SizedBox(height: 18),
+                _SectionTitle(
+                  title: 'Personal Details',
+                  subtitle:
+                      'As mentioned on your passport or government approved IDs',
+                ),
+                SizedBox(height: 12),
+                _BasicInfoCard(),
+                SizedBox(height: 12),
+                _ContactInfoCard(),
+                SizedBox(height: 12),
+                _PassportInfoCard(),
+                SizedBox(height: 12),
+                _PersonalizedInfoCard(),
+                SizedBox(height: 16),
+                _LogoutButton(),
+              ],
+            ),
           ),
         ),
       ),
@@ -42,23 +50,57 @@ class CustomerProfileScreen extends StatelessWidget {
   }
 }
 
-class _TopBar extends StatelessWidget {
-  const _TopBar();
+class _Breadcrumb extends StatelessWidget {
+  const _Breadcrumb();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Icon(Icons.arrow_back, color: Color(0xFF0B1E6D)),
-        SizedBox(width: 8),
+    return BreadCrumb(
+      items: <BreadCrumbItem>[
+        BreadCrumbItem(
+          content: const Text(
+            'Dashboard',
+            style: TextStyle(color: AppPalette.textMuted, fontSize: 12),
+          ),
+        ),
+        BreadCrumbItem(
+          content: const Text(
+            'My Profile',
+            style: TextStyle(
+              color: AppPalette.textStrongBlue,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+      divider: const Icon(
+        Icons.chevron_right_rounded,
+        size: 16,
+        color: Color(0xFF94A3B8),
+      ),
+    );
+  }
+}
+
+class _PageHeading extends StatelessWidget {
+  const _PageHeading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Text(
           'Candidate Profile',
           style: TextStyle(
-            fontSize: 30 / 1.5,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF0B1E6D),
+            fontSize: 25,
+            fontWeight: FontWeight.w800,
+            color: AppPalette.textPrimary,
           ),
         ),
+        SizedBox(height: 4),
+       
       ],
     );
   }
@@ -78,65 +120,84 @@ class _ProfileHeaderCard extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              const CircleAvatar(
-                radius: 52,
-                backgroundImage: AssetImage('assets/img/sign-in/login.jpg'),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppPalette.borderSoftBlue, width: 3),
+                ),
+                child: const CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/img/sign-in/login.jpg'),
+                ),
               ),
               Positioned(
                 right: 2,
-                bottom: 4,
+                bottom: 2,
                 child: Container(
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0B1E6D),
+                    color: AppPalette.brandBlue,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: Colors.white, width: 2),
                   ),
                   child: const Icon(Icons.verified, color: Colors.white, size: 14),
                 ),
               ),
-              Positioned(
-                right: -12,
-                bottom: -2,
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(17),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                    boxShadow: const [BoxShadow(color: Color(0x1A000000), blurRadius: 5)],
-                  ),
-                  child: const Icon(Icons.download_outlined, size: 18, color: Color(0xFF0B1E6D)),
-                ),
-              ),
             ],
           ),
-          const SizedBox(height: 14),
-          const Text('Demo User', style: TextStyle(fontSize: 39 / 1.5, fontWeight: FontWeight.w600, color: Color(0xFF0B1E6D))),
-          const SizedBox(height: 4),
-          const Text('demo.user@example.com', style: TextStyle(color: Color(0xFF334155), fontSize: 16)),
+          const SizedBox(height: 12),
+          const Text(
+            'Demo User',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: AppPalette.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 3),
+          const Text(
+            'demo.user@example.com',
+            style: TextStyle(color: AppPalette.textMuted, fontSize: 14),
+          ),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
+            runSpacing: 8,
             children: const [
-              _Pill(label: 'Verified Candidate', bg: Color(0xFFDDE8FF), fg: Color(0xFF1E3A8A)),
-              _Pill(label: 'Active Now', bg: Color(0xFFE5E7EB), fg: Color(0xFF4B5563)),
+              _Pill(
+                label: 'Verified Candidate',
+                bg: Color(0xFFE8F0FF),
+                fg: Color(0xFF1E3A8A),
+              ),
+              _Pill(
+                label: 'Active Now',
+                bg: Color(0xFFEFF6FF),
+                fg: AppPalette.textStrongBlue,
+              ),
             ],
           ),
-          const SizedBox(height: 14),
-          FilledButton.icon(
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CustomerProfileEditScreen()));
-            },
-            icon: const Icon(Icons.edit_outlined),
-            label: const Text('Edit Profile'),
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF0B1E6D),
-              foregroundColor: Colors.white,
-              minimumSize: const Size(170, 46),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: 170,
+            child: FilledButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const CustomerProfileEditScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              label: const Text('Edit Profile'),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppPalette.brandBlue,
+                foregroundColor: Colors.white,
+                minimumSize: const Size.fromHeight(46),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
           ),
         ],
@@ -156,9 +217,23 @@ class _SectionTitle extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 35 / 1.5, fontWeight: FontWeight.w600, color: Color(0xFF0B1E6D))),
-        const SizedBox(height: 3),
-        Text(subtitle, style: const TextStyle(fontSize: 16, color: Color(0xFF52525B), height: 1.35)),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AppPalette.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            fontSize: 13,
+            color: AppPalette.textMuted,
+            height: 1.35,
+          ),
+        ),
       ],
     );
   }
@@ -226,33 +301,39 @@ class _PersonalizedInfoCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: _cardDecoration(),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-        _CardTitle(icon: Icons.accessibility_new_outlined, title: 'Personalized Info'),
-        SizedBox(height: 16),
-        _TagSection(
-          label: 'LIKED SERVICES',
-          tags: [
-            _Pill(label: 'Work permit', bg: Color(0xFFDDE8FF), fg: Color(0xFF1E3A8A)),
-            _Pill(label: 'Student visa', bg: Color(0xFFDDE8FF), fg: Color(0xFF1E3A8A)),
-          ],
-        ),
-        SizedBox(height: 14),
-        _TagSection(
-          label: 'LIKED COUNTRIES',
-          tags: [
-            _Pill(label: '🌐 Japan', bg: Color(0xFFDBEAFE), fg: Color(0xFF1E3A8A)),
-            _Pill(label: '🌐 Malaysia', bg: Color(0xFFDBEAFE), fg: Color(0xFF1E3A8A)),
-          ],
-        ),
-        SizedBox(height: 14),
-        _TagSection(
-          label: 'LIKED JOB TYPE',
-          tags: [
-            _Pill(label: 'Factory', bg: Colors.white, fg: Color(0xFF374151), outlined: true),
-            _Pill(label: 'Hospitality', bg: Colors.white, fg: Color(0xFF374151), outlined: true),
-          ],
-        ),
-      ]),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CardTitle(
+            icon: Icons.accessibility_new_outlined,
+            title: 'Personalized Info',
+          ),
+          SizedBox(height: 14),
+          _TagSection(
+            label: 'LIKED SERVICES',
+            tags: [
+              _Pill(label: 'Work permit', bg: Color(0xFFE8F0FF), fg: Color(0xFF1E3A8A)),
+              _Pill(label: 'Student visa', bg: Color(0xFFE8F0FF), fg: Color(0xFF1E3A8A)),
+            ],
+          ),
+          SizedBox(height: 12),
+          _TagSection(
+            label: 'LIKED COUNTRIES',
+            tags: [
+              _Pill(label: 'Japan', bg: Color(0xFFDBEAFE), fg: Color(0xFF1E3A8A)),
+              _Pill(label: 'Malaysia', bg: Color(0xFFDBEAFE), fg: Color(0xFF1E3A8A)),
+            ],
+          ),
+          SizedBox(height: 12),
+          _TagSection(
+            label: 'LIKED JOB TYPE',
+            tags: [
+              _Pill(label: 'Factory', bg: Colors.white, fg: AppPalette.textPrimary, outlined: true),
+              _Pill(label: 'Hospitality', bg: Colors.white, fg: AppPalette.textPrimary, outlined: true),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -274,7 +355,7 @@ class _InfoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _CardTitle(icon: icon, title: title),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           ...rows,
         ],
       ),
@@ -292,9 +373,23 @@ class _CardTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: const Color(0xFF0B1E6D)),
+        Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE8F0FF),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: AppPalette.brandBlue, size: 18),
+        ),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 20 / 1.25, fontWeight: FontWeight.w600, color: Color(0xFF0B1E6D))),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppPalette.textPrimary,
+          ),
+        ),
       ],
     );
   }
@@ -313,13 +408,32 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: isLast ? Colors.transparent : const Color(0xFFE5E7EB)),
+          bottom: BorderSide(
+            color: isLast ? Colors.transparent : AppPalette.borderNeutral,
+          ),
         ),
       ),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: const TextStyle(fontSize: 10, color: Color(0xFF737373), letterSpacing: 0.7))),
-          Text(value, style: const TextStyle(fontSize: 16, color: Color(0xFF111827))),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppPalette.textMuted,
+                letterSpacing: 0.7,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 15,
+              color: AppPalette.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -337,7 +451,15 @@ class _TagSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: Color(0xFF737373), letterSpacing: 0.7)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            color: AppPalette.textMuted,
+            letterSpacing: 0.7,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(height: 8),
         Wrap(spacing: 8, runSpacing: 8, children: tags),
       ],
@@ -346,7 +468,12 @@ class _TagSection extends StatelessWidget {
 }
 
 class _Pill extends StatelessWidget {
-  const _Pill({required this.label, required this.bg, required this.fg, this.outlined = false});
+  const _Pill({
+    required this.label,
+    required this.bg,
+    required this.fg,
+    this.outlined = false,
+  });
 
   final String label;
   final Color bg;
@@ -356,13 +483,20 @@ class _Pill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(999),
-        border: outlined ? Border.all(color: const Color(0xFFD1D5DB)) : null,
+        border: outlined ? Border.all(color: AppPalette.borderNeutral) : null,
       ),
-      child: Text(label, style: TextStyle(fontSize: 12, color: fg)),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          color: fg,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
@@ -375,10 +509,10 @@ class _LogoutButton extends StatelessWidget {
     return Center(
       child: TextButton.icon(
         onPressed: () {},
-        icon: const Icon(Icons.logout, color: Color(0xFFDC2626)),
+        icon: const Icon(Icons.logout, color: AppPalette.danger),
         label: const Text(
           'Logout from Device',
-          style: TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.w500),
+          style: TextStyle(color: AppPalette.danger, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -387,15 +521,9 @@ class _LogoutButton extends StatelessWidget {
 
 BoxDecoration _cardDecoration() {
   return BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(10),
-    border: Border.all(color: const Color(0xFFE5E7EB)),
-    boxShadow: const [
-      BoxShadow(
-        color: Color(0x0D000000),
-        blurRadius: 6,
-        offset: Offset(0, 2),
-      ),
-    ],
+    color: AppPalette.surface,
+    borderRadius: BorderRadius.circular(16),
+    border: Border.all(color: AppPalette.borderSoftBlue),
+    boxShadow: AppPalette.cardShadow,
   );
 }
