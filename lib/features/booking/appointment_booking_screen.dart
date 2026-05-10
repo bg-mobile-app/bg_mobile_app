@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
-import '../../common/theme/app_palette.dart';
+import '../../common/theme/app_colors.dart';
 import '../home/dashboard_screen.dart';
 import 'appointment_ticket_screen.dart';
 
@@ -32,6 +32,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
       avatarText: 'SH',
       avatarColor: Color(0xFF2563EB),
       actionLabel: 'Download Ticket',
+      packagePrice: 85000,
+      paidAmount: 45000,
     ),
     AppointmentBookingItem(
       postId: 'EP-8200',
@@ -49,6 +51,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
       avatarColor: Color(0xFFC7D2FE),
       avatarTextColor: Color(0xFF475569),
       actionLabel: 'Join Meeting',
+      packagePrice: 78000,
+      paidAmount: 38000,
     ),
     AppointmentBookingItem(
       postId: 'SK-4412',
@@ -65,6 +69,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
       avatarText: 'DK',
       avatarColor: Color(0xFF6B7280),
       actionLabel: 'Download Ticket',
+      packagePrice: 85000,
+      paidAmount: 45000,
     ),
   ];
 
@@ -309,222 +315,154 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
   );
 
   Widget _buildCardView() => ListView.separated(
-    itemCount: _items.length + 1,
-    separatorBuilder: (_, __) => const SizedBox(height: 12),
-    itemBuilder: (context, index) {
-      if (index == _items.length) return _buildPremiumBanner();
-      final item = _items[index];
-      final meetingIcon = item.meeting == 'Virtual'
-          ? Icons.videocam_outlined
-          : Icons.groups_2_outlined;
-      final actionIcon = item.meeting == 'Virtual'
-          ? Icons.video_call_rounded
-          : Icons.confirmation_number_outlined;
+        itemCount: _items.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          final item = _items[index];
+          final dueAmount = item.packagePrice - item.paidAmount;
 
-      return Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppPalette.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppPalette.borderSoftBlue),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x10051B44),
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 19,
-                  backgroundColor: item.avatarColor,
-                  child: Text(
-                    item.avatarText,
-                    style: TextStyle(
-                      color: item.avatarTextColor,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+          return Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFFFF),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFBBC1D6)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0D000000),
+                  blurRadius: 15,
+                  offset: Offset(0, 8),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF1F3FF),
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                  ),
+                  child: Row(
                     children: [
-                      Text(
-                        item.fullName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppPalette.textPrimary,
-                        ),
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(color: item.avatarColor, borderRadius: BorderRadius.circular(999)),
+                        child: const Icon(Icons.person_outline, color: Colors.white, size: 36),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.country,
-                        style: const TextStyle(
-                          color: AppPalette.textMuted,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(item.fullName, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color(0xFF191B24))),
+                          const SizedBox(height: 4),
+                          Row(children: [
+                            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: const Color(0xFFD8E6FF), borderRadius: BorderRadius.circular(8)), child: Text(item.postId, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF38485D)))),
+                            const SizedBox(width: 8),
+                            const Text('•', style: TextStyle(color: Color(0xFF737687), fontSize: 12)),
+                            const SizedBox(width: 8),
+                            Text(item.country, style: const TextStyle(fontSize: 16, color: Color(0xFF434655))),
+                          ]),
+                        ]),
                       ),
                     ],
                   ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Expanded(child: _detailTile('VISA CATEGORY', item.visaCategory, Icons.article_outlined)),
+                      const SizedBox(width: 14),
+                      Expanded(child: _detailTile('MEETING TYPE', item.meeting, Icons.groups_outlined)),
+                    ]),
+                    const SizedBox(height: 18),
+                    Row(children: [
+                      Expanded(child: _detailTile('DATE', item.date, Icons.calendar_today_outlined)),
+                      const SizedBox(width: 14),
+                      Expanded(child: _detailTile('TIME', item.time, Icons.schedule)),
+                    ]),
+                    const SizedBox(height: 18),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(color: const Color(0xFFF1F3FF), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFBBC1D6))),
+                      child: Row(children: [
+                        const Icon(Icons.flight, color: Color(0xFF434655), size: 30),
+                        const SizedBox(width: 14),
+                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          const Text('PASSPORT NUMBER', style: TextStyle(fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
+                          Text(item.passportNo, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                        ])),
+                        const Icon(Icons.verified, color: Color(0xFF737687), size: 28),
+                      ]),
+                    ),
+                    const SizedBox(height: 18),
+                    const Divider(color: Color(0xFFBBC1D6)),
+                    const SizedBox(height: 12),
+                    _amountRow('Package Price', '${_formatMoney(item.packagePrice)} BDT', const Color(0xFF191B24), false),
+                    const SizedBox(height: 12),
+                    _amountRow('Paid Amount', '${_formatMoney(item.paidAmount)} BDT', AppColors.primary, true),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(color: const Color(0xFFFAD6D6), borderRadius: BorderRadius.circular(14)),
+                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        const Text('DUE AMOUNT', style: TextStyle(color: Color(0xFF9F0E0E), fontWeight: FontWeight.w700, fontSize: 16)),
+                        Text('${_formatMoney(dueAmount)} BDT', style: const TextStyle(color: Color(0xFF9F0E0E), fontWeight: FontWeight.w800, fontSize: 24)),
+                      ]),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () => _openTicket(item),
+                        icon: const Icon(Icons.download, size: 22),
+                        label: const Text('Download Ticket', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                        style: FilledButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, minimumSize: const Size.fromHeight(56), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                      ),
+                    ),
+                  ]),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8F0FF),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    item.postId,
-                    style: const TextStyle(
-                      color: AppPalette.brandBlue,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: const BoxDecoration(color: Color(0xFFF1F3FF), borderRadius: BorderRadius.only(bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16))),
+                  child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Icon(Icons.info_outline, color: Color(0xFF737687), size: 18),
+                    SizedBox(width: 8),
+                    Flexible(child: Text('PLEASE ARRIVE 15 MINUTES BEFORE YOUR SCHEDULED TIME.', style: TextStyle(fontSize: 11, color: Color(0xFF434655), fontWeight: FontWeight.w600))),
+                  ]),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppPalette.borderNeutral),
-              ),
-              child: Row(
-                children: [
-                  Expanded(child: _metaCard('VISA CATEGORY', item.visaCategory)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _metaCard(
-                      'MEETING TYPE',
-                      item.meeting,
-                      icon: meetingIcon,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppPalette.borderNeutral),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _dateTimeBlock(
-                          Icons.calendar_today_outlined,
-                          'Date',
-                          item.date,
-                        ),
-                      ),
-                      Container(
-                        width: 1,
-                        height: 28,
-                        color: AppPalette.borderNeutral,
-                      ),
-                      Expanded(
-                        child: _dateTimeBlock(Icons.access_time, 'Time', item.time),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  const Divider(height: 1, color: AppPalette.borderNeutral),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.badge_outlined,
-                        size: 16,
-                        color: AppPalette.textMuted,
-                      ),
-                      const SizedBox(width: 6),
-                      const Text(
-                        'Passport',
-                        style: TextStyle(
-                          color: AppPalette.textMuted,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        item.passportNo,
-                        style: const TextStyle(
-                          color: AppPalette.textPrimary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppPalette.borderNeutral),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _amountCol('Package Price', item.packagePrice),
-                  ),
-                  Container(
-                    width: 1,
-                    height: 30,
-                    color: AppPalette.borderNeutral,
-                  ),
-                  Expanded(child: _amountCol('Paid Amount', item.paidAmount)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () => _openTicket(item),
-                    icon: Icon(actionIcon, size: 18),
-                    label: Text(item.actionLabel),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppPalette.borderSoftBlue,
-                      foregroundColor: AppPalette.brandBlue,
-                      minimumSize: const Size.fromHeight(46),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          );
+        },
       );
-    },
-  );
+
+  Widget _detailTile(String label, String value, IconData icon) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: const TextStyle(fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
+      const SizedBox(height: 6),
+      Row(children: [Icon(icon, size: 22, color: AppColors.primary), const SizedBox(width: 8), Expanded(child: Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)))]),
+    ]);
+  }
+
+  Widget _amountRow(String label, String value, Color color, bool bold) {
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text(label, style: const TextStyle(fontSize: 18, color: Color(0xFF434655))),
+      Text(value, style: TextStyle(fontSize: 24, fontWeight: bold ? FontWeight.w700 : FontWeight.w600, color: color)),
+    ]);
+  }
+
+  String _formatMoney(int amount) {
+    final s = amount.toString();
+    final chars = s.split('').reversed.toList();
+    final parts = <String>[];
+    for (int i = 0; i < chars.length; i += 3) {
+      parts.add(chars.sublist(i, (i + 3).clamp(0, chars.length)).join());
+    }
+    return parts.join(',').split('').reversed.join();
+  }
 
   Widget _metaCard(String label, String value, {IconData? icon}) {
     return Column(
@@ -588,32 +526,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
     );
   }
 
-  Widget _amountCol(String label, int amount) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: AppPalette.textMuted,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '৳ $amount',
-          style: const TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: 16,
-            color: AppPalette.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
+  Widget _buildPremiumBanner() { // legacy
 
-  Widget _buildPremiumBanner() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -683,6 +597,22 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
 }
 
 class AppointmentBookingItem {
+  final String postId;
+  final int bookingId;
+  final String fullName;
+  final String country;
+  final String visaCategory;
+  final String meeting;
+  final String date;
+  final String time;
+  final String passportNo;
+  final String avatarText;
+  final Color avatarColor;
+  final Color avatarTextColor;
+  final String actionLabel;
+  final int packagePrice;
+  final int paidAmount;
+
   const AppointmentBookingItem({
     required this.postId,
     required this.bookingId,
@@ -699,21 +629,7 @@ class AppointmentBookingItem {
     required this.avatarColor,
     this.avatarTextColor = Colors.white,
     required this.actionLabel,
+    required this.packagePrice,
+    required this.paidAmount,
   });
-
-  final String postId;
-  final int bookingId;
-  final String fullName;
-  final String country;
-  final String visaCategory;
-  final String meeting;
-  final String date;
-  final String time;
-  final String passportNo;
-  final int packagePrice;
-  final int paidAmount;
-  final String avatarText;
-  final Color avatarColor;
-  final Color avatarTextColor;
-  final String actionLabel;
 }
