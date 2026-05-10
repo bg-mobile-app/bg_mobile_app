@@ -143,10 +143,10 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
         brandBlue: _brandBlue,
         isLoggedIn: _isLoggedIn,
         onSignIn: () async {
-          final result = await Navigator.pushNamed(context, '/login');
+          final result = await context.push('/login');
           if (result == true && mounted) setState(() => _isLoggedIn = true);
         },
-        onSignUp: () => Navigator.pushNamed(context, '/sign-up/customer'),
+        onSignUp: () => context.push('/sign-up/customer'),
         onNotifications: _showComingSoon,
         onProfile: _showComingSoon,
       ),

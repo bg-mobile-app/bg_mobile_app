@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../routes/app_routes.dart';
 
@@ -68,7 +69,7 @@ class _AgencyTypeCard extends StatelessWidget {
     return InkWell(
       onTap: onTapRoute == null
           ? null
-          : () => Navigator.of(context).pushNamed(onTapRoute!),
+          : () => context.push(onTapRoute!),
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.all(16),
