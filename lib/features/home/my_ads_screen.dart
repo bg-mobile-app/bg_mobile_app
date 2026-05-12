@@ -1,37 +1,117 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
 import 'dashboard_screen.dart';
 
-class MyAdsScreen extends StatelessWidget {
+class MyAdsScreen extends StatefulWidget {
   const MyAdsScreen({super.key});
+
+  @override
+  State<MyAdsScreen> createState() => _MyAdsScreenState();
+}
+
+class _MyAdsScreenState extends State<MyAdsScreen> {
+  static const Color _brandBlue = Color(0xFF2563EB);
+
+  final TextEditingController _searchController = TextEditingController();
+  String _activeFilter = 'All Ads';
+  List<_AdItem> _visibleAds = List.of(_ads);
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _runFilter() {
+    final query = _searchController.text.trim().toLowerCase();
+    setState(() {
+      _visibleAds = _ads.where((ad) {
+        final matchesStatus =
+            _activeFilter == 'All Ads' || ad.status == _activeFilter;
+        final matchesQuery =
+            query.isEmpty ||
+            ad.title.toLowerCase().contains(query) ||
+            ad.country.toLowerCase().contains(query) ||
+            ad.id.toString().contains(query);
+        return matchesStatus && matchesQuery;
+      }).toList();
+    });
+  }
+
+  void _showInfo(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
 
   @override
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
       currentHref: '/dashboard/ads/my',
       child: Container(
-        color: const Color(0xFFF4F6FC),
+        color: const Color(0xFFF8FAFC),
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _TopBar(),
-                const SizedBox(height: 20),
-                _CreateButton(),
-                const SizedBox(height: 20),
-                _SearchBox(),
-                const SizedBox(height: 20),
-                _StatusFilters(),
-                const SizedBox(height: 18),
-                ..._ads.map((ad) => Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: _AdCard(ad: ad),
-                    )),
-              ],
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1080),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _TopBar(onHelpTap: () => _showInfo('Ads guide is coming soon')),
+                    const SizedBox(height: 18),
+                    _CreateButton(
+                      onTap: () => context.push('/dashboard/ads/create'),
+                    ),
+                    const SizedBox(height: 14),
+                    _SearchBox(
+                      controller: _searchController,
+                      onChanged: (_) => _runFilter(),
+                      onSearchTap: _runFilter,
+                    ),
+                    const SizedBox(height: 14),
+                    _StatusFilters(
+                      activeFilter: _activeFilter,
+                      onSelected: (status) {
+                        setState(() => _activeFilter = status);
+                        _runFilter();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    if (_visibleAds.isEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFDBEAFE)),
+                        ),
+                        child: Text(
+                          'No ads found for selected filter.',
+                          style: AppTextStyles.subtitle1.copyWith(
+                            color: AppPalette.textMuted,
+                          ),
+                        ),
+                      ),
+                    ..._visibleAds.map(
+                      (ad) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: _AdCard(
+                          ad: ad,
+                          onTap: () => _showInfo('Opening ad #${ad.id} details'),
+                          onEdit: () => _showInfo('Editing ad #${ad.id}'),
+                          onPromote: () => _showInfo('Promote ad #${ad.id} request sent'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -41,54 +121,130 @@ class MyAdsScreen extends StatelessWidget {
 }
 
 class _TopBar extends StatelessWidget {
+  const _TopBar({required this.onHelpTap});
+
+  final VoidCallback onHelpTap;
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: Color(0xFF0F4ECF))),
-        Expanded(
-          child: Text('Create Post (বিজ্ঞাপন দিন)', style: AppTextStyles.headline2.copyWith(color: const Color(0xFF0F4ECF), fontWeight: FontWeight.w800)),
+        IconButton(
+          onPressed: () => Navigator.of(context).maybePop(),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F4ECF)),
         ),
-        const Icon(Icons.help_outline, color: Color(0xFF0F4ECF)),
+        Expanded(
+          child: Text(
+            'My Ads (বিজ্ঞাপন)',
+            style: AppTextStyles.headline2.copyWith(
+              color: const Color(0xFF0F4ECF),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        IconButton(
+          onPressed: onHelpTap,
+          icon: const Icon(Icons.help_outline, color: Color(0xFF0F4ECF)),
+        ),
       ],
     );
   }
 }
 
 class _CreateButton extends StatelessWidget {
+  const _CreateButton({required this.onTap});
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 70,
-      decoration: BoxDecoration(color: const Color(0xFF0D4CC7), borderRadius: BorderRadius.circular(18), boxShadow: const [BoxShadow(color: Color(0x2A0D4CC7), blurRadius: 14, offset: Offset(0, 6))]),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add, color: Colors.white, size: 30),
-          SizedBox(width: 12),
-          Text('CREATE NEW ADS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, letterSpacing: 1.5, fontSize: 30 / 2)),
-        ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0D4CC7),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x2A0D4CC7),
+              blurRadius: 14,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.add_circle_outline, color: Colors.white, size: 24),
+            const SizedBox(width: 10),
+            Text(
+              'CREATE NEW ADS',
+              style: AppTextStyles.subtitle1.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _SearchBox extends StatelessWidget {
+  const _SearchBox({
+    required this.controller,
+    required this.onChanged,
+    required this.onSearchTap,
+  });
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onSearchTap;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFD9E5FF))),
+      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFDBEAFE)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D2563EB),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          const SizedBox(width: 10),
-          Expanded(child: Text('Search in bideshgami', style: AppTextStyles.subtitle1.copyWith(color: const Color(0xFF5A6785)))),
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(color: const Color(0xFF2563EB), borderRadius: BorderRadius.circular(16), boxShadow: const [BoxShadow(color: Color(0x2A2563EB), blurRadius: 8, offset: Offset(0, 3))]),
-            child: const Icon(Icons.search, color: Colors.white),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Search by title, country or post ID',
+                hintStyle: TextStyle(color: Color(0xFF64748B)),
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: onSearchTap,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _MyAdsScreenState._brandBlue,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(Icons.search, color: Colors.white, size: 20),
+            ),
           ),
         ],
       ),
@@ -97,31 +253,49 @@ class _SearchBox extends StatelessWidget {
 }
 
 class _StatusFilters extends StatelessWidget {
+  const _StatusFilters({required this.activeFilter, required this.onSelected});
+
+  final String activeFilter;
+  final ValueChanged<String> onSelected;
+
   @override
   Widget build(BuildContext context) {
-    final statuses = ['All Ads', 'PENDING', 'ACTIVE', 'REJECTED'];
+    const statuses = ['All Ads', 'PENDING', 'ACTIVE', 'REJECTED', 'END QUOTA'];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: statuses
-            .map((status) => Padding(
-                  padding: const EdgeInsets.only(right: 12),
+            .map(
+              (status) => Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: InkWell(
+                  onTap: () => onSelected(status),
+                  borderRadius: BorderRadius.circular(999),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
-                      color: status == 'All Ads' ? const Color(0xFF0D4CC7) : const Color(0xFFD3DBEE),
-                      borderRadius: BorderRadius.circular(24),
+                      color: status == activeFilter
+                          ? const Color(0xFF0D4CC7)
+                          : const Color(0xFFD3DBEE),
+                      borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
                       status,
                       style: TextStyle(
-                        color: status == 'All Ads' ? Colors.white : const Color(0xFF33394B),
+                        color: status == activeFilter
+                            ? Colors.white
+                            : const Color(0xFF334155),
                         fontWeight: FontWeight.w700,
-                        fontSize: 30 / 2,
+                        fontSize: 13,
                       ),
                     ),
                   ),
-                ))
+                ),
+              ),
+            )
             .toList(),
       ),
     );
@@ -129,76 +303,197 @@ class _StatusFilters extends StatelessWidget {
 }
 
 class _AdCard extends StatelessWidget {
-  const _AdCard({required this.ad});
+  const _AdCard({
+    required this.ad,
+    required this.onTap,
+    required this.onEdit,
+    required this.onPromote,
+  });
+
   final _AdItem ad;
+  final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onPromote;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: const Color(0xFFF9FBFF), borderRadius: BorderRadius.circular(30), border: Border.all(color: const Color(0xFFDEE5F5))),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30)),
-            child: Stack(
-              children: [
-                Image.network(ad.image, width: 164, height: 200, fit: BoxFit.cover),
-                Positioned(
-                  left: 10,
-                  bottom: 8,
-                  child: Text('ID: ${ad.id}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 24 / 2)),
-                ),
-              ],
+    final bool isQuotaEnd = ad.status == 'END QUOTA';
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0D0F172A),
+              blurRadius: 14,
+              offset: Offset(0, 6),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(ad.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 42 / 2, fontWeight: FontWeight.w700, height: 1.15)),
-                  const SizedBox(height: 6),
-                  Text('Post ID: ${ad.id}', style: AppTextStyles.subtitle1.copyWith(color: AppPalette.textPrimary, fontSize: 16 / 1.2)),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(color: ad.status == 'END QUOTA' ? const Color(0xFFF5DADA) : const Color(0xFFC5EED8), borderRadius: BorderRadius.circular(20)),
-                        child: Text(ad.status, style: TextStyle(color: ad.status == 'END QUOTA' ? const Color(0xFFB10000) : const Color(0xFF00703A), fontWeight: FontWeight.w800, letterSpacing: 1)),
+          ],
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(22),
+                bottomLeft: Radius.circular(22),
+              ),
+              child: Image.asset(ad.image, width: 120, height: 150, fit: BoxFit.cover),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ad.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.subtitle1.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppPalette.textPrimary,
                       ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(color: const Color(0xFFCDD7F7), borderRadius: BorderRadius.circular(18)),
-                        child: const Row(children: [Icon(Icons.edit_outlined, color: Color(0xFF0D4CC7), size: 20), SizedBox(width: 6), Text('Edit', style: TextStyle(color: Color(0xFF0D4CC7), fontSize: 30 / 2))]),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Post ID: #${ad.id} • ${ad.country}',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppPalette.textMuted,
                       ),
-                    ],
-                  )
-                ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isQuotaEnd
+                                ? const Color(0xFFFEE2E2)
+                                : const Color(0xFFDCFCE7),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            ad.status,
+                            style: TextStyle(
+                              color: isQuotaEnd
+                                  ? const Color(0xFFB91C1C)
+                                  : const Color(0xFF047857),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        _ActionButton(label: 'Edit', icon: Icons.edit_outlined, onTap: onEdit),
+                        const SizedBox(width: 8),
+                        _ActionButton(label: 'Boost', icon: Icons.trending_up, onTap: onPromote),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({required this.label, required this.icon, required this.onTap});
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE0E7FF),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: const Color(0xFF1D4ED8)),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFF1D4ED8),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _AdItem {
-  const _AdItem({required this.id, required this.title, required this.status, required this.image});
+  const _AdItem({
+    required this.id,
+    required this.title,
+    required this.status,
+    required this.image,
+    required this.country,
+  });
 
   final int id;
   final String title;
   final String status;
   final String image;
+  final String country;
 }
 
 const _ads = [
-  _AdItem(id: 20, title: 'এসি টেকনিশিয়ান নিয়োগ বিজ্ঞপ্তি', status: 'ACTIVE', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA01XVoyK7Orh0QTkHE8D6TO5-vz93wlNbq0YC3TrqYhtf4wWBUAASTEO0AtXheaV4EYQE1rlc3wN-V1QyJjG31kSoktQwtiRNu3PBFpNuZCTcjo-CWUr2-OivfWF6FKHzhEbvlDn5Tyji6CNcOsgKB2c8GftgGDvuGY94V9WdUP4EqSlmJUHZBUX9AhFjszPmAwBitkgglGg067oNVq1L1jzmbmlFAnJubhVeON4CHZ_hqf73iY2HXkDRmZJ_fPESBQpJTwKBLbd4'),
-  _AdItem(id: 19, title: 'ভিসা ভিসা ভিসা...', status: 'ACTIVE', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC85jfHvvuamCjivt1PKX4ASRGDjPNraVTKZkx2N4BbJujMdoXWcqXll8PKR9MD9WOVHp2YaUKorTnmt7ZNTNMlbjHjEUjq8Kp1UXdDeUgf3g4vVM8ZUqCV8GL6pX_TT0lEx_l8zxxb6jf2gbV-h5B4S2pCmQ1zTFtLz05R6Cjbz426Az-dIQCUnthDJKZMvLAq2uYgi9VkV1LsqZmkLoxpztbDMqDyL4svfQmOtd9FnuvaaBYvIQ0P9vVSsT1xvR9uDrgAYqLEH9A'),
-  _AdItem(id: 18, title: 'আয়ারল্যান্ড জরুরী নিয়োগ', status: 'END QUOTA', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAMTaxA3eBfLG1bsOfirvwaJ_f6Ew7xncoBHBViJ9XfZTYhGc_-ae1U0BIJrQd_T-6I6rUYAbVCTIOS73AXTfjEAcUu0oQz-Q4uSwKh6n_8QroqTak7tAg-7Yca7nJWHF9MikkvKTQpKvGn_DQw5EM4swVjG-TOLDoYfO4w0c4ZhRfwWcgeA1NW8Lw6qHz4_ybKRSkiGsvKaQPVp_WhwBIJgxXcDUTd75QzoivvQovEyJUllJVOQbwSqpGpZv3Z7pOj4WICvVn9elA'),
-  _AdItem(id: 17, title: 'কাতার জরুরী নিয়োগ বিজ্ঞপ্তি', status: 'ACTIVE', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAMTaxA3eBfLG1bsOfirvwaJ_f6Ew7xncoBHBViJ9XfZTYhGc_-ae1U0BIJrQd_T-6I6rUYAbVCTIOS73AXTfjEAcUu0oQz-Q4uSwKh6n_8QroqTak7tAg-7Yca7nJWHF9MikkvKTQpKvGn_DQw5EM4swVjG-TOLDoYfO4w0c4ZhRfwWcgeA1NW8Lw6qHz4_ybKRSkiGsvKaQPVp_WhwBIJgxXcDUTd75QzoivvQovEyJUllJVOQbwSqpGpZv3Z7pOj4WICvVn9elA'),
-  _AdItem(id: 16, title: 'italy job visa spacial of', status: 'ACTIVE', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAs_8QZGEBXwsMLxpRXg4A6Kq7lYi_h8Glk0lvjP3zb7hrZgW0-i9-Cv6fwp0tMGr8-uM3tMEJr2lsQK45_ftGTgnIR_ygUn09LID7PfdL3YOab_1q_3k9X3CjtXnRzi99lnE8jBqi3B3BRdkHz92Y9PpIaB68hTXNwsU-Jq_3F3-XellJWT09w24wUcFZdQYs4oCT81HCZJ9kdrfePcE98qhdZ2DRuZ7rLFuhVig5OK0rxnepB2z6OdamtJmjPkKBVbOoS1bbBQ70'),
+  _AdItem(
+    id: 20,
+    title: 'Factory Worker Hiring Circular - Malaysia',
+    status: 'ACTIVE',
+    image: 'assets/img/work-permit/3.png',
+    country: 'Malaysia',
+  ),
+  _AdItem(
+    id: 19,
+    title: 'Urgent Construction Visa - Romania',
+    status: 'PENDING',
+    image: 'assets/img/work-permit/2.png',
+    country: 'Romania',
+  ),
+  _AdItem(
+    id: 18,
+    title: 'Hotel Staff Job Offer - Japan',
+    status: 'END QUOTA',
+    image: 'assets/img/work-permit/1.jpg',
+    country: 'Japan',
+  ),
+  _AdItem(
+    id: 17,
+    title: 'Qatar Technical Worker Recruitment',
+    status: 'REJECTED',
+    image: 'assets/img/work-permit/2.png',
+    country: 'Qatar',
+  ),
+  _AdItem(
+    id: 16,
+    title: 'Italy Work Permit Special Package',
+    status: 'ACTIVE',
+    image: 'assets/img/work-permit/1.jpg',
+    country: 'Italy',
+  ),
 ];
