@@ -20,6 +20,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   bool _isCardView = false;
   late final TextEditingController _searchController;
   String _searchQuery = '';
+  DateTimeRange? _selectedDateRange;
 
   final List<BookingItem> _bookings = const [
     BookingItem(
@@ -300,14 +301,21 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
 
   List<BookingItem> get _filteredBookings {
     final query = _searchQuery.trim().toLowerCase();
-    if (query.isEmpty) return _bookings;
     return _bookings.where((item) {
-      return item.workPermitId.toLowerCase().contains(query) ||
+      final matchesQuery =
+          query.isEmpty ||
+          item.workPermitId.toLowerCase().contains(query) ||
           item.id.toString().contains(query) ||
           item.serviceType.toLowerCase().contains(query) ||
           item.name.toLowerCase().contains(query) ||
           item.passportNo.toLowerCase().contains(query) ||
           item.statusLabel.toLowerCase().contains(query);
+      final createdAt = DateTime.parse(item.createdAt);
+      final matchesDate =
+          _selectedDateRange == null ||
+          (!createdAt.isBefore(_selectedDateRange!.start) &&
+              !createdAt.isAfter(_selectedDateRange!.end));
+      return matchesQuery && matchesDate;
     }).toList();
   }
 
@@ -318,26 +326,37 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
       child: Container(
         color: AppPalette.pageBackground,
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _breadcrumb(),
-                const SizedBox(height: 14),
-                AppSearchBar(
-                  controller: _searchController,
-                  hintText: 'Search by booking ID, name, passport or status',
-                  onChanged: (value) => setState(() => _searchQuery = value),
-                  onSearchTap: () =>
-                      setState(() => _searchQuery = _searchController.text),
-                ),
-                const SizedBox(height: 14),
-                _viewToggle(),
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _breadcrumb(),
+                    const SizedBox(height: 14),
+                    AppSearchBar(
+                      controller: _searchController,
+                      hintText: 'Search by booking ID, name, passport or status',
+                      onChanged: (value) => setState(() => _searchQuery = value),
+                      onSearchTap: () =>
+                          setState(() => _searchQuery = _searchController.text),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        _viewToggle(),
+                        const SizedBox(width: 10),
+                        Expanded(child: _dateRangeButton()),
+                      ],
+                    ),
 
-                const SizedBox(height: 16),
-                if (_isCardView) _buildCardList() else _buildTableList(),
-              ],
+                    const SizedBox(height: 16),
+                    if (_isCardView) _buildCardList() else _buildTableList(),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -349,9 +368,20 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
     return BreadCrumb(
       items: <BreadCrumbItem>[
         BreadCrumbItem(
-          content: Text(
-            'Receive Booking List',
-            style: TextStyle(color: AppPalette.textMuted, fontSize: 12),
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.view_list_rounded,
+                size: 14,
+                color: AppPalette.textMuted,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'Receive Booking List',
+                style: TextStyle(color: AppPalette.textMuted, fontSize: 12),
+              ),
+            ],
           ),
         ),
         BreadCrumbItem(
@@ -377,6 +407,70 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
     return ViewToggleButton(
       isCardView: _isCardView,
       onChanged: (isCardView) => setState(() => _isCardView = isCardView),
+    );
+  }
+
+  Widget _dateRangeButton() {
+    final label = _selectedDateRange == null
+        ? 'Select Date Range'
+        : '${_formatDate(_selectedDateRange!.start)} - ${_formatDate(_selectedDateRange!.end)}';
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppPalette.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD8E3FA)),
+      ),
+      child: Row(
+        children: [
+          InkWell(
+            onTap: () async {
+              final now = DateTime.now();
+              final picked = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(now.year + 3, 12, 31),
+                initialDateRange: _selectedDateRange,
+              );
+              if (picked == null) return;
+              setState(() => _selectedDateRange = picked);
+            },
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.date_range_rounded,
+                  size: 18,
+                  color: AppPalette.textStrongBlue,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppPalette.textStrongBlue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Spacer(),
+          if (_selectedDateRange != null)
+            InkWell(
+              onTap: () => setState(() => _selectedDateRange = null),
+              borderRadius: BorderRadius.circular(999),
+              child: const Padding(
+                padding: EdgeInsets.all(4),
+                child: Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: AppPalette.textMuted,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -479,7 +573,6 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
           visaText: item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
           policeClearText: item.policeClearanceExpiryDate == null ? '22/08/2026' : _displayDate(item.policeClearanceExpiryDate!),
           totalCostText: '৳ ${_money(item.agencyTotalCost)}',
-          paidAmountText: '৳ ${_money(item.paidAmount)}',
           hasAdvancePayout: item.hasAdvancePayout,
           hasAfterVisaPayout: item.hasAfterVisaPayout,
           hasBeforeFlightPayout: item.hasBeforeFlightPayout,
@@ -521,6 +614,12 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
         .toList()
         .reversed
         .join(',');
+  }
+
+  String _formatDate(DateTime date) {
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$m-$d';
   }
 
   ReceivedBookingCardStyle _styleFor(String status) {

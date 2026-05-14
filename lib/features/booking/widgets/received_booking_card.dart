@@ -29,7 +29,6 @@ class ReceivedBookingCard extends StatelessWidget {
     required this.visaText,
     required this.policeClearText,
     required this.totalCostText,
-    required this.paidAmountText,
     required this.hasAdvancePayout,
     required this.hasAfterVisaPayout,
     required this.hasBeforeFlightPayout,
@@ -49,7 +48,6 @@ class ReceivedBookingCard extends StatelessWidget {
   final String visaText;
   final String policeClearText;
   final String totalCostText;
-  final String paidAmountText;
   final bool hasAdvancePayout;
   final bool hasAfterVisaPayout;
   final bool hasBeforeFlightPayout;
@@ -58,63 +56,34 @@ class ReceivedBookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppPalette.surface,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x334B5D7A), width: 1.2),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0D000000), blurRadius: 26, offset: Offset(0, 12)),
-          BoxShadow(color: Color(0x122563EB), blurRadius: 8, offset: Offset(0, 1)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _header(),
-          const SizedBox(height: 20),
-          _profileSection(),
-          const SizedBox(height: 20),
-          _detailsSection(),
-          const SizedBox(height: 16),
-          _financialBar(),
-          const SizedBox(height: 12),
-          _payoutIndicators(),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton(
-                  onPressed: () {},
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                    backgroundColor: AppPalette.textStrongBlue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  child: Text(
-                    style.ctaLabel,
-                    style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: .2),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8EDF7),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: IconButton(
-                  onPressed: onMoreTap,
-                  icon: const Icon(Icons.more_vert, color: AppPalette.textStrongBlue),
-                ),
-              ),
-            ],
-          ),
-        ],
+    return GestureDetector(
+      onLongPress: onMoreTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppPalette.surface,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: const Color(0x334B5D7A), width: 1.2),
+          boxShadow: const [
+            BoxShadow(color: Color(0x0D000000), blurRadius: 26, offset: Offset(0, 12)),
+            BoxShadow(color: Color(0x122563EB), blurRadius: 8, offset: Offset(0, 1)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _header(),
+            const SizedBox(height: 20),
+            _profileSection(),
+            const SizedBox(height: 20),
+            _detailsSection(),
+            const SizedBox(height: 16),
+            _financialBar(),
+            const SizedBox(height: 12),
+            _payoutIndicators(),
+          ],
+        ),
       ),
     );
   }
@@ -300,34 +269,37 @@ class ReceivedBookingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF3FA),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFEAF1FF), Color(0xFFDCE7FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFD8E3FA)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(child: _moneyBlock('Total Cost', totalCostText, true)),
-          Expanded(child: _moneyBlock('Paid Amount', paidAmountText, false)),
+          const Text(
+            'TOTAL COST',
+            style: TextStyle(
+              fontSize: 12,
+              color: AppPalette.textMuted,
+              letterSpacing: .8,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            totalCostText,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 28,
+              color: AppPalette.textStrongBlue,
+            ),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _moneyBlock(String label, String value, bool primary) {
-    return Column(
-      crossAxisAlignment: primary ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: AppPalette.textMuted)),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: 18,
-            color: primary ? AppPalette.textStrongBlue : AppPalette.textPrimary,
-          ),
-        ),
-      ],
     );
   }
 
