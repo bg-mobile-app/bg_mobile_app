@@ -475,17 +475,22 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
     children: [
       ..._filteredBookings.map((item) {
         return Container(
-          margin: const EdgeInsets.only(bottom: 18),
+          margin: const EdgeInsets.only(bottom: 20),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: const Color(0xFFFFFFFF),
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: const Color(0x334B5D7A)),
+            border: Border.all(color: const Color(0x334B5D7A), width: 1.2),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x0D000000),
                 blurRadius: 26,
                 offset: Offset(0, 12),
+              ),
+              BoxShadow(
+                color: Color(0x122563EB),
+                blurRadius: 8,
+                offset: Offset(0, 1),
               ),
             ],
           ),
@@ -514,7 +519,10 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text('Visa Approved'),
+                      child: const Text(
+                        'Visa Approved',
+                        style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: .2),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -527,7 +535,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
                     ),
                     child: IconButton(
                       onPressed: () => _openActionsSheet(context, item),
-                      icon: const Icon(Icons.more_vert),
+                      icon: const Icon(Icons.more_vert, color: AppPalette.textStrongBlue),
                     ),
                   ),
                 ],
@@ -567,17 +575,20 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: style.badgeBg,
+            gradient: LinearGradient(
+              colors: [style.badgeBg, style.badgeBg.withValues(alpha: 0.72)],
+            ),
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
             item.status.toUpperCase(),
             style: TextStyle(
               color: style.badgeText,
-              fontSize: 11,
+              fontSize: 10.5,
               fontWeight: FontWeight.w800,
+              letterSpacing: .4,
             ),
           ),
         ),
@@ -593,7 +604,13 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
           child: Container(
             width: 56,
             height: 56,
-            color: const Color(0xFFDCE9FF),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFDCE9FF), Color(0xFFB4C5FF)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
             alignment: Alignment.center,
             child: Text(
               item.name.isEmpty ? '?' : item.name[0].toUpperCase(),
@@ -763,6 +780,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFEFF3FA),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFD8E3FA)),
       ),
       child: Row(
         children: [
