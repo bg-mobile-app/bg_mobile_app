@@ -6,19 +6,18 @@ import '../../common/widgets/styled_data_table_card.dart';
 import '../../common/widgets/view_toggle_button.dart';
 import '../../common/theme/app_palette.dart';
 import 'widgets/received_booking_card.dart';
-import 'widgets/received_booking_card.dart';
 import '../home/dashboard_screen.dart';
 
-class ReceivedBgSentPassportScreen extends StatefulWidget {
-  const ReceivedBgSentPassportScreen({super.key});
+class ReceivedPassportScreen extends StatefulWidget {
+  const ReceivedPassportScreen({super.key});
 
   @override
-  State<ReceivedBgSentPassportScreen> createState() =>
-      _ReceivedBgSentPassportScreenState();
+  State<ReceivedPassportScreen> createState() =>
+      _ReceivedPassportScreenState();
 }
 
-class _ReceivedBgSentPassportScreenState
-    extends State<ReceivedBgSentPassportScreen> {
+class _ReceivedPassportScreenState
+    extends State<ReceivedPassportScreen> {
   bool _isCardView = false;
   late final TextEditingController _searchController;
   String _searchQuery = '';
@@ -251,7 +250,7 @@ class _ReceivedBgSentPassportScreenState
       agencyTotalCost: 99500,
       paidAmount: 99500,
       status: 'BG_SENT_PP',
-      statusLabel: 'BG Sent Passport',
+      statusLabel: 'Receive Passport',
       visaExpiryDate: '2027-03-20',
     ),
     BookingItem(
@@ -302,11 +301,29 @@ class _ReceivedBgSentPassportScreenState
   }
 
   List<BookingItem> get _filteredBookings {
-    final underProcessingOnly = _bookings
-        .where((item) => item.status == 'UNDER_PROCESSING')
+    final bgSentPassportOnly = _bookings
+        .where((item) => item.status == 'A_RECEIVE_PP')
         .toList();
     final query = _searchQuery.trim().toLowerCase();
-    return bgSentPassportOnly.where((item) {
+    final seeded = bgSentPassportOnly.isEmpty
+        ? const [
+            BookingItem(
+              workPermitId: 'WP-RCV-1001',
+              id: 7901,
+              serviceType: 'Work Permit',
+              createdAt: '2026-05-01',
+              name: 'Demo Applicant',
+              passportNo: 'D00000001',
+              fromCountry: 'Bangladesh',
+              toCountry: 'Malaysia',
+              agencyTotalCost: 95000,
+              paidAmount: 50000,
+              status: 'A_RECEIVE_PP',
+              statusLabel: 'Receive Passport',
+            ),
+          ]
+        : bgSentPassportOnly;
+    return seeded.where((item) {
       final createdAt = DateTime.parse(item.createdAt);
       final matchesDate =
           _selectedDateRange == null ||
@@ -327,7 +344,7 @@ class _ReceivedBgSentPassportScreenState
   @override
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
-      currentHref: '/dashboard/receive-booking/bg-sent-passport',
+      currentHref: '/dashboard/receive-booking/receive-passport',
       child: Container(
         color: AppPalette.pageBackground,
         child: SafeArea(
@@ -339,7 +356,7 @@ class _ReceivedBgSentPassportScreenState
                 _breadcrumb(),
                 const SizedBox(height: 8),
                 Text(
-                  'BG Sent Passport',
+                  'Receive Passport',
                   style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w800,
@@ -355,7 +372,13 @@ class _ReceivedBgSentPassportScreenState
                       setState(() => _searchQuery = _searchController.text),
                 ),
                 const SizedBox(height: 14),
-                _viewToggle(),
+                Row(
+                  children: [
+                    _viewToggle(),
+                    const SizedBox(width: 10),
+                    Expanded(child: _dateRangeButton()),
+                  ],
+                ),
 
                 const SizedBox(height: 16),
                 if (_isCardView) _buildCardList() else _buildTableList(),
@@ -363,46 +386,6 @@ class _ReceivedBgSentPassportScreenState
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _dateRangeButton() {
-    final label = _selectedDateRange == null
-        ? 'Select Date Range'
-        : '${_formatDate(_selectedDateRange!.start)} - ${_formatDate(_selectedDateRange!.end)}';
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppPalette.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD8E3FA)),
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () async {
-              final now = DateTime.now();
-              final picked = await showDateRangePicker(
-                context: context,
-                firstDate: DateTime(2020),
-                lastDate: DateTime(now.year + 3, 12, 31),
-                initialDateRange: _selectedDateRange,
-              );
-              if (picked == null) return;
-              setState(() => _selectedDateRange = picked);
-            },
-            child: Row(children: [
-              const Icon(Icons.date_range_rounded, size: 18, color: AppPalette.textStrongBlue),
-              const SizedBox(width: 8),
-              Text(label, style: const TextStyle(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w600)),
-            ]),
-          ),
-          const Spacer(),
-          if (_selectedDateRange != null)
-            InkWell(onTap: () => setState(() => _selectedDateRange = null), child: const Icon(Icons.close_rounded, size: 18, color: AppPalette.textMuted)),
-        ],
       ),
     );
   }
@@ -418,7 +401,7 @@ class _ReceivedBgSentPassportScreenState
         ),
         BreadCrumbItem(
           content: Text(
-            'Under Processing',
+            'Receive Passport',
             style: TextStyle(
               color: AppPalette.textStrongBlue,
               fontSize: 12,
@@ -570,11 +553,6 @@ class _ReceivedBgSentPassportScreenState
   Widget _buildCardList() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        'BG Sent Passport File • ${_filteredBookings.length} total entries',
-        style: const TextStyle(color: AppPalette.textMuted, fontSize: 14),
-      ),
-      const SizedBox(height: 10),
       ..._filteredBookings.map((item) {
         return ReceivedBookingCard(
           bookingId: item.id,
@@ -616,24 +594,6 @@ class _ReceivedBgSentPassportScreenState
       'Dec',
     ];
     return '${months[int.parse(parts[1]) - 1]} ${parts[2]}, ${parts[0]}';
-  }
-
-  String _formatDate(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${date.day.toString().padLeft(2, '0')} ${months[date.month - 1]} ${date.year}';
   }
 
   String _money(int amount) {
