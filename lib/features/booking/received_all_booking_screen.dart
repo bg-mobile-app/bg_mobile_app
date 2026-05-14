@@ -493,11 +493,14 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _cardHeader(item),
-              const SizedBox(height: 14),
+              const SizedBox(height: 20),
               _profileSection(item),
-              const SizedBox(height: 14),
+              const SizedBox(height: 20),
               _detailsGrid(item),
+              const SizedBox(height: 16),
               _financialBar(item),
+              const SizedBox(height: 12),
+              _buildPayoutIndicators(item),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -523,6 +526,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      child: const Text('Visa Approved'),
                     ),
                     icon: const Icon(Icons.more_vert),
                   ),
@@ -543,9 +547,26 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Booking #${item.id}',
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    color: AppPalette.textMuted,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                  children: [
+                    const TextSpan(text: 'Booking ID: '),
+                    TextSpan(
+                      text: '#${item.id}',
+                      style: const TextStyle(
+                        color: AppPalette.textStrongBlue,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                      ),
+                    ),
+                    icon: const Icon(Icons.more_vert),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               Text(
@@ -565,7 +586,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
-            item.statusLabel.toUpperCase(),
+            item.status.toUpperCase(),
             style: TextStyle(
               color: style.badgeText,
               fontSize: 11,
@@ -603,7 +624,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
             children: [
               Text(
                 item.name,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 2),
               Text(
@@ -664,7 +685,14 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
                   item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
                 ),
               ),
-              Expanded(child: _buildPayoutIndicators(item)),
+              Expanded(
+                child: _detailBlock(
+                  'Police Clear.',
+                  item.policeClearanceExpiryDate == null
+                      ? '22/08/2026'
+                      : _displayDate(item.policeClearanceExpiryDate!),
+                ),
+              ),
             ],
           ),
         ],
@@ -695,51 +723,47 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   }
 
   Widget _buildPayoutIndicators(BookingItem item) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        const Text(
-          'PAYOUT',
-          style: TextStyle(
-            fontSize: 11,
-            color: AppPalette.textMuted,
-            fontWeight: FontWeight.w700,
-            letterSpacing: .2,
+        Expanded(child: _buildPayoutChip('ADVANCE', item.hasAdvancePayout, Icons.check_circle)),
+        const SizedBox(width: 8),
+        Expanded(child: _buildPayoutChip('PRE-VISA', item.hasAfterVisaPayout, Icons.pending)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _buildPayoutChip(
+            'PRE-FLIGHT',
+            item.hasBeforeFlightPayout,
+            Icons.flight,
           ),
-        ),
-        const SizedBox(height: 4),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: [
-            _buildPayoutChip('Adv', item.hasAdvancePayout),
-            _buildPayoutChip('Visa', item.hasAfterVisaPayout),
-            _buildPayoutChip('Flight', item.hasBeforeFlightPayout),
-          ],
         ),
       ],
     );
   }
 
-  Widget _buildPayoutChip(String label, bool done) {
+  Widget _buildPayoutChip(String label, bool done, IconData icon) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
       decoration: BoxDecoration(
-        color: done ? const Color(0xFFE8F8EE) : const Color(0xFFFFF4E8),
-        borderRadius: BorderRadius.circular(999),
+        color: done ? const Color(0xFFF0FDF4) : const Color(0xFFE1E8FD),
+        borderRadius: BorderRadius.circular(8),
+        border: done ? Border.all(color: const Color(0xFFD1FAE5)) : null,
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            done ? Icons.check_circle : Icons.pending,
+            icon,
             size: 14,
-            color: done ? AppPalette.success : AppPalette.warning,
+            color: done ? const Color(0xFF15803D) : const Color(0xFF737686),
           ),
           const SizedBox(width: 4),
           Text(
             label,
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: done ? const Color(0xFF15803D) : const Color(0xFF737686),
+            ),
           ),
         ],
       ),
@@ -748,7 +772,6 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
 
   Widget _financialBar(BookingItem item) {
     return Container(
-      margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFFEFF3FA),
