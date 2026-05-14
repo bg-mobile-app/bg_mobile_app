@@ -664,7 +664,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
                   item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
                 ),
               ),
-              Expanded(child: _payoutIndicators(item)),
+              Expanded(child: _buildPayoutIndicators(item)),
             ],
           ),
         ],
@@ -694,7 +694,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
     );
   }
 
-  Widget _payoutIndicators(BookingItem item) {
+  Widget _buildPayoutIndicators(BookingItem item) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -712,16 +712,16 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
           spacing: 6,
           runSpacing: 6,
           children: [
-            _payoutChip('Adv', item.hasAdvancePayout),
-            _payoutChip('Visa', item.hasAfterVisaPayout),
-            _payoutChip('Flight', item.hasBeforeFlightPayout),
+            _buildPayoutChip('Adv', item.hasAdvancePayout),
+            _buildPayoutChip('Visa', item.hasAfterVisaPayout),
+            _buildPayoutChip('Flight', item.hasBeforeFlightPayout),
           ],
         ),
       ],
     );
   }
 
-  Widget _payoutChip(String label, bool done) {
+  Widget _buildPayoutChip(String label, bool done) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
