@@ -11,7 +11,7 @@ class ChatConversationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F3FF),
+      backgroundColor: const Color(0xFFDCE7F7),
       body: SafeArea(
         bottom: false,
         child: Stack(
@@ -22,7 +22,7 @@ class ChatConversationScreen extends StatelessWidget {
                 Expanded(
                   child: Container(
                     width: double.infinity,
-                    color: const Color(0xFFF1F3FF),
+                    color: const Color(0xFFDCE7F7),
                     child: ListView(
                       padding: const EdgeInsets.fromLTRB(16, 24, 16, 120),
                       children: [
@@ -75,7 +75,7 @@ class _TopBar extends StatelessWidget {
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: const BoxDecoration(
-        color: Color(0xFFF1F3FF),
+        color: Color(0xFFDCE7F7),
         border: Border(bottom: BorderSide(color: Color(0xFFC3C6D7))),
         boxShadow: [
           BoxShadow(
@@ -118,7 +118,7 @@ class _TopBar extends StatelessWidget {
                         : const Color(0xFF737686),
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(
-                      color: const Color(0xFFF1F3FF),
+                      color: const Color(0xFFDCE7F7),
                       width: 2,
                     ),
                   ),
@@ -325,7 +325,7 @@ class _InputDock extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       decoration: const BoxDecoration(
-        color: Color(0xFFF1F3FF),
+        color: Color(0xFFDCE7F7),
         border: Border(top: BorderSide(color: Color(0xFFC3C6D7))),
       ),
       child: Row(

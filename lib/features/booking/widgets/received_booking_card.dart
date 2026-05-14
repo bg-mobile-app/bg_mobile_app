@@ -1,0 +1,390 @@
+import 'package:flutter/material.dart';
+
+import '../../../common/theme/app_palette.dart';
+
+class ReceivedBookingCardStyle {
+  const ReceivedBookingCardStyle({
+    required this.badgeBg,
+    required this.badgeText,
+    required this.ctaLabel,
+  });
+
+  final Color badgeBg;
+  final Color badgeText;
+  final String ctaLabel;
+}
+
+class ReceivedBookingCard extends StatelessWidget {
+  const ReceivedBookingCard({
+    super.key,
+    required this.bookingId,
+    required this.postId,
+    required this.statusText,
+    required this.name,
+    required this.passportNo,
+    required this.createdAtText,
+    required this.fromCountry,
+    required this.toCountry,
+    required this.medicalText,
+    required this.visaText,
+    required this.policeClearText,
+    required this.totalCostText,
+    required this.paidAmountText,
+    required this.hasAdvancePayout,
+    required this.hasAfterVisaPayout,
+    required this.hasBeforeFlightPayout,
+    required this.style,
+    required this.onMoreTap,
+  });
+
+  final int bookingId;
+  final String postId;
+  final String statusText;
+  final String name;
+  final String passportNo;
+  final String createdAtText;
+  final String fromCountry;
+  final String toCountry;
+  final String medicalText;
+  final String visaText;
+  final String policeClearText;
+  final String totalCostText;
+  final String paidAmountText;
+  final bool hasAdvancePayout;
+  final bool hasAfterVisaPayout;
+  final bool hasBeforeFlightPayout;
+  final ReceivedBookingCardStyle style;
+  final VoidCallback onMoreTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppPalette.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x334B5D7A), width: 1.2),
+        boxShadow: const [
+          BoxShadow(color: Color(0x0D000000), blurRadius: 26, offset: Offset(0, 12)),
+          BoxShadow(color: Color(0x122563EB), blurRadius: 8, offset: Offset(0, 1)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _header(),
+          const SizedBox(height: 20),
+          _profileSection(),
+          const SizedBox(height: 20),
+          _detailsSection(),
+          const SizedBox(height: 16),
+          _financialBar(),
+          const SizedBox(height: 12),
+          _payoutIndicators(),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton(
+                  onPressed: () {},
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    backgroundColor: AppPalette.textStrongBlue,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Text(
+                    style.ctaLabel,
+                    style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: .2),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8EDF7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: IconButton(
+                  onPressed: onMoreTap,
+                  icon: const Icon(Icons.more_vert, color: AppPalette.textStrongBlue),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _header() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Text(
+            '#$bookingId',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppPalette.textStrongBlue,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [style.badgeBg, style.badgeBg.withValues(alpha: 0.72)],
+                ),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                statusText.toUpperCase(),
+                style: TextStyle(
+                  color: style.badgeText,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: .4,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            postId,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppPalette.textMuted,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _profileSection() {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          _pill('Passport: $passportNo', AppPalette.textMuted),
+          const SizedBox(height: 8),
+          _pill(createdAtText, AppPalette.textStrongBlue),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailsSection() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Color(0x334B5D7A)),
+          bottom: BorderSide(color: Color(0x334B5D7A)),
+        ),
+      ),
+      child: Column(
+        children: [
+          _routeRow(),
+          const SizedBox(height: 14),
+          _clearanceRow(),
+        ],
+      ),
+    );
+  }
+
+  Widget _routeRow() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF3FA),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFD8E3FA)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              fromCountry,
+              textAlign: TextAlign.left,
+              style: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textPrimary),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Icon(Icons.flight_takeoff_rounded, size: 18, color: AppPalette.textStrongBlue),
+          ),
+          Expanded(
+            child: Text(
+              toCountry,
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textPrimary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _clearanceRow() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0x334B5D7A)),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: _clearanceCell('Medical', medicalText, Icons.medical_services_outlined)),
+          const SizedBox(height: 28, child: VerticalDivider(color: Color(0x334B5D7A), thickness: 1)),
+          Expanded(child: _clearanceCell('Visa', visaText, Icons.verified_user_outlined)),
+          const SizedBox(height: 28, child: VerticalDivider(color: Color(0x334B5D7A), thickness: 1)),
+          Expanded(child: _clearanceCell('Police Clear', policeClearText, Icons.gavel_rounded)),
+        ],
+      ),
+    );
+  }
+
+  Widget _clearanceCell(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 13, color: AppPalette.textMuted),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  label.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppPalette.textMuted,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: .2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _financialBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF3FA),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFD8E3FA)),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: _moneyBlock('Total Cost', totalCostText, true)),
+          Expanded(child: _moneyBlock('Paid Amount', paidAmountText, false)),
+        ],
+      ),
+    );
+  }
+
+  Widget _moneyBlock(String label, String value, bool primary) {
+    return Column(
+      crossAxisAlignment: primary ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, color: AppPalette.textMuted)),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
+            color: primary ? AppPalette.textStrongBlue : AppPalette.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _payoutIndicators() {
+    return Row(
+      children: [
+        Expanded(child: _payoutChip('ADVANCE', hasAdvancePayout, Icons.check_circle)),
+        const SizedBox(width: 8),
+        Expanded(child: _payoutChip('PRE-VISA', hasAfterVisaPayout, Icons.pending)),
+        const SizedBox(width: 8),
+        Expanded(child: _payoutChip('PRE-FLIGHT', hasBeforeFlightPayout, Icons.flight)),
+      ],
+    );
+  }
+
+  Widget _payoutChip(String label, bool done, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+      decoration: BoxDecoration(
+        color: done ? const Color(0xFFF0FDF4) : const Color(0xFFE1E8FD),
+        borderRadius: BorderRadius.circular(8),
+        border: done ? Border.all(color: const Color(0xFFD1FAE5)) : null,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 14, color: done ? const Color(0xFF15803D) : const Color(0xFF737686)),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: done ? const Color(0xFF15803D) : const Color(0xFF737686),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pill(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF3FA),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFD8E3FA)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}

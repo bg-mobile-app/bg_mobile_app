@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.tune, color: Colors.white, size: 20),
+                child: const Icon(Icons.tune, color: AppPalette.appcolor, size: 20),
               ),
             ),
           ],
