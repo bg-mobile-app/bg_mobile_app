@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,6 +6,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../common/services/location_service.dart';
 import '../../common/services/profile_service.dart';
+import '../../common/theme/app_palette.dart';
 
 class CustomerProfileEditScreen extends StatefulWidget {
   const CustomerProfileEditScreen({super.key});
@@ -41,8 +43,15 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
   int? _selectedDistrictId;
   int? _selectedPoliceStationId;
 
+  String? _existingProfileImageUrl;
+  String? _existingNidImageUrl;
+  String? _existingTradeLicenseUrl;
+  String? _existingRlLicenseUrl;
+  String? _existingCivilAviationLicenseUrl;
+
   XFile? _profileImage;
   XFile? _nidImage;
+  XFile? _nidBackImage; // Local mock storage for back NID
   XFile? _tradeLicenseImage;
   XFile? _rlLicenseImage;
   XFile? _civilAviationLicenseImage;
@@ -78,6 +87,12 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
       final doc = profile.documents.isNotEmpty ? profile.documents.first : null;
 
       setState(() {
+        _existingProfileImageUrl = profile.image;
+        _existingNidImageUrl = doc?.nidImage;
+        _existingTradeLicenseUrl = doc?.tradeLicenseImage;
+        _existingRlLicenseUrl = doc?.rlLicenseImage;
+        _existingCivilAviationLicenseUrl = doc?.civilAviationLicenseImage;
+
         _agencyNameController.text = profile.agencyName;
         _agencyPhoneController.text = profile.owner?.phone ?? '';
         _agencyAddressController.text = profile.agencyAddress ?? '';
@@ -196,51 +211,204 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      backgroundColor: AppPalette.pageBackground,
+      appBar: AppBar(
+        title: const Text(
+          'Edit Profile',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: AppPalette.textPrimary,
+        elevation: 0,
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: _error != null && !_isLoading
-            ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 16)), const SizedBox(height: 12), ElevatedButton(onPressed: _loadData, child: const Text('Retry'))]))
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _error!,
+                        style: const TextStyle(color: AppPalette.danger, fontSize: 16, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadData,
+                        style: ElevatedButton.styleFrom(backgroundColor: AppPalette.brandBlue, foregroundColor: Colors.white),
+                        child: const Text('Retry'),
+                      )
+                    ],
+                  ),
+                ),
+              )
             : Skeletonizer(
                 enabled: _isLoading,
                 child: Form(
                   key: _formKey,
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      _field('Agency Name', _agencyNameController),
-                      _field('Agency Phone', _agencyPhoneController),
-                      _field('Agency Address', _agencyAddressController),
-                      const SizedBox(height: 8),
-                      const Text('Owner Information', style: TextStyle(fontWeight: FontWeight.bold)),
-                      _field('Owner Full Name', _ownerNameController),
-                      _field('Owner Phone', _ownerPhoneController),
-                      _field('Owner Email', _ownerEmailController, keyboardType: TextInputType.emailAddress),
-                      _districtDropdown(),
-                      _policeStationDropdown(),
-                      const SizedBox(height: 8),
-                      const Text('Bank Information', style: TextStyle(fontWeight: FontWeight.bold)),
-                      _field('Bank Name', _bankNameController),
-                      _field('Branch Name', _branchNameController),
-                      _field('Account Name', _accountNameController),
-                      _field('Account Number', _accountNoController),
-                      _field('Routing Number', _routingNoController),
-                      const SizedBox(height: 8),
-                      const Text('Documents', style: TextStyle(fontWeight: FontWeight.bold)),
-                      _field('RL Number', _rlNoController),
-                      _imagePickerTile('Profile Image', _profileImage, () => _pickImage((v) => setState(() => _profileImage = v))),
-                      _imagePickerTile('NID Image', _nidImage, () => _pickImage((v) => setState(() => _nidImage = v))),
-                      _imagePickerTile('Trade License Image', _tradeLicenseImage, () => _pickImage((v) => setState(() => _tradeLicenseImage = v))),
-                      _imagePickerTile('RL License Image', _rlLicenseImage, () => _pickImage((v) => setState(() => _rlLicenseImage = v))),
-                      _imagePickerTile('Civil Aviation License Image', _civilAviationLicenseImage, () => _pickImage((v) => setState(() => _civilAviationLicenseImage = v))),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _isSaving ? null : _saveProfile,
-                          child: Text(_isSaving ? 'Saving...' : 'Update Profile'),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildProfilePhotoHeader(),
+                        
+                        // Card 1: Agency Details
+                        _buildSectionCard(
+                          title: 'Agency Details',
+                          icon: Icons.business_center,
+                          children: [
+                            _buildCustomTextField(
+                              label: 'Agency Name',
+                              controller: _agencyNameController,
+                              icon: Icons.business,
+                            ),
+                            _buildCustomTextField(
+                              label: 'Agency Phone',
+                              controller: _agencyPhoneController,
+                              icon: Icons.phone_android,
+                              keyboardType: TextInputType.phone,
+                            ),
+                            _buildCustomTextField(
+                              label: 'Agency Address',
+                              controller: _agencyAddressController,
+                              icon: Icons.map,
+                            ),
+                          ],
                         ),
-                      ),
-                    ]),
+
+                        // Card 2: Owner Information
+                        _buildSectionCard(
+                          title: 'Owner Information',
+                          icon: Icons.person,
+                          children: [
+                            _buildCustomTextField(
+                              label: 'Full Name',
+                              controller: _ownerNameController,
+                              icon: Icons.badge_outlined,
+                            ),
+                            _buildCustomTextField(
+                              label: 'Phone Number',
+                              controller: _ownerPhoneController,
+                              icon: Icons.phone,
+                              keyboardType: TextInputType.phone,
+                            ),
+                            _buildCustomTextField(
+                              label: 'Email Address',
+                              controller: _ownerEmailController,
+                              icon: Icons.email_outlined,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                          ],
+                        ),
+
+                        // Card 3: Location
+                        _buildSectionCard(
+                          title: 'Location',
+                          icon: Icons.location_on,
+                          children: [
+                            _buildCustomDropdown<int>(
+                              label: 'District',
+                              value: _selectedDistrictId,
+                              icon: Icons.my_location,
+                              items: _districts.map((d) => DropdownMenuItem<int>(value: d.id, child: Text(d.name))).toList(),
+                              onChanged: _isLoading ? null : _onDistrictChanged,
+                            ),
+                            _buildCustomDropdown<int>(
+                              label: 'Police Station',
+                              value: _selectedPoliceStationId,
+                              icon: Icons.local_police_outlined,
+                              items: _policeStations.map((p) => DropdownMenuItem<int>(value: p.id, child: Text(p.name))).toList(),
+                              onChanged: _isLoading ? null : (v) => setState(() => _selectedPoliceStationId = v),
+                            ),
+                          ],
+                        ),
+
+                        // Card 4: Bank Information
+                        _buildSectionCard(
+                          title: 'Bank Information',
+                          icon: Icons.account_balance,
+                          children: [
+                            _buildCustomTextField(
+                              label: 'Bank Name',
+                              controller: _bankNameController,
+                              icon: Icons.account_balance_outlined,
+                            ),
+                            _buildCustomTextField(
+                              label: 'Branch Name',
+                              controller: _branchNameController,
+                              icon: Icons.door_sliding_outlined,
+                            ),
+                            _buildCustomTextField(
+                              label: 'Account Name',
+                              controller: _accountNameController,
+                              icon: Icons.account_box_outlined,
+                            ),
+                            _buildCustomTextField(
+                              label: 'Account Number',
+                              controller: _accountNoController,
+                              icon: Icons.numbers_outlined,
+                              keyboardType: TextInputType.number,
+                            ),
+                            _buildCustomTextField(
+                              label: 'Routing Number',
+                              controller: _routingNoController,
+                              icon: Icons.alt_route_outlined,
+                              keyboardType: TextInputType.number,
+                            ),
+                          ],
+                        ),
+
+                        // Card 5: Documents
+                        _buildSectionCard(
+                          title: 'Documents',
+                          icon: Icons.description,
+                          children: [
+                            _buildCustomTextField(
+                              label: 'RL Number',
+                              controller: _rlNoController,
+                              icon: Icons.gavel_outlined,
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'NID Verification',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppPalette.textMuted),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                _buildNidCard(
+                                  label: 'NID Front Side',
+                                  localFile: _nidImage,
+                                  existingUrl: _existingNidImageUrl,
+                                  onTap: () => _pickImage((v) => setState(() => _nidImage = v)),
+                                ),
+                                const SizedBox(width: 12),
+                                _buildNidCard(
+                                  label: 'NID Back Side',
+                                  localFile: _nidBackImage,
+                                  existingUrl: null,
+                                  onTap: () => _pickImage((v) => setState(() => _nidBackImage = v)),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Licenses & Certificates',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppPalette.textMuted),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildLicenseGrid(),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+
+                        _buildSaveButton(),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -248,53 +416,499 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
     );
   }
 
-  Widget _imagePickerTile(String label, XFile? file, VoidCallback onTap) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFD1D5DB))),
-        title: Text(label),
-        subtitle: Text(file?.name ?? 'No file selected'),
-        trailing: const Icon(Icons.upload_file),
+  Widget _buildProfilePhotoHeader() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 4),
+                    boxShadow: AppPalette.cardShadow,
+                  ),
+                  child: CircleAvatar(
+                    radius: 70,
+                    backgroundColor: const Color(0xFFEFF6FF),
+                    backgroundImage: _profileImage != null
+                        ? FileImage(File(_profileImage!.path))
+                        : (_existingProfileImageUrl != null && _existingProfileImageUrl!.isNotEmpty
+                            ? NetworkImage(_existingProfileImageUrl!)
+                            : const AssetImage('assets/img/sign-in/login.jpg')) as ImageProvider,
+                  ),
+                ),
+                Positioned(
+                  bottom: 4,
+                  right: 4,
+                  child: GestureDetector(
+                    onTap: () => _pickImage((v) => setState(() => _profileImage = v)),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppPalette.brandBlue,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppPalette.brandBlue.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.photo_camera,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () => _pickImage((v) => setState(() => _profileImage = v)),
+              child: const Text(
+                'Change Photo',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppPalette.brandBlue,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppPalette.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: AppPalette.brandBlue, size: 22),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppPalette.textPrimary),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomTextField({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppPalette.textMuted),
+        ),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          validator: validator ?? (value) => (value == null || value.trim().isEmpty) ? '$label is required' : null,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppPalette.textPrimary),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, color: AppPalette.textMuted, size: 20),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            filled: true,
+            fillColor: const Color(0xFFF9FAFB),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppPalette.borderNeutral),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppPalette.brandBlue, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppPalette.danger),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppPalette.danger, width: 1.5),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildCustomDropdown<T>({
+    required String label,
+    required T? value,
+    required List<DropdownMenuItem<T>> items,
+    required IconData icon,
+    required ValueChanged<T?>? onChanged,
+    String? Function(T?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppPalette.textMuted),
+        ),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<T>(
+          value: value,
+          items: items,
+          onChanged: onChanged,
+          validator: validator ?? (v) => v == null ? '$label is required' : null,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppPalette.textPrimary),
+          icon: const Icon(Icons.arrow_drop_down, color: AppPalette.textMuted),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, color: AppPalette.textMuted, size: 20),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            filled: true,
+            fillColor: const Color(0xFFF9FAFB),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppPalette.borderNeutral),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppPalette.brandBlue, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppPalette.danger),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppPalette.danger, width: 1.5),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildNidCard({
+    required String label,
+    required XFile? localFile,
+    required String? existingUrl,
+    required VoidCallback onTap,
+  }) {
+    final hasFile = localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
+    final fileName = localFile != null 
+        ? localFile.name 
+        : (existingUrl != null ? existingUrl.split('/').last : '');
+
+    return Expanded(
+      child: GestureDetector(
         onTap: onTap,
+        child: Container(
+          height: 120,
+          decoration: BoxDecoration(
+            color: hasFile ? const Color(0xFFECFDF5) : const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: hasFile ? const Color(0xFF10B981) : AppPalette.borderNeutral,
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                hasFile ? Icons.check_circle : Icons.upload_file,
+                color: hasFile ? const Color(0xFF10B981) : AppPalette.textMuted,
+                size: 30,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: hasFile ? const Color(0xFF065F46) : AppPalette.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  hasFile ? fileName : 'PNG, JPG (Max 5MB)',
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: hasFile ? const Color(0xFF047857) : AppPalette.textMuted,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _districtDropdown() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: DropdownButtonFormField<int>(
-        value: _selectedDistrictId,
-        decoration: const InputDecoration(labelText: 'District', border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)))),
-        items: _districts.map((d) => DropdownMenuItem<int>(value: d.id, child: Text(d.name))).toList(),
-        onChanged: _isLoading ? null : _onDistrictChanged,
-        validator: (v) => v == null ? 'District is required' : null,
+  Widget _buildLicenseGrid() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 500;
+        if (isWide) {
+          return Row(
+            children: [
+              _buildLicenseCard(
+                label: 'Trade License',
+                icon: Icons.verified_user,
+                localFile: _tradeLicenseImage,
+                existingUrl: _existingTradeLicenseUrl,
+                onTap: () => _pickImage((v) => setState(() => _tradeLicenseImage = v)),
+              ),
+              const SizedBox(width: 12),
+              _buildLicenseCard(
+                label: 'RL License',
+                icon: Icons.badge,
+                localFile: _rlLicenseImage,
+                existingUrl: _existingRlLicenseUrl,
+                onTap: () => _pickImage((v) => setState(() => _rlLicenseImage = v)),
+              ),
+              const SizedBox(width: 12),
+              _buildLicenseCard(
+                label: 'Civil Aviation',
+                icon: Icons.flight,
+                localFile: _civilAviationLicenseImage,
+                existingUrl: _existingCivilAviationLicenseUrl,
+                onTap: () => _pickImage((v) => setState(() => _civilAviationLicenseImage = v)),
+              ),
+            ],
+          );
+        } else {
+          return Column(
+            children: [
+              _buildLicenseCardWide(
+                label: 'Trade License',
+                icon: Icons.verified_user,
+                localFile: _tradeLicenseImage,
+                existingUrl: _existingTradeLicenseUrl,
+                onTap: () => _pickImage((v) => setState(() => _tradeLicenseImage = v)),
+              ),
+              const SizedBox(height: 10),
+              _buildLicenseCardWide(
+                label: 'RL License',
+                icon: Icons.badge,
+                localFile: _rlLicenseImage,
+                existingUrl: _existingRlLicenseUrl,
+                onTap: () => _pickImage((v) => setState(() => _rlLicenseImage = v)),
+              ),
+              const SizedBox(height: 10),
+              _buildLicenseCardWide(
+                label: 'Civil Aviation License',
+                icon: Icons.flight,
+                localFile: _civilAviationLicenseImage,
+                existingUrl: _existingCivilAviationLicenseUrl,
+                onTap: () => _pickImage((v) => setState(() => _civilAviationLicenseImage = v)),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildLicenseCard({
+    required String label,
+    required IconData icon,
+    required XFile? localFile,
+    required String? existingUrl,
+    required VoidCallback onTap,
+  }) {
+    final hasFile = localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
+    final fileName = localFile != null 
+        ? localFile.name 
+        : (existingUrl != null ? existingUrl.split('/').last : 'Not Uploaded');
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 95,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: hasFile ? const Color(0xFF3B82F6).withOpacity(0.3) : AppPalette.borderNeutral,
+              width: 1.2,
+            ),
+            boxShadow: AppPalette.softShadow,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(icon, color: AppPalette.brandBlue, size: 18),
+                  const Icon(Icons.edit, color: AppPalette.textMuted, size: 13),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppPalette.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    fileName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 9,
+                      color: AppPalette.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _policeStationDropdown() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: DropdownButtonFormField<int>(
-        value: _selectedPoliceStationId,
-        decoration: const InputDecoration(labelText: 'Police Station', border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)))),
-        items: _policeStations.map((p) => DropdownMenuItem<int>(value: p.id, child: Text(p.name))).toList(),
-        onChanged: _isLoading ? null : (v) => setState(() => _selectedPoliceStationId = v),
-        validator: (v) => v == null ? 'Police Station is required' : null,
+  Widget _buildLicenseCardWide({
+    required String label,
+    required IconData icon,
+    required XFile? localFile,
+    required String? existingUrl,
+    required VoidCallback onTap,
+  }) {
+    final hasFile = localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
+    final fileName = localFile != null 
+        ? localFile.name 
+        : (existingUrl != null ? existingUrl.split('/').last : 'Not Uploaded');
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: hasFile ? const Color(0xFF3B82F6).withOpacity(0.3) : AppPalette.borderNeutral,
+            width: 1.2,
+          ),
+          boxShadow: AppPalette.softShadow,
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppPalette.brandBlue, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppPalette.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    fileName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppPalette.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.edit, color: AppPalette.textMuted, size: 14),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _field(String label, TextEditingController controller, {TextInputType? keyboardType}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        validator: (value) => (value == null || value.trim().isEmpty) ? '$label is required' : null,
-        decoration: InputDecoration(labelText: label, border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)))),
+  Widget _buildSaveButton() {
+    return Container(
+      margin: const EdgeInsets.only(top: 12, bottom: 32),
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        onPressed: _isSaving ? null : _saveProfile,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppPalette.brandBlue,
+          foregroundColor: Colors.white,
+          elevation: 2,
+          shadowColor: AppPalette.brandBlue.withOpacity(0.4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        child: _isSaving
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              )
+            : const Text(
+                'Save Changes',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.3,
+                ),
+              ),
       ),
     );
   }
