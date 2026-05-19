@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../common/theme/app_palette.dart';
+import 'services/create_ad_service.dart';
 import '../../common/theme/app_text_styles.dart';
 import 'dashboard_screen.dart';
 
@@ -14,10 +19,100 @@ class CreateAdFormScreen extends StatefulWidget {
 }
 
 class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
+  final CreateAdService _createAdService = CreateAdService();
+  final TextEditingController _jobTitleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final ImagePicker _imagePicker = ImagePicker();
+
   int _currentStep = 0;
+  bool _isLoadingMeta = false;
+  bool _isPublishing = false;
+  List<CountryOption> _countries = [];
+  List<WorkTypeOption> _workTypes = [];
+  int? _selectedCountryId;
+  int? _selectedWorkTypeId;
+  XFile? _selectedImage;
 
   String _tr(String en, String bn) => widget.isBangla ? bn : en;
 
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFormMeta();
+  }
+
+  @override
+  void dispose() {
+    _jobTitleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadFormMeta() async {
+    setState(() => _isLoadingMeta = true);
+    final countries = await _createAdService.getCountries();
+    final workTypes = await _createAdService.getWorkTypes();
+    if (!mounted) return;
+    setState(() {
+      _countries = countries;
+      _workTypes = workTypes;
+      _isLoadingMeta = false;
+    });
+  }
+
+  Future<void> _publishAd() async {
+    if (_selectedCountryId == null || _selectedWorkTypeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Please select country and work type', 'দেশ এবং কাজের ধরন নির্বাচন করুন'))),
+      );
+      return;
+    }
+    setState(() => _isPublishing = true);
+    try {
+      await _createAdService.createAd(
+        countryId: _selectedCountryId,
+        workTypeId: _selectedWorkTypeId,
+        title: _jobTitleController.text.trim(),
+        description: _descriptionController.text.trim(),
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Ad created successfully', 'বিজ্ঞাপন সফলভাবে তৈরি হয়েছে'))),
+      );
+      _exitForm();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Failed to publish ad', 'বিজ্ঞাপন প্রকাশ করা যায়নি'))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isPublishing = false);
+      }
+    }
+  }
+
+  void _exitForm() {
+    if (context.canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      context.go('/dashboard/ads/create');
+    }
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final file = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+      if (file == null || !mounted) return;
+      setState(() => _selectedImage = file);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Failed to pick image', 'ছবি নির্বাচন করা যায়নি'))),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
@@ -85,7 +180,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             if (_currentStep > 0) {
               setState(() => _currentStep--);
             } else {
-              Navigator.pop(context);
+              _exitForm();
             }
           },
           child: const Icon(Icons.arrow_back, color: AppPalette.brandBlue),
@@ -146,27 +241,42 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppPalette.brandBlue.withOpacity(0.1), width: 2),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(color: AppPalette.brandBlue.withOpacity(0.05), shape: BoxShape.circle),
-                  child: const Icon(Icons.cloud_upload_outlined, color: AppPalette.brandBlue, size: 32),
-                ),
-                const SizedBox(height: 16),
-                Text(_tr('Upload job poster or main image', 'কাজের পোস্টার বা প্রধান ছবি আপলোড করুন'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppPalette.textPrimary, height: 1.4)),
-                const SizedBox(height: 6),
-                const Text('(PNG, JPG, WEBP, Max 2MB)', style: TextStyle(fontSize: 12, color: AppPalette.textMuted)),
-              ],
+          InkWell(
+            onTap: _pickImage,
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppPalette.brandBlue.withOpacity(0.1), width: 2),
+              ),
+              child: Column(
+                children: [
+                  if (_selectedImage == null)
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(color: AppPalette.brandBlue.withOpacity(0.05), shape: BoxShape.circle),
+                      child: const Icon(Icons.cloud_upload_outlined, color: AppPalette.brandBlue, size: 32),
+                    )
+                  else
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(_selectedImage!.path),
+                        height: 120,
+                        width: 180,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+                  Text(_selectedImage == null ? _tr('Upload job poster or main image', 'কাজের পোস্টার বা প্রধান ছবি আপলোড করুন') : _tr('Image selected. Tap to change', 'ছবি নির্বাচন করা হয়েছে। পরিবর্তন করতে ট্যাপ করুন'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppPalette.textPrimary, height: 1.4)),
+                  const SizedBox(height: 6),
+                  const Text('(PNG, JPG, WEBP, Max 2MB)', style: TextStyle(fontSize: 12, color: AppPalette.textMuted)),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -229,11 +339,11 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             ],
           ),
           const SizedBox(height: 32),
-          _buildField(label: _tr('Country', 'দেশ'), hint: _tr('Select Country', 'দেশ নির্বাচন করুন'), isDropdown: true),
+          _buildDropdownField(label: _tr('Country', 'দেশ'), value: _selectedCountryId, hint: _tr('Select Country', 'দেশ নির্বাচন করুন'), options: _countries.map((e) => DropdownMenuItem<int>(value: e.id, child: Text(e.name))).toList(), onChanged: (value) => setState(() => _selectedCountryId = value)),
           const SizedBox(height: 24),
-          _buildField(label: _tr('Type of Work', 'কাজের ধরন'), hint: _tr('Select Work Type', 'কাজের ধরন নির্বাচন করুন'), isDropdown: true),
+          _buildDropdownField(label: _tr('Type of Work', 'কাজের ধরন'), value: _selectedWorkTypeId, hint: _tr('Select Work Type', 'কাজের ধরন নির্বাচন করুন'), options: _workTypes.map((e) => DropdownMenuItem<int>(value: e.id, child: Text(e.name))).toList(), onChanged: (value) => setState(() => _selectedWorkTypeId = value)),
           const SizedBox(height: 24),
-          _buildField(label: _tr('Job Title', 'পদের নাম'), hint: _tr('e.g. Electrician', 'উদাঃ ইলেকট্রিশিয়ান')),
+          _buildField(label: _tr('Job Title', 'পদের নাম'), hint: _tr('e.g. Electrician', 'উদাঃ ইলেকট্রিশিয়ান'), controller: _jobTitleController),
           const SizedBox(height: 24),
           
           Text(_tr('SALARY', 'বেতন'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: AppPalette.textMuted)),
@@ -406,6 +516,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(24)),
             child: TextField(
+              controller: _descriptionController,
               maxLines: null,
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -422,7 +533,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     );
   }
 
-  Widget _buildField({required String label, required String hint, IconData? icon, bool isDropdown = false}) {
+  Widget _buildField({required String label, required String hint, IconData? icon, TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -439,6 +550,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             children: [
               Expanded(
                 child: TextField(
+                  controller: controller,
                   decoration: InputDecoration(
                     hintText: hint,
                     hintStyle: const TextStyle(fontSize: 15, color: Color(0xFF94A3B8)),
@@ -449,9 +561,41 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                   style: const TextStyle(fontSize: 15, color: AppPalette.textPrimary, fontWeight: FontWeight.w600),
                 ),
               ),
-              if (isDropdown) const Icon(Icons.expand_more, color: Color(0xFF94A3B8)),
               if (icon != null) Icon(icon, color: const Color(0xFF94A3B8)),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String label,
+    required int? value,
+    required String hint,
+    required List<DropdownMenuItem<int>> options,
+    required ValueChanged<int?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: AppPalette.textMuted)),
+        const SizedBox(height: 8),
+        Container(
+          height: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              value: value,
+              isExpanded: true,
+              hint: Text(hint, style: const TextStyle(fontSize: 15, color: Color(0xFF94A3B8))),
+              items: options,
+              onChanged: onChanged,
+            ),
           ),
         ),
       ],
@@ -626,11 +770,11 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             Expanded(
               flex: 2,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: _isPublishing ? null : () {
                   if (_currentStep < 3) {
-                    setState(() => _currentStep++);
+                    setState(() => _currentStep = (_currentStep + 1).clamp(0, 3));
                   } else {
-                    Navigator.pop(context);
+                    _publishAd();
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -640,7 +784,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: Text(
+                child: _isPublishing ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Text(
                   _currentStep < 3 ? _tr('Next Step', 'পরবর্তী ধাপ') : _tr('Publish Ad', 'বিজ্ঞাপন দিন'),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
