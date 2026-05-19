@@ -64,8 +64,8 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       agencyAddress: 'Agency address loading',
       district: District(name: 'District'),
       policeStation: PoliceStation(name: 'Police Station'),
-      documents: const [Document(rlNo: 'RL-XXXX')],
-      bankInformation: const [
+      documents: [Document(rlNo: 'RL-XXXX')],
+      bankInformation: [
         BankInformation(
           bankName: 'Bank Name',
           branchName: 'Branch Name',
