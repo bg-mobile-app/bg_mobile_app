@@ -92,26 +92,45 @@ class StaffAccountsService {
     await _apiClient.post('/user/register/agency/staff/', data: payload);
   }
 
-  Future<TypesHandler<RecruitingAgencyStaffGETProps>> getRecruitingAgencyStaff({
-    int page = 1,
-  }) async {
-    final response = await _apiClient.get('/profile/agency-staff/', queryParameters: {'page': page});
+  Future<Map<String, dynamic>> getStaffDetails(String userId) async {
+    final response = await _apiClient.get('/profile/user/$userId/');
     final data = response.data;
-    final map = data is Map<String, dynamic>
-        ? data
-        : Map<String, dynamic>.from(data as Map);
+    if (data is Map<String, dynamic>) return data;
+    throw Exception('Invalid staff details response');
+  }
 
-    final rawResults = map['results'] as List? ?? const [];
+  Future<void> updateRecruitingAgencyStaff({
+    required String userId,
+    required String fullName,
+    required String contactNo,
+    required String gender,
+    required String designation,
+    required List<String> permissions,
+    required String email,
+    String? username,
+    String? password,
+  }) async {
+    final payload = <String, dynamic>{
+      'fullName': fullName,
+      'contactNo': contactNo,
+      'gender': gender,
+      'designation': designation,
+      'permissions': permissions,
+      'email': email,
+      if (username != null && username.isNotEmpty) 'username': username,
+      if (password != null && password.isNotEmpty) 'password': password,
+    };
 
-    return TypesHandler<RecruitingAgencyStaffGETProps>(
-      count: map['count'] is int ? map['count'] as int : int.tryParse('${map['count']}') ?? 0,
-      next: map['next']?.toString(),
-      previous: map['previous']?.toString(),
-      results: rawResults
-          .whereType<Map>()
-          .map((e) => RecruitingAgencyStaffGETProps.fromJson(Map<String, dynamic>.from(e)))
-          .toList(),
-      pageSize: map['pageSize'] is int ? map['pageSize'] as int : int.tryParse('${map['pageSize']}') ?? 10,
+    await _apiClient.patch('/profile/user/$userId/', data: payload);
+  }
+
+  Future<void> updateStaffVerifiedStatus({
+    required String userId,
+    required bool isActive,
+  }) async {
+    await _apiClient.patch(
+      '/profile/user/$userId/verified/',
+      data: {'isActive': isActive},
     );
   }
 }

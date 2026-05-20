@@ -7,7 +7,9 @@ import 'dashboard_screen.dart';
 import 'services/staff_accounts_service.dart';
 
 class CreateUserScreen extends StatefulWidget {
-  const CreateUserScreen({super.key});
+  const CreateUserScreen({super.key, this.userId});
+
+  final String? userId;
 
   @override
   State<CreateUserScreen> createState() => _CreateUserScreenState();
@@ -29,6 +31,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   String _selectedGender = 'MALE';
 
   bool _isSubmitting = false;
+  bool _isLoadingUser = false;
+
+  bool get _isEditMode => widget.userId != null && widget.userId!.isNotEmpty;
 
   final List<String> _allPermissions = [
     'ADS_CREATE',
@@ -46,6 +51,14 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     'REFUND_PAYMENT',
   ];
   final Set<String> _selectedPermissions = {};
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEditMode) {
+      _loadUserData();
+    }
+  }
 
   @override
   void dispose() {
@@ -78,13 +91,15 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       children: [
                         _breadcrumb(),
                         const SizedBox(height: 8),
-                        const Align(
+                        Align(
                           alignment: Alignment.centerLeft,
-                          child: Text('Onboard New Talent', style: AppTextStyles.headline2),
+                          child: Text(_isEditMode ? 'Update Staff Account' : 'Onboard New Talent', style: AppTextStyles.headline2),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Fill in the details below to grant system access\nto a new team member.',
+                        Text(
+                          _isEditMode
+                              ? 'Update the existing user details below.'
+                              : 'Fill in the details below to grant system access\nto a new team member.',
                           textAlign: TextAlign.left,
                           style: AppTextStyles.caption,
                         ),
@@ -145,19 +160,19 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: _isSubmitting ? null : _submit,
+                            onPressed: (_isSubmitting || _isLoadingUser) ? null : _submit,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF0C4ACD),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                            child: _isSubmitting
+                            child: (_isSubmitting || _isLoadingUser)
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
                                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                   )
-                                : const Text(
-                                    'Create Staff Account',
+                                : Text(
+                                    _isEditMode ? 'Update Staff Account' : 'Create Staff Account',
                                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
                                   ),
                           ),
@@ -167,7 +182,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           width: double.infinity,
                           height: 48,
                           child: OutlinedButton(
-                            onPressed: _isSubmitting ? null : _resetForm,
+                            onPressed: (_isSubmitting || _isLoadingUser) ? null : _resetForm,
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Color(0xFF9EB7E3)),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -201,23 +216,64 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      await _staffAccountsService.createRecruitingAgencyStaff(
-        fullName: _fullNameController.text.trim(),
-        contactNo: _contactNoController.text.trim(),
-        gender: _selectedGender,
-        designation: _designationController.text.trim(),
-        permissions: _selectedPermissions.toList(),
-        email: _emailController.text.trim(),
-        username: _usernameController.text.trim(),
-        password: _passwordController.text,
-      );
+      if (_isEditMode) {
+        await _staffAccountsService.updateRecruitingAgencyStaff(
+          userId: widget.userId!,
+          fullName: _fullNameController.text.trim(),
+            contactNo: _contactNoController.text.trim(),
+            gender: _selectedGender,
+            designation: _designationController.text.trim(),
+            permissions: _selectedPermissions.toList(),
+            email: _emailController.text.trim(),
+            username: _usernameController.text.trim(),
+            password: _passwordController.text,
+        );
+      } else {
+        await _staffAccountsService.createRecruitingAgencyStaff(
+          fullName: _fullNameController.text.trim(),
+          contactNo: _contactNoController.text.trim(),
+          gender: _selectedGender,
+          designation: _designationController.text.trim(),
+          permissions: _selectedPermissions.toList(),
+          email: _emailController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
+        );
+      }
 
-      _showMessage('Staff account created successfully.');
+      _showMessage(_isEditMode ? 'Staff account updated successfully.' : 'Staff account created successfully.');
       if (mounted) Navigator.of(context).maybePop();
     } catch (e) {
-      _showMessage('Failed to create staff account: $e', isError: true);
+      _showMessage(_isEditMode ? 'Failed to update staff account: $e' : 'Failed to create staff account: $e', isError: true);
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+
+
+  Future<void> _loadUserData() async {
+    setState(() => _isLoadingUser = true);
+    try {
+      final data = await _staffAccountsService.getStaffDetails(widget.userId!);
+      _fullNameController.text = (data['fullName'] ?? '').toString();
+      _contactNoController.text = (data['contactNo'] ?? '').toString();
+      _designationController.text = (data['designation'] ?? '').toString();
+      _usernameController.text = (data['username'] ?? '').toString();
+      _emailController.text = (data['email'] ?? '').toString();
+      final gender = (data['gender'] ?? '').toString().toUpperCase();
+      if (_genders.contains(gender)) _selectedGender = gender;
+      final permissions = data['permissions'];
+      if (permissions is List) {
+        _selectedPermissions
+          ..clear()
+          ..addAll(permissions.map((e) => e.toString()));
+      }
+      if (mounted) setState(() {});
+    } catch (e) {
+      _showMessage('Failed to load user details: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => _isLoadingUser = false);
     }
   }
 
