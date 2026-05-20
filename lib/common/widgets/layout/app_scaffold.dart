@@ -97,29 +97,31 @@ class _DashboardHostScreen extends StatelessWidget {
       case '/dashboard/receive-booking/all-booking':
         return const ReceivedAllBookingScreen();
       case '/dashboard/receive-booking/applied-booking':
-        return const ReceivedAppliedBookingScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'APPLIED_FILE', pageTitle: 'Applied Booking');
       case '/dashboard/receive-booking/bg-collect-passport':
-        return const ReceivedBgCollectPassportScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'BG_COLLECT_PP', pageTitle: 'BG Collect Passport');
       case '/dashboard/receive-booking/bg-sent-passport':
-        return const ReceivedBgSentPassportScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'BG_SENT_PP', pageTitle: 'BG Sent Passport');
       case '/dashboard/receive-booking/receive-passport':
-        return const ReceivedPassportScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'A_RECEIVE_PP', pageTitle: 'Receive Passport');
       case '/dashboard/receive-booking/under-processing':
-        return const ReceivedUnderProcessingScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'UNDER_PROCESSING', pageTitle: 'Under Processing');
       case '/dashboard/receive-booking/visa-approved':
-        return const ReceivedVisaApprovedScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'VISA_APPROVED', pageTitle: 'Visa Approved');
       case '/dashboard/receive-booking/bmet-done':
-        return const ReceivedBmetDoneScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'BMET_DONE', pageTitle: 'BMET Done');
       case '/dashboard/receive-booking/ticket-done':
-        return const ReceivedTicketDoneScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'TICKET_DONE', pageTitle: 'Ticket Done');
       case '/dashboard/receive-booking/pp-sent-to-bg':
-        return const ReceivedPpSentToBgScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'PP_SENT_TO_BG', pageTitle: 'PP Sent to BG');
+      case '/dashboard/receive-booking/bg-receive-passport':
+        return const ReceivedAllBookingScreen(initialStatus: 'BG_RECEIVED_PP', pageTitle: 'BG Receive Passport');
       case '/dashboard/receive-booking/ready-for-flight':
-        return const ReceivedReadyForFlightScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'READY_FOR_FLIGHT', pageTitle: 'Ready For Flight');
       case '/dashboard/receive-booking/success-flight':
-        return const ReceivedSuccessFlightScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'SUCCESS_FLIGHT', pageTitle: 'Success Flight');
       case '/dashboard/receive-booking/reject-flight':
-        return const ReceivedRejectFlightScreen();
+        return const ReceivedAllBookingScreen(initialStatus: 'REJECT_FILE', pageTitle: 'Reject File');
       case '/dashboard/passport-return/request-review':
         return const PassportReturnRequestScreen();
       case '/dashboard/passport-return/accept':

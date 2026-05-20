@@ -10,7 +10,9 @@ import '../home/dashboard_screen.dart';
 import 'services/booking_service.dart';
 
 class ReceivedAllBookingScreen extends StatefulWidget {
-  const ReceivedAllBookingScreen({super.key});
+  const ReceivedAllBookingScreen({super.key, this.initialStatus = '', this.pageTitle = 'All Booking'});
+  final String initialStatus;
+  final String pageTitle;
 
   @override
   State<ReceivedAllBookingScreen> createState() =>
@@ -21,6 +23,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   bool _isCardView = false;
   late final TextEditingController _searchController;
   String _searchQuery = '';
+  late String _selectedStatus;
   DateTimeRange? _selectedDateRange;
 
   final BookingService _bookingService = BookingService();
@@ -32,6 +35,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _selectedStatus = widget.initialStatus;
     _fetchBookings();
   }
 
@@ -72,7 +76,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
 
     try {
       final response = await _bookingService.getReceiveBookings(
-        status: '',
+        status: _selectedStatus,
         search: _searchQuery,
         page: 1,
         fromDate: _selectedDateRange == null ? null : _formatApiDate(_selectedDateRange!.start),
@@ -157,6 +161,8 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
                         Expanded(child: _dateRangeButton()),
                       ],
                     ),
+                    const SizedBox(height: 10),
+                    _statusChips(),
 
                     const SizedBox(height: 16),
                     if (_isLoading)
@@ -183,6 +189,50 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
     );
   }
 
+  Widget _statusChips() {
+    const statuses = <String>[
+      '',
+      'APPLIED_FILE',
+      'BG_COLLECT_PP',
+      'BG_SENT_PP',
+      'A_RECEIVE_PP',
+      'UNDER_PROCESSING',
+      'VISA_APPROVED',
+      'BMET_DONE',
+      'TICKET_DONE',
+      'PP_SENT_TO_BG',
+      'BG_RECEIVED_PP',
+      'READY_FOR_FLIGHT',
+      'SUCCESS_FLIGHT',
+      'RETURN_REQUEST',
+      'RETURN_ACCEPTED',
+      'RETURN_PP_SENT_TO_BG',
+      'BG_COLLECT_RETURN_PP',
+      'CLEAR_FOR_HANDOVER',
+      'BG_HANDOVER_PP_TO_CUSTOMER',
+      'REJECT_FILE',
+    ];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: statuses.map((status) {
+          final selected = _selectedStatus == status;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ChoiceChip(
+              label: Text(status.isEmpty ? 'ALL' : status.replaceAll('_', ' ')),
+              selected: selected,
+              onSelected: (_) {
+                setState(() => _selectedStatus = status);
+                _fetchBookings();
+              },
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _breadcrumb() {
     return BreadCrumb(
       items: <BreadCrumbItem>[
@@ -205,7 +255,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
         ),
         BreadCrumbItem(
           content: Text(
-            'All Booking',
+            widget.pageTitle,
             style: TextStyle(
               color: AppPalette.textStrongBlue,
               fontSize: 12,
@@ -300,19 +350,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   Widget _buildTableList() => StyledDataTableCard(
     dataRowMaxHeight: 86,
     columnSpacing: 20,
-    columns: const [
-      DataColumn(label: Text('Post ID')),
-      DataColumn(label: Text('Booking ID')),
-      DataColumn(label: Text('Apply Date')),
-      DataColumn(label: Text('Customer Info')),
-      DataColumn(label: Text('From & To')),
-      DataColumn(label: Text('Total Cost')),
-      DataColumn(label: Text('Medical Expiry')),
-      DataColumn(label: Text('Police Expiry')),
-      DataColumn(label: Text('Visa Expiry')),
-      DataColumn(label: Text('Appointment')),
-      DataColumn(label: Text('Status')),
-    ],
+    columns: _tableColumns(),
     rows: _filteredBookings.map((item) {
       final style = _styleFor(item.statusLabel);
       return DataRow(
@@ -330,34 +368,6 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
           DataCell(Text('${item.fromCountry} → ${item.toCountry}')),
           DataCell(Text('৳ ${_money(item.agencyTotalCost)}')),
           DataCell(
-            Text(
-              item.medicalExpiryDate == null
-                  ? '-'
-                  : _displayDate(item.medicalExpiryDate!),
-            ),
-          ),
-          DataCell(
-            Text(
-              item.policeClearanceExpiryDate == null
-                  ? '-'
-                  : _displayDate(item.policeClearanceExpiryDate!),
-            ),
-          ),
-          DataCell(
-            Text(
-              item.visaExpiryDate == null
-                  ? '-'
-                  : _displayDate(item.visaExpiryDate!),
-            ),
-          ),
-          DataCell(
-            Text(
-              item.appointmentDate == null
-                  ? '-'
-                  : _displayDate(item.appointmentDate!),
-            ),
-          ),
-          DataCell(
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
@@ -374,10 +384,51 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
               ),
             ),
           ),
+          if (_selectedStatus == 'UNDER_PROCESSING')
+            DataCell(Text(item.medicalExpiryDate == null ? '-' : _displayDate(item.medicalExpiryDate!))),
+          if (_selectedStatus == 'UNDER_PROCESSING')
+            DataCell(Text(item.policeClearanceExpiryDate == null ? '-' : _displayDate(item.policeClearanceExpiryDate!))),
+          if (_selectedStatus == 'VISA_APPROVED')
+            DataCell(Text(item.visaExpiryDate == null ? '-' : _displayDate(item.visaExpiryDate!))),
+          const DataCell(
+            Icon(
+              Icons.more_horiz_rounded,
+              color: AppPalette.textMuted,
+              size: 18,
+            ),
+          ),
         ],
       );
     }).toList(),
   );
+
+  List<DataColumn> _tableColumns() {
+    const baseColumns = <DataColumn>[
+      DataColumn(label: Text('Post ID')),
+      DataColumn(label: Text('Booking ID')),
+      DataColumn(label: Text('Apply Date')),
+      DataColumn(label: Text('Customer Info')),
+      DataColumn(label: Text('From & To')),
+      DataColumn(label: Text('Total Cost')),
+      DataColumn(label: Text('Status')),
+    ];
+    if (_selectedStatus == 'UNDER_PROCESSING') {
+      return const [
+        ...baseColumns,
+        DataColumn(label: Text('Medical Expiry Date')),
+        DataColumn(label: Text('Police Clearance Expiry Date')),
+        DataColumn(label: Text('Actions')),
+      ];
+    }
+    if (_selectedStatus == 'VISA_APPROVED') {
+      return const [
+        ...baseColumns,
+        DataColumn(label: Text('Visa Expiry Date')),
+        DataColumn(label: Text('Actions')),
+      ];
+    }
+    return const [...baseColumns, DataColumn(label: Text('Actions'))];
+  }
 
   Widget _buildCardList() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,7 +458,9 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   );
 
   String _displayDate(String iso) {
-    final parts = iso.split('-');
+    final parsed = DateTime.tryParse(iso);
+    if (parsed == null) return iso;
+    final date = parsed.toLocal();
     const months = [
       'Jan',
       'Feb',
@@ -422,7 +475,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
       'Nov',
       'Dec',
     ];
-    return '${months[int.parse(parts[1]) - 1]} ${parts[2]}, ${parts[0]}';
+    return '${months[date.month - 1]} ${date.day.toString().padLeft(2, '0')}, ${date.year}';
   }
 
   String _money(int amount) {
