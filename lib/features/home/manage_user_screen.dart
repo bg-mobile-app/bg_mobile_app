@@ -36,7 +36,6 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
 
   static const bool _currentUserIsAdmin = true;
   static const String _currentUserRole = 'Admin';
-  final _staffAccountsService = StaffAccountsService();
 
   @override
   void initState() {
@@ -118,18 +117,19 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
   bool _canManage(RecruitingAgencyStaffGETProps member) =>
       _currentUserIsAdmin || member.userRole == _currentUserRole;
 
-  Future<void> _toggleBlock(_StaffMember member) async {
-    final nextIsBlocked = !member.isBlocked;
+  Future<void> _toggleBlock(RecruitingAgencyStaffGETProps member) async {
+    final isBlocked = member.isActive == 'False';
+    final nextIsActive = isBlocked;
     try {
       await _staffAccountsService.updateStaffVerifiedStatus(
         userId: member.userId,
-        isActive: !nextIsBlocked,
+        isActive: nextIsActive,
       );
       setState(() {
-        final index = _members.indexWhere((item) => item.userId == member.userId);
+        final index = _members.indexWhere((item) => item.id == member.id);
         if (index != -1) {
           _members[index] = _members[index].copyWith(
-            isBlocked: nextIsBlocked,
+            isActive: nextIsActive ? 'True' : 'False',
           );
         }
       });
@@ -228,10 +228,22 @@ class _UserTableCard extends StatelessWidget {
   final bool Function(RecruitingAgencyStaffGETProps member) canManage;
   final ValueChanged<RecruitingAgencyStaffGETProps> onToggleBlock;
 
+  Color _getRoleColor(String role) {
+    switch (role.toLowerCase()) {
+      case 'admin':
+        return const Color(0xFF004AC6);
+      case 'staff':
+        return const Color(0xFF10B981);
+      default:
+        return const Color(0xFF64748B);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const currentUserRole = 'Admin';
     final isAdmin = currentUserRole == 'Admin';
+
     return StyledDataTableCard(
       columns: [
         const DataColumn(label: Text('USER ID')),
@@ -243,123 +255,118 @@ class _UserTableCard extends StatelessWidget {
         const DataColumn(label: Text('STATUS / ACTIONS')),
       ],
       rows: members.map((member) {
-              final hasPermission = canManage(member);
-              return DataRow(
-                cells: [
-                  DataCell(
+        final hasPermission = canManage(member);
+        final isBlocked = member.isActive == 'False';
+        final roleColor = _getRoleColor(member.userRole);
+
+        return DataRow(
+          cells: [
+            DataCell(
+              Text(
+                '#${member.userCode}',
+                style: const TextStyle(
+                  color: Color(0xFF737686),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            DataCell(
+              Text(
+                member.email,
+                style: const TextStyle(color: Color(0xFF434655)),
+              ),
+            ),
+            DataCell(
+              Text(
+                member.phone,
+                style: const TextStyle(color: Color(0xFF434655)),
+              ),
+            ),
+            DataCell(
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: roleColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Text(
+                  member.userRole,
+                  style: TextStyle(
+                    color: roleColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            DataCell(
+              Text(
+                member.designation,
+                style: const TextStyle(color: Color(0xFF141B2B)),
+              ),
+            ),
+            if (isAdmin)
+              DataCell(
+                TextButton(
+                  onPressed: hasPermission ? () {} : null,
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFFE9EDFF),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide.none,
+                    ),
+                  ),
+                  child: const Text(
+                    'See Activity',
+                    style: TextStyle(
+                      color: Color(0xFF004AC6),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            DataCell(
+              Row(
+                children: [
+                  if (hasPermission) ...[
+                    Switch(
+                      value: !isBlocked,
+                      onChanged: (_) => onToggleBlock(member),
+                      activeTrackColor: const Color(0xFF004AC6),
+                      inactiveTrackColor: const Color(0xFFC3C6D7),
+                    ),
+                    const SizedBox(width: 4),
                     Text(
-                      '#${member.userId}',
-                      style: const TextStyle(
-                        color: Color(0xFF737686),
-                        fontWeight: FontWeight.w500,
+                      isBlocked ? 'Blocked' : 'Active',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isBlocked ? AppPalette.danger : AppPalette.success,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  DataCell(
-                    Text(
-                      member.email,
-                      style: const TextStyle(color: Color(0xFF434655)),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      member.phone,
-                      style: const TextStyle(color: Color(0xFF434655)),
-                    ),
-                  ),
-                  DataCell(
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        size: 20,
+                        color: Color(0xFF434655),
                       ),
-                      decoration: BoxDecoration(
-                        color: member.roleColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Text(
-                        member.role,
-                        style: TextStyle(
-                          color: member.roleColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      onPressed: () => context.go('/dashboard/user/create-user/${member.userId}'),
+                      tooltip: 'Edit User',
                     ),
-                  ),
-                  DataCell(
-                    Text(
-                      member.designation,
-                      style: const TextStyle(color: Color(0xFF141B2B)),
+                  ] else ...[
+                    Icon(
+                      isBlocked ? Icons.block : Icons.check_circle,
+                      size: 16,
+                      color: isBlocked ? AppPalette.danger : AppPalette.success,
                     ),
-                  ),
-                  if (isAdmin)
-                    DataCell(
-                      TextButton(
-                        onPressed: hasPermission ? () {} : null,
-                        style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFE9EDFF),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide.none,
-                          ),
-                        ),
-                        child: const Text(
-                          'See Activity',
-                          style: TextStyle(
-                            color: Color(0xFF004AC6),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  DataCell(
-                    Row(
-                      children: [
-                        if (hasPermission) ...[
-                          Switch(
-                            value: !member.isBlocked,
-                            onChanged: (_) => onToggleBlock(member),
-                            activeTrackColor: const Color(0xFF004AC6),
-                            inactiveTrackColor: const Color(0xFFC3C6D7),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            member.isBlocked ? 'Blocked' : 'Active',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: member.isBlocked
-                                  ? AppPalette.danger
-                                  : AppPalette.success,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.edit_outlined,
-                              size: 20,
-                              color: Color(0xFF434655),
-                            ),
-                            onPressed: () => context.go('/dashboard/user/create-user/${member.userId}'),
-                            tooltip: 'Edit User',
-                          ),
-                        ] else ...[
-                          Icon(
-                            member.isBlocked ? Icons.block : Icons.check_circle,
-                            size: 16,
-                            color: member.isBlocked
-                                ? AppPalette.danger
-                                : AppPalette.success,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(member.isBlocked ? 'Blocked' : 'Active'),
-                        ],
-                      ],
-                    ),
-                  ),
-                  Text(isBlocked ? 'Blocked' : 'Active'),
+                    const SizedBox(width: 4),
+                    Text(isBlocked ? 'Blocked' : 'Active'),
+                  ],
                 ],
               ),
             ),
@@ -489,18 +496,21 @@ class _CardGrid extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: canManage ? () => context.go('/dashboard/user/create-user/${member.userId}') : null,
-                  icon: const Icon(Icons.edit_outlined, size: 18),
-                  label: const Text('Edit'),
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE9EDFF),
-                    foregroundColor: AppColors.textPrimary,
-                    elevation: 2,
-                    side: BorderSide.none,
-                    shadowColor: Colors.black.withValues(alpha: 0.1),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  const Icon(Icons.mail_outline, size: 16, color: AppPalette.textMuted),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      m.email,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppPalette.textMuted,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -552,23 +562,44 @@ class _CardGrid extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (isAdmin)
-                    TextButton(
-                      onPressed: hasPermission ? () {} : null,
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(50, 30),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: const Text(
-                        'See Activity',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppPalette.brandBlue,
+                  Row(
+                    children: [
+                      if (isAdmin) ...[
+                        TextButton(
+                          onPressed: hasPermission ? () {} : null,
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(50, 30),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            'See Activity',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppPalette.brandBlue,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                        const SizedBox(width: 8),
+                      ],
+                      if (hasPermission)
+                        OutlinedButton.icon(
+                          onPressed: () => context.go('/dashboard/user/create-user/${m.userId}'),
+                          icon: const Icon(Icons.edit_outlined, size: 14),
+                          label: const Text('Edit', style: TextStyle(fontSize: 12)),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            side: const BorderSide(color: AppPalette.borderNeutral),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ],
