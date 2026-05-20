@@ -21,6 +21,7 @@ import '../../../features/home/notifications_screen.dart';
 import '../../../features/home/payments_screen.dart';
 import '../../../features/home/terms_conditions_screen.dart';
 import '../../../features/home/commission_screen.dart';
+import '../../../features/reminder/medical_expiry_screen.dart';
 import '../../../features/search/work_permit_list_screen.dart';
 import 'app_bottom_nav.dart';
 
@@ -136,6 +137,12 @@ class _DashboardHostScreen extends StatelessWidget {
           pageTitle: 'BG Handover PP to Customer',
           currentHref: '/dashboard/passport-return/bg-handover-pp-to-customer',
         );
+      case '/dashboard/reminder/medical-expiry':
+        return const MedicalExpiryScreen();
+      case '/dashboard/reminder/police-clearance-expiry':
+        return const PoliceClearanceExpiryScreen();
+      case '/dashboard/reminder/visa-expiry':
+        return const VisaExpiryScreen();
       case '/dashboard/customer/profile':
         return const CustomerProfileScreen();
       case '/dashboard/ads/create':
