@@ -113,7 +113,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
       hasAdvancePayout: item.hasAdvancePayout,
       hasAfterVisaPayout: item.hasAfterVisaPayout,
       hasBeforeFlightPayout: item.hasBeforeFlightPayout,
-      paymentStepCount: item.paymentStepCount,
+      paymentStepCount: item.paymentStepCount ?? 0,
       isReturn: item.isReturn,
     );
   }
