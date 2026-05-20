@@ -1,8 +1,8 @@
-import 'dart:async';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
+import '../../common/services/api_client.dart';
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
 import 'dashboard_screen.dart';
@@ -38,19 +38,56 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     setState(() => _isLoading = true);
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 800));
+      await ApiClient().post(
+        '/auth/change-password/',
+        data: {
+          'old_password': _oldPasswordController.text,
+          'new_password': _newPasswordController.text,
+          'confirm_password': _confirmPasswordController.text,
+        },
+      );
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password changed successfully')));
       _formKey.currentState!.reset();
       _oldPasswordController.clear();
       _newPasswordController.clear();
       _confirmPasswordController.clear();
+    } on DioException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_extractApiError(e))));
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to change password')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  String _extractApiError(DioException error) {
+    final data = error.response?.data;
+    if (data is Map) {
+      final errors = data['errors'];
+      if (errors is Map) {
+        final detail = errors['detail'];
+        if (detail is List && detail.isNotEmpty) {
+          return detail.join(', ');
+        }
+        if (detail != null) {
+          return detail.toString();
+        }
+        return errors.values.where((v) => v != null).join(', ');
+      }
+
+      if (data['detail'] != null) {
+        return data['detail'].toString();
+      }
+      if (data['message'] != null) {
+        return data['message'].toString();
+      }
+    }
+
+    return 'Failed to change password';
   }
 
   @override
