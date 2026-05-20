@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../common/theme/app_colors.dart';
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_spacing.dart';
 import '../../common/theme/app_text_styles.dart';
@@ -211,9 +210,277 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
 // keep other widgets mostly unchanged
 class _SearchAndActions extends StatelessWidget { const _SearchAndActions({required this.isCardView,required this.onViewChanged,required this.controller,required this.onQueryChanged,}); final bool isCardView; final ValueChanged<bool> onViewChanged; final TextEditingController controller; final ValueChanged<String> onQueryChanged; @override Widget build(BuildContext context){ return Column(children:[Row(children:[ViewToggleButton(isCardView:isCardView,onChanged:onViewChanged),const SizedBox(width: AppSpacing.sm),Expanded(child:SizedBox(height:48,child:ElevatedButton.icon(onPressed:()=>context.go('/dashboard/user/create-user'),icon:const Icon(Icons.person_add),label:const Text('Add Member'))))]),const SizedBox(height: AppSpacing.sm),AppSearchBar(controller:controller,hintText:'Search by user ID, email, phone, role...',onChanged:onQueryChanged,onSearchTap:()=>onQueryChanged(controller.text))]);}}
 
-class _UserTableCard extends StatelessWidget { const _UserTableCard({required this.members,required this.canManage,required this.onToggleBlock,}); final List<RecruitingAgencyStaffGETProps> members; final bool Function(RecruitingAgencyStaffGETProps member) canManage; final ValueChanged<RecruitingAgencyStaffGETProps> onToggleBlock; @override Widget build(BuildContext context){ const currentUserRole='Admin'; final isAdmin=currentUserRole=='Admin'; return StyledDataTableCard(columns:[const DataColumn(label:Text('USER ID')),const DataColumn(label:Text('EMAIL')),const DataColumn(label:Text('PHONE')),const DataColumn(label:Text('ROLE')),const DataColumn(label:Text('DESIGNATION')),if(isAdmin) const DataColumn(label:Text('ACTIVITY')),const DataColumn(label:Text('STATUS / ACTIONS')),],rows:members.map((member){ final hasPermission=canManage(member); final isBlocked=member.isActive=='False'; return DataRow(cells:[DataCell(Text('#${member.userCode}')),DataCell(Text(member.email)),DataCell(Text(member.phone)),DataCell(Text(member.userRole)),DataCell(Text(member.designation)),if(isAdmin) DataCell(TextButton(onPressed:hasPermission?(){}:null,child:const Text('See Activity'))),DataCell(Row(children:[Switch(value:!isBlocked,onChanged:hasPermission?(_)=>onToggleBlock(member):null),Text(isBlocked?'Blocked':'Active')])))]);}).toList()); }}
+class _UserTableCard extends StatelessWidget {
+  const _UserTableCard({
+    required this.members,
+    required this.canManage,
+    required this.onToggleBlock,
+  });
 
-class _CardGrid extends StatelessWidget { const _CardGrid({required this.members,required this.canManage,required this.onToggleBlock,}); final List<RecruitingAgencyStaffGETProps> members; final bool Function(RecruitingAgencyStaffGETProps member) canManage; final ValueChanged<RecruitingAgencyStaffGETProps> onToggleBlock; @override Widget build(BuildContext context){ return Column(children:List.generate(members.length,(index){ final m=members[index]; final isBlocked=m.isActive=='False'; return ListTile(title:Text(m.userCode),subtitle:Text('${m.email}\n${m.designation}'),isThreeLine:true,trailing:Switch(value:!isBlocked,onChanged:canManage(m)?(_)=>onToggleBlock(m):null)); })); }}
+  final List<RecruitingAgencyStaffGETProps> members;
+  final bool Function(RecruitingAgencyStaffGETProps member) canManage;
+  final ValueChanged<RecruitingAgencyStaffGETProps> onToggleBlock;
+
+  @override
+  Widget build(BuildContext context) {
+    const currentUserRole = 'Admin';
+    final isAdmin = currentUserRole == 'Admin';
+    return StyledDataTableCard(
+      columns: [
+        const DataColumn(label: Text('USER ID')),
+        const DataColumn(label: Text('EMAIL')),
+        const DataColumn(label: Text('PHONE')),
+        const DataColumn(label: Text('ROLE')),
+        const DataColumn(label: Text('DESIGNATION')),
+        if (isAdmin) const DataColumn(label: Text('ACTIVITY')),
+        const DataColumn(label: Text('STATUS / ACTIONS')),
+      ],
+      rows: members.map((member) {
+        final hasPermission = canManage(member);
+        final isBlocked = member.isActive == 'False';
+        return DataRow(
+          cells: [
+            DataCell(Text('#${member.userCode}')),
+            DataCell(Text(member.email)),
+            DataCell(Text(member.phone)),
+            DataCell(Text(member.userRole)),
+            DataCell(Text(member.designation)),
+            if (isAdmin)
+              DataCell(
+                TextButton(
+                  onPressed: hasPermission ? () {} : null,
+                  child: const Text('See Activity'),
+                ),
+              ),
+            DataCell(
+              Row(
+                children: [
+                  Switch(
+                    value: !isBlocked,
+                    onChanged: hasPermission ? (_) => onToggleBlock(member) : null,
+                  ),
+                  Text(isBlocked ? 'Blocked' : 'Active'),
+                ],
+              ),
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _CardGrid extends StatelessWidget {
+  const _CardGrid({
+    required this.members,
+    required this.canManage,
+    required this.onToggleBlock,
+  });
+
+  final List<RecruitingAgencyStaffGETProps> members;
+  final bool Function(RecruitingAgencyStaffGETProps member) canManage;
+  final ValueChanged<RecruitingAgencyStaffGETProps> onToggleBlock;
+
+  @override
+  Widget build(BuildContext context) {
+    const currentUserRole = 'Admin';
+    final isAdmin = currentUserRole == 'Admin';
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 400,
+        mainAxisSpacing: AppSpacing.md,
+        crossAxisSpacing: AppSpacing.md,
+        mainAxisExtent: 220,
+      ),
+      itemCount: members.length,
+      itemBuilder: (context, index) {
+        final m = members[index];
+        final isBlocked = m.isActive == 'False';
+        final hasPermission = canManage(m);
+        
+        final initials = m.userCode.length >= 4 
+            ? m.userCode.substring(m.userCode.length - 4) 
+            : m.userCode;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppPalette.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppPalette.borderNeutral),
+            boxShadow: AppPalette.cardShadow,
+          ),
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      initials,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '#${m.userCode}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppPalette.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          m.designation,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppPalette.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppPalette.borderSoftBlue,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      m.userRole,
+                      style: const TextStyle(
+                        color: AppPalette.brandBlue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  const Icon(Icons.mail_outline, size: 16, color: AppPalette.textMuted),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      m.email,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppPalette.textMuted,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  const Icon(Icons.phone_outlined, size: 16, color: AppPalette.textMuted),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      m.phone,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppPalette.textMuted,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              const Divider(height: 1, color: AppPalette.borderNeutral),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        height: 24,
+                        width: 40,
+                        child: Transform.scale(
+                          scale: 0.8,
+                          child: Switch(
+                            value: !isBlocked,
+                            onChanged: hasPermission ? (_) => onToggleBlock(m) : null,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        isBlocked ? 'Blocked' : 'Active',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isBlocked ? AppPalette.danger : AppPalette.success,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (isAdmin)
+                    TextButton(
+                      onPressed: hasPermission ? () {} : null,
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(50, 30),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: const Text(
+                        'See Activity',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppPalette.brandBlue,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
 
 const _skeletonMembers = [
   RecruitingAgencyStaffGETProps(id: 0, userId: 'loading', userCode: 'STF-0000', email: 'loading@example.com', phone: '+0 000', userRole: 'Role', designation: 'Designation', isActive: 'True'),
