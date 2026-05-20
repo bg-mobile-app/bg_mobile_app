@@ -113,16 +113,16 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
       final response = await _bookingService.getMyAppointments(
         page: _currentPage,
         search: _searchQuery,
-        aptFromDate: fromDate,
-        aptToDate: toDate,
+        fromDate: fromDate,
+        toDate: toDate,
       );
 
       final mapped = response.results.map((dto) {
         String dateStr = 'N/A';
         String timeStr = 'N/A';
-        if (dto.appointmentDate.isNotEmpty) {
+        if ((dto.appointmentDate ?? '').isNotEmpty) {
           try {
-            final dt = DateTime.parse(dto.appointmentDate).toLocal();
+            final dt = DateTime.parse(dto.appointmentDate!).toLocal();
             final months = [
               'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -136,7 +136,7 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
             final minute = dt.minute.toString().padLeft(2, '0');
             timeStr = '${hour.toString().padLeft(2, '0')}:$minute $amPm';
           } catch (e) {
-            dateStr = dto.appointmentDate;
+            dateStr = dto.appointmentDate ?? 'N/A';
           }
         }
 
