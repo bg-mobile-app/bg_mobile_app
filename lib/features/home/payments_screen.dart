@@ -1,11 +1,16 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
+import '../../common/widgets/app_search_bar.dart';
+import '../../common/widgets/view_toggle_button.dart';
+import '../../common/widgets/styled_data_table_card.dart';
 import 'dashboard_screen.dart';
+import 'services/payment_service.dart';
 
 const List<String> bookingStatus = [
   'ADVANCE',
@@ -23,29 +28,23 @@ class PaymentsScreen extends StatefulWidget {
 }
 
 class _PaymentsScreenState extends State<PaymentsScreen> {
-  static const int _pageSize = 20;
-
   final _searchController = TextEditingController();
   Timer? _debounce;
 
   String _status = '';
   String _debouncedSearch = '';
-  int _currentPage = 1;
   bool _cardView = true;
 
-  final List<PaymentHistoryItem> _allPayments = [
-    PaymentHistoryItem(id: '1000', bookingId: 'B-99821', postId: 'P-5541', collectedAt: DateTime(2026, 1, 27, 10, 20), passportNo: 'A12345678', amount: 50000, step: 'ADVANCE'),
-    PaymentHistoryItem(id: '0999', bookingId: 'B-99750', postId: 'P-5420', collectedAt: DateTime(2026, 1, 20, 14, 45), passportNo: 'A12345678', amount: 50000, step: 'RETURN'),
-    PaymentHistoryItem(id: '0998', bookingId: 'B-99740', postId: 'P-5380', collectedAt: DateTime(2026, 1, 15, 9, 30), passportNo: 'B87654321', amount: 75000, step: 'COMPLETED'),
-    PaymentHistoryItem(id: '0997', bookingId: 'B-99722', postId: 'P-5301', collectedAt: DateTime(2026, 1, 10, 11, 0), passportNo: 'C11223344', amount: 42000, step: 'ADVANCE'),
-    PaymentHistoryItem(id: '0996', bookingId: 'B-99710', postId: 'P-5250', collectedAt: DateTime(2026, 1, 5, 16, 15), passportNo: 'D55667788', amount: 60000, step: 'ADVANCE'),
-    PaymentHistoryItem(id: '0995', bookingId: 'B-99690', postId: 'P-5110', collectedAt: DateTime(2026, 1, 1, 10, 0), passportNo: 'E99887766', amount: 90000, step: 'COMPLETED'),
-  ];
+  final PaymentService _paymentService = PaymentService();
+  bool _isInitialLoading = true;
+  String? _error;
+  List<PaymentsHistory> _payments = [];
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
+    _loadPayments(isInitial: true);
   }
 
   @override
@@ -58,26 +57,54 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
   void _onSearchChanged() {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 350), () {
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      if (!mounted) return;
+      final query = _searchController.text.trim();
+      if (_debouncedSearch != query) {
+        setState(() {
+          _debouncedSearch = query;
+        });
+        _loadPayments(isInitial: true);
+      }
+    });
+  }
+
+  Future<void> _loadPayments({bool isInitial = false}) async {
+    if (isInitial) {
+      setState(() {
+        _isInitialLoading = true;
+        _error = null;
+      });
+    }
+
+    try {
+      final response = await _paymentService.getPaymentsHistory(
+        step: _status,
+        search: _debouncedSearch,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _payments = response.results;
+        _error = null;
+      });
+    } catch (e) {
       if (!mounted) return;
       setState(() {
-        _debouncedSearch = _searchController.text.trim();
-        _currentPage = 1;
+        _error = 'Failed to load payments history. Please check your connection.';
       });
-    });
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isInitialLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _allPayments.where((item) {
-      final statusOk = _status.isEmpty || item.step == _status;
-      final searchOk = _debouncedSearch.isEmpty || item.passportNo.toLowerCase().contains(_debouncedSearch.toLowerCase());
-      return statusOk && searchOk;
-    }).toList();
-
-    final start = (_currentPage - 1) * _pageSize;
-    final end = (start + _pageSize).clamp(0, filtered.length);
-    final pageItems = filtered.sublist(start, end);
+    final displayItems = _isInitialLoading ? _skeletonPayments : _payments;
 
     return DashboardPageScaffold(
       currentHref: '/dashboard/my-payments',
@@ -97,7 +124,9 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'See history of your payment plan invoice (${filtered.length})',
+                  _isInitialLoading
+                      ? 'Loading your payment history...'
+                      : 'See history of your payment plan invoice (${_payments.length})',
                   style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted),
                 ),
                 const SizedBox(height: 14),
@@ -105,9 +134,18 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 const SizedBox(height: 12),
                 _searchBox(),
                 const SizedBox(height: 16),
-                _cardView ? _cardContent(pageItems) : _tableContent(pageItems),
+                if (_error != null)
+                  _errorState()
+                else
+                  Skeletonizer(
+                    enabled: _isInitialLoading,
+                    child: _cardView ? _cardContent(displayItems) : _tableContent(displayItems),
+                  ),
                 const SizedBox(height: 16),
-                _statsSection(),
+                Skeletonizer(
+                  enabled: _isInitialLoading,
+                  child: _statsSection(displayItems),
+                ),
               ],
             ),
           ),
@@ -136,171 +174,131 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
   Widget _topControls() {
     return Row(
       children: [
-        Container(
-          padding: const EdgeInsets.all(3),
-          decoration: BoxDecoration(
-            color: AppPalette.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppPalette.borderSoftBlue),
-            boxShadow: AppPalette.softShadow,
-          ),
-          child: Row(
-            children: [
-              _viewButton(label: 'Card View', icon: Icons.grid_view_rounded, active: _cardView, onTap: () => setState(() => _cardView = true)),
-              _viewButton(label: 'List View', icon: Icons.view_list_rounded, active: !_cardView, onTap: () => setState(() => _cardView = false)),
-            ],
-          ),
+        ViewToggleButton(
+          isCardView: _cardView,
+          onChanged: (value) => setState(() => _cardView = value),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         Expanded(child: _statusDropdown()),
       ],
     );
   }
 
-  Widget _viewButton({required String label, required IconData icon, required bool active, required VoidCallback onTap}) {
-    return TextButton.icon(
-      onPressed: onTap,
-      style: TextButton.styleFrom(
-        backgroundColor: active ? AppPalette.brandBlue : Colors.transparent,
-        foregroundColor: active ? Colors.white : AppPalette.textMuted,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        minimumSize: const Size(0, 36),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      icon: Icon(icon, size: 15),
-      label: Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-    );
-  }
-
   Widget _searchBox() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-      decoration: BoxDecoration(
-        color: AppPalette.surface,
-        border: Border.all(color: AppPalette.borderSoftBlue),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: AppPalette.softShadow,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              style: const TextStyle(color: AppPalette.textPrimary),
-              decoration: const InputDecoration(
-                hintText: 'Search by Passport No...',
-                hintStyle: TextStyle(color: AppPalette.textMuted),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-              ),
-            ),
-          ),
-          InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppPalette.brandBlue,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x402563EB),
-                    blurRadius: 18,
-                    offset: Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.search, size: 20, color: Colors.white),
-            ),
-          ),
-        ],
-      ),
+    return AppSearchBar(
+      controller: _searchController,
+      hintText: 'Search by Passport No...',
+      onChanged: (value) {
+        // Debounce handles this via listener
+      },
+      onSearchTap: () {
+        _debounce?.cancel();
+        final query = _searchController.text.trim();
+        if (_debouncedSearch != query) {
+          setState(() {
+            _debouncedSearch = query;
+          });
+          _loadPayments(isInitial: true);
+        }
+      },
     );
   }
 
   Widget _statusDropdown() {
-    return DropdownButtonFormField<String>(
-      initialValue: _status,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: AppPalette.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppPalette.borderSoftBlue)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppPalette.borderSoftBlue)),
-      ),
-      items: [
-        const DropdownMenuItem(value: '', child: Text('All Status')),
-        ...bookingStatus.map((e) => DropdownMenuItem(value: e, child: Text(e))),
-      ],
-      onChanged: (value) => setState(() {
-        _status = value ?? '';
-        _currentPage = 1;
-      }),
-    );
-  }
-
-  Widget _tableContent(List<PaymentHistoryItem> items) {
     return Container(
+      height: 48,
       decoration: BoxDecoration(
-        color: AppPalette.surface,
-        borderRadius: BorderRadius.circular(18),
+        color: Colors.white,
         border: Border.all(color: AppPalette.borderSoftBlue),
-        boxShadow: AppPalette.cardShadow,
-      ),
-      child: Column(
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.all(12),
-            child: DataTable(
-              headingRowColor: WidgetStateProperty.all(const Color(0xFFEFF6FF)),
-              headingTextStyle: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textStrongBlue, fontSize: 12.5),
-              dataTextStyle: const TextStyle(color: AppPalette.textPrimary, fontSize: 13),
-              columns: const [
-                DataColumn(label: Text('Payment Invoice')),
-                DataColumn(label: Text('Booking ID')),
-                DataColumn(label: Text('Post ID')),
-                DataColumn(label: Text('Payment Date')),
-                DataColumn(label: Text('Passport No')),
-                DataColumn(label: Text('Amount')),
-                DataColumn(label: Text('Status')),
-              ],
-              rows: items
-                  .map(
-                    (item) => DataRow(
-                      cells: [
-                        DataCell(Text('#INV-${item.id}', style: const TextStyle(fontWeight: FontWeight.w700))),
-                        DataCell(Text(item.bookingId)),
-                        DataCell(Text(item.postId)),
-                        DataCell(Text(_formatListDate(item.collectedAt))),
-                        DataCell(Text(item.passportNo)),
-                        DataCell(Text('৳ ${_money(item.amount)}', style: const TextStyle(fontWeight: FontWeight.w700))),
-                        DataCell(_statusChip(item.step)),
-                      ],
-                    ),
-                  )
-                  .toList(),
-            ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D2563EB),
+            blurRadius: 20,
+            offset: Offset(0, 8),
           ),
-          _pagination(items.length),
         ],
       ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: DropdownButtonFormField<String>(
+          value: _status.isEmpty ? null : _status,
+          isExpanded: true,
+          style: const TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.w500),
+          dropdownColor: Colors.white,
+          iconEnabledColor: AppPalette.brandBlue,
+          decoration: const InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            hintText: 'All Status',
+            hintStyle: TextStyle(color: AppPalette.textMuted, fontSize: 13),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 8,
+            ),
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+          ),
+          items: [
+            const DropdownMenuItem(value: '', child: Text('All Status')),
+            ...bookingStatus.map((e) => DropdownMenuItem(value: e, child: Text(e))),
+          ],
+          onChanged: (value) {
+            setState(() {
+              _status = value ?? '';
+            });
+            _loadPayments(isInitial: true);
+          },
+        ),
+      ),
     );
   }
 
-  Widget _cardContent(List<PaymentHistoryItem> items) {
-    return Column(
-      children: [
-        ...items.map(_paymentCard),
-        _pagination(items.length),
+  Widget _tableContent(List<PaymentsHistory> items) {
+    if (items.isEmpty) {
+      return _emptyState();
+    }
+
+    return StyledDataTableCard(
+      columns: const [
+        DataColumn(label: Text('Payment Invoice')),
+        DataColumn(label: Text('Booking ID')),
+        DataColumn(label: Text('Post ID')),
+        DataColumn(label: Text('Payment Date')),
+        DataColumn(label: Text('Passport No')),
+        DataColumn(label: Text('Amount')),
+        DataColumn(label: Text('Status')),
       ],
+      rows: items
+          .map(
+            (item) => DataRow(
+              cells: [
+                DataCell(Text('#INV-${item.id}', style: const TextStyle(fontWeight: FontWeight.w700))),
+                DataCell(Text(item.bookingId)),
+                DataCell(Text(item.postId)),
+                DataCell(Text(_formatListDate(item.collectedAt))),
+                DataCell(Text(item.passportNo)),
+                DataCell(Text('৳ ${_money(item.amount)}', style: const TextStyle(fontWeight: FontWeight.w700))),
+                DataCell(_statusChip(item.step)),
+              ],
+            ),
+          )
+          .toList(),
     );
   }
 
-  Widget _paymentCard(PaymentHistoryItem item) {
+  Widget _cardContent(List<PaymentsHistory> items) {
+    if (items.isEmpty) {
+      return _emptyState();
+    }
+
+    return Column(
+      children: items.map(_paymentCard).toList(),
+    );
+  }
+
+  Widget _paymentCard(PaymentsHistory item) {
     final isReturn = item.step == 'RETURN';
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -428,7 +426,13 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     );
   }
 
-  Widget _statsSection() {
+  Widget _statsSection(List<PaymentsHistory> items) {
+    final totalProcessed = items.fold<int>(0, (sum, i) => sum + i.amount);
+    final pendingCount = items.where((i) => i.step != 'COMPLETED').length;
+    final totalCount = items.isEmpty ? 1 : items.length;
+    final completedCount = items.where((i) => i.step == 'COMPLETED').length;
+    final completionProgress = (completedCount / totalCount).clamp(0.0, 1.0);
+
     return Column(
       children: [
         Container(
@@ -444,7 +448,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
             children: [
               const Text('TOTAL PROCESSED', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
-              Text('৳ ${_money(_allPayments.fold<int>(0, (sum, i) => sum + i.amount))}', style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800)),
+              Text('৳ ${_money(totalProcessed)}', style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800)),
             ],
           ),
         ),
@@ -464,14 +468,14 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
               const Text('PENDING CLAIMS', style: TextStyle(color: AppPalette.textMuted, fontSize: 12, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               Text(
-                '${_allPayments.where((i) => i.step != 'COMPLETED').length}',
+                '$pendingCount',
                 style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w700, color: AppPalette.textPrimary),
               ),
               const SizedBox(height: 12),
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
                 child: LinearProgressIndicator(
-                  value: _allPayments.where((i) => i.step == 'COMPLETED').length / _allPayments.length,
+                  value: completionProgress,
                   minHeight: 5,
                   color: AppPalette.brandBlue,
                   backgroundColor: const Color(0xFFE7EAF3),
@@ -484,27 +488,63 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     );
   }
 
-  Widget _pagination(int countOnPage) {
-    final filteredCount = _allPayments.where((i) => (_status.isEmpty || i.step == _status) && (_debouncedSearch.isEmpty || i.passportNo.toLowerCase().contains(_debouncedSearch.toLowerCase()))).length;
-    final totalPages = (filteredCount / _pageSize).ceil().clamp(1, 999);
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _emptyState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppPalette.borderSoftBlue),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: Text(
-              'Showing ${countOnPage == 0 ? 0 : ((_currentPage - 1) * _pageSize) + 1} to ${((_currentPage - 1) * _pageSize) + countOnPage} of $filteredCount entries',
-              style: const TextStyle(fontSize: 12, color: AppPalette.textMuted),
-            ),
+          const Icon(Icons.payments_outlined, size: 60, color: AppPalette.textMuted),
+          const SizedBox(height: 16),
+          Text(
+            'No payments history found',
+            style: AppTextStyles.headline4.copyWith(color: AppPalette.textPrimary, fontWeight: FontWeight.bold),
           ),
-          Row(
-            children: [
-              IconButton(onPressed: _currentPage > 1 ? () => setState(() => _currentPage--) : null, icon: const Icon(Icons.chevron_left_rounded)),
-              Text('Page $_currentPage of $totalPages', style: const TextStyle(fontSize: 13)),
-              IconButton(onPressed: _currentPage < totalPages ? () => setState(() => _currentPage++) : null, icon: const Icon(Icons.chevron_right_rounded)),
-            ],
+          const SizedBox(height: 8),
+          Text(
+            'Try adjusting your search query or status filter.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _errorState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF2F2),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFFCA5A5)),
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.error_outline_rounded, size: 48, color: Colors.redAccent),
+          const SizedBox(height: 14),
+          Text(
+            _error ?? 'Failed to load payments',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () => _loadPayments(isInitial: true),
+            icon: const Icon(Icons.refresh_rounded, size: 16),
+            label: const Text('Try Again'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppPalette.brandBlue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
           ),
         ],
       ),
@@ -573,22 +613,53 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
   }
 }
 
-class PaymentHistoryItem {
-  const PaymentHistoryItem({
-    required this.id,
-    required this.bookingId,
-    required this.postId,
-    required this.collectedAt,
-    required this.passportNo,
-    required this.amount,
-    required this.step,
-  });
-
-  final String id;
-  final String bookingId;
-  final String postId;
-  final DateTime collectedAt;
-  final String passportNo;
-  final int amount;
-  final String step;
-}
+final List<PaymentsHistory> _skeletonPayments = [
+  PaymentsHistory(
+    id: 1000,
+    bookingId: 'B-99821',
+    postId: 'P-5541',
+    collectedAt: DateTime(2026, 1, 27, 10, 20),
+    passportNo: 'A12345678',
+    amount: 50000,
+    step: 'ADVANCE',
+    sequence: '1',
+    terminal: 'BKASH',
+    transactionType: 'CREDIT',
+  ),
+  PaymentsHistory(
+    id: 999,
+    bookingId: 'B-99750',
+    postId: 'P-5420',
+    collectedAt: DateTime(2026, 1, 20, 14, 45),
+    passportNo: 'A12345678',
+    amount: 50000,
+    step: 'RETURN',
+    sequence: '2',
+    terminal: 'BKASH',
+    transactionType: 'DEBIT',
+  ),
+  PaymentsHistory(
+    id: 998,
+    bookingId: 'B-99740',
+    postId: 'P-5380',
+    collectedAt: DateTime(2026, 1, 15, 9, 30),
+    passportNo: 'B87654321',
+    amount: 75000,
+    step: 'COMPLETED',
+    sequence: '3',
+    terminal: 'NAGAD',
+    transactionType: 'CREDIT',
+  ),
+  PaymentsHistory(
+    id: 997,
+    bookingId: 'B-99722',
+    postId: 'P-5301',
+    collectedAt: DateTime(2026, 1, 10, 11, 0),
+    passportNo: 'C11223344',
+    amount: 42000,
+    step: 'ADVANCE',
+    sequence: '1',
+    terminal: 'ROCKET',
+    transactionType: 'CREDIT',
+  ),
+];
