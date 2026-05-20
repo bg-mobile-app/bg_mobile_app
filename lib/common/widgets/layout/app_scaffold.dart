@@ -155,6 +155,11 @@ class _DashboardHostScreen extends StatelessWidget {
       case '/dashboard/ads/my':
         return const MyAdsScreen();
       default:
+        if (route.startsWith('/dashboard/user/create-user/')) {
+          final userId = route.substring('/dashboard/user/create-user/'.length);
+          return CreateUserScreen(userId: userId);
+        }
+
         return DashboardDummyScreen(
           title: route.split('/').last.replaceAll('-', ' '),
         );

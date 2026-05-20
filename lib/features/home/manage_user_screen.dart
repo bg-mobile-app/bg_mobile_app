@@ -9,6 +9,7 @@ import '../../common/widgets/app_search_bar.dart';
 import '../../common/widgets/styled_data_table_card.dart';
 import '../../common/widgets/view_toggle_button.dart';
 import 'dashboard_screen.dart';
+import 'services/staff_accounts_service.dart';
 
 class ManageUserScreen extends StatefulWidget {
   const ManageUserScreen({super.key});
@@ -29,6 +30,7 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
 
   static const bool _currentUserIsAdmin = true;
   static const String _currentUserRole = 'Admin';
+  final _staffAccountsService = StaffAccountsService();
 
   @override
   void initState() {
@@ -79,15 +81,22 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
   bool _canManage(_StaffMember member) =>
       _currentUserIsAdmin || member.role == _currentUserRole;
 
-  void _toggleBlock(_StaffMember member) {
-    setState(() {
-      final index = _members.indexWhere((item) => item.userId == member.userId);
-      if (index != -1) {
-        _members[index] = _members[index].copyWith(
-          isBlocked: !_members[index].isBlocked,
-        );
-      }
-    });
+  Future<void> _toggleBlock(_StaffMember member) async {
+    final nextIsBlocked = !member.isBlocked;
+    try {
+      await _staffAccountsService.updateStaffVerifiedStatus(
+        userId: member.userId,
+        isActive: !nextIsBlocked,
+      );
+      setState(() {
+        final index = _members.indexWhere((item) => item.userId == member.userId);
+        if (index != -1) {
+          _members[index] = _members[index].copyWith(
+            isBlocked: nextIsBlocked,
+          );
+        }
+      });
+    } catch (_) {}
   }
 
   void _resetInfiniteData() {
@@ -347,7 +356,7 @@ class _UserTableCard extends StatelessWidget {
                               size: 20,
                               color: Color(0xFF434655),
                             ),
-                            onPressed: () {},
+                            onPressed: () => context.go('/dashboard/user/create-user/${member.userId}'),
                             tooltip: 'Edit User',
                           ),
                         ] else ...[
@@ -544,7 +553,7 @@ class _StaffCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: canManage ? () {} : null,
+                  onPressed: canManage ? () => context.go('/dashboard/user/create-user/${member.userId}') : null,
                   icon: const Icon(Icons.edit_outlined, size: 18),
                   label: const Text('Edit'),
                   style: OutlinedButton.styleFrom(
