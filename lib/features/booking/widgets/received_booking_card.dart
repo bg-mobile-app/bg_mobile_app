@@ -34,6 +34,9 @@ class ReceivedBookingCard extends StatelessWidget {
     required this.hasBeforeFlightPayout,
     required this.style,
     required this.onMoreTap,
+    this.showMedical = false,
+    this.showVisa = false,
+    this.showPoliceClear = false,
   });
 
   final int bookingId;
@@ -53,6 +56,9 @@ class ReceivedBookingCard extends StatelessWidget {
   final bool hasBeforeFlightPayout;
   final ReceivedBookingCardStyle style;
   final VoidCallback onMoreTap;
+  final bool showMedical;
+  final bool showVisa;
+  final bool showPoliceClear;
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +162,7 @@ class ReceivedBookingCard extends StatelessWidget {
   }
 
   Widget _detailsSection() {
+    final hasClearance = showMedical || showVisa || showPoliceClear;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: const BoxDecoration(
@@ -167,8 +174,10 @@ class ReceivedBookingCard extends StatelessWidget {
       child: Column(
         children: [
           _routeRow(),
-          const SizedBox(height: 14),
-          _clearanceRow(),
+          if (hasClearance) ...[
+            const SizedBox(height: 14),
+            _clearanceRow(),
+          ],
         ],
       ),
     );
@@ -209,6 +218,14 @@ class ReceivedBookingCard extends StatelessWidget {
   }
 
   Widget _clearanceRow() {
+    final cells = <Widget>[
+      if (showMedical)
+        Expanded(child: _clearanceCell('Medical', medicalText, Icons.medical_services_outlined)),
+      if (showVisa)
+        Expanded(child: _clearanceCell('Visa', visaText, Icons.verified_user_outlined)),
+      if (showPoliceClear)
+        Expanded(child: _clearanceCell('Police Clear', policeClearText, Icons.gavel_rounded)),
+    ];
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
@@ -217,15 +234,21 @@ class ReceivedBookingCard extends StatelessWidget {
         border: Border.all(color: const Color(0x334B5D7A)),
       ),
       child: Row(
-        children: [
-          Expanded(child: _clearanceCell('Medical', medicalText, Icons.medical_services_outlined)),
-          const SizedBox(height: 28, child: VerticalDivider(color: Color(0x334B5D7A), thickness: 1)),
-          Expanded(child: _clearanceCell('Visa', visaText, Icons.verified_user_outlined)),
-          const SizedBox(height: 28, child: VerticalDivider(color: Color(0x334B5D7A), thickness: 1)),
-          Expanded(child: _clearanceCell('Police Clear', policeClearText, Icons.gavel_rounded)),
-        ],
+        children: _withDividers(cells),
       ),
     );
+  }
+
+  List<Widget> _withDividers(List<Widget> children) {
+    if (children.length <= 1) return children;
+    final output = <Widget>[];
+    for (var i = 0; i < children.length; i++) {
+      output.add(children[i]);
+      if (i != children.length - 1) {
+        output.add(const SizedBox(height: 28, child: VerticalDivider(color: Color(0x334B5D7A), thickness: 1)));
+      }
+    }
+    return output;
   }
 
   Widget _clearanceCell(String label, String value, IconData icon) {
