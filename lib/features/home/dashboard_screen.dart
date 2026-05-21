@@ -839,47 +839,6 @@ class _DashboardPageScaffoldState extends State<DashboardPageScaffold> {
     }
   }
 
-  String get _screenName {
-    const titles = <String, String>{
-      '/dashboard/agency': 'Agency Dashboard',
-      '/dashboard/customer': 'Dashboard',
-      '/dashboard/booking/my': 'All Booking',
-      '/dashboard/receive-booking/all-booking': 'All Booking',
-      '/dashboard/receive-booking/applied-booking': 'Applied Booking',
-      '/dashboard/receive-booking/bg-collect-passport': 'BG Collect Passport',
-      '/dashboard/receive-booking/bg-sent-passport': 'BG Sent Passport',
-      '/dashboard/receive-booking/receive-passport': 'Receive Passport',
-      '/dashboard/booking/my/success-file': 'Success Flight',
-      '/dashboard/booking/my/return-passport': 'Return Passport',
-      '/dashboard/booking/appointment': 'Appointment Booking',
-      '/dashboard/notifications': 'Notifications',
-      '/dashboard/check-status': 'Check Status',
-      '/dashboard/payments': 'Payments',
-      '/dashboard/my-ads': 'My Ads',
-      '/dashboard/my-favourite': 'My Favourite',
-      '/dashboard/create-ad': 'Create Ad',
-      '/dashboard/create-user': 'Create User',
-      '/dashboard/manage-user': 'Manage User',
-      '/dashboard/change-password': 'Change Password',
-      '/dashboard/customer-profile': 'Customer Profile',
-    };
-    final matchedTitle = titles[widget.currentHref];
-    if (matchedTitle != null) return matchedTitle;
-    final parts = widget.currentHref
-        .split('/')
-        .where((part) => part.isNotEmpty)
-        .toList();
-    final segment = parts.isEmpty ? 'screen' : parts.last;
-    return segment
-        .split('-')
-        .map(
-          (word) => word.isEmpty
-              ? word
-              : '${word[0].toUpperCase()}${word.substring(1)}',
-        )
-        .join(' ');
-  }
-
   @override
   Widget build(BuildContext context) {
     final owner = _profile?.owner;
@@ -888,7 +847,6 @@ class _DashboardPageScaffoldState extends State<DashboardPageScaffold> {
       endDrawer: CustomerSidebarDrawer(
         currentHref: widget.currentHref,
         fullName: owner?.fullName ?? _profile?.agencyName ?? 'User',
-        userId: owner?.id?.toString() ?? 'N/A',
         email: owner?.email ?? 'N/A',
         phone: owner?.phone ?? _profile?.agencyPhone ?? 'N/A',
         profileImage: _profile?.image,
@@ -901,28 +859,11 @@ class _DashboardPageScaffoldState extends State<DashboardPageScaffold> {
         titleSpacing: 16,
         title: Row(
           children: [
-            Expanded(
-              child: Text(
-                _screenName,
-                style: const TextStyle(
-                  color: AppPalette.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+            Image.asset(
+              'assets/img/logo/logo_black.png',
+              height: 34,
+              fit: BoxFit.contain,
             ),
-            Expanded(
-              child: Center(
-                child: Image.asset(
-                  'assets/img/logo/logo_black.png',
-                  height: 34,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            const SizedBox(width: 40),
           ],
         ),
         actions: [
@@ -967,7 +908,6 @@ class CustomerSidebarDrawer extends StatefulWidget {
     super.key,
     required this.currentHref,
     required this.fullName,
-    required this.userId,
     required this.email,
     required this.phone,
     required this.profileImage,
@@ -976,7 +916,6 @@ class CustomerSidebarDrawer extends StatefulWidget {
 
   final String fullName;
   final String currentHref;
-  final String userId;
   final String email;
   final String phone;
   final String? profileImage;
@@ -1006,7 +945,6 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
             children: [
               _SidebarUserInfo(
                 fullName: widget.fullName,
-                userId: widget.userId,
                 email: widget.email,
                 phone: widget.phone,
                 profileImage: widget.profileImage,
@@ -1059,14 +997,12 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
 class _SidebarUserInfo extends StatelessWidget {
   const _SidebarUserInfo({
     required this.fullName,
-    required this.userId,
     required this.email,
     required this.phone,
     required this.profileImage,
   });
 
   final String fullName;
-  final String userId;
   final String email;
   final String phone;
   final String? profileImage;
@@ -1091,18 +1027,35 @@ class _SidebarUserInfo extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
           textAlign: TextAlign.center,
         ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.email_outlined, size: 14, color: Color(0xFF475569)),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                email,
+                style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 4),
-        Text(
-          'User ID: $userId',
-          style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
-        ),
-        Text(
-          'User Email: $email',
-          style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
-        ),
-        Text(
-          'User Phone: $phone',
-          style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF475569)),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                phone,
+                style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
       ],
     );
