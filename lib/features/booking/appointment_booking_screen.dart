@@ -159,9 +159,11 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
         final color = colors[dto.id % colors.length];
 
         return AppointmentBookingItem(
-          postId: dto.workPermitSlug.isNotEmpty
-              ? dto.workPermitSlug.toUpperCase()
-              : 'WP-${dto.workPermitId}',
+          postId: dto.workPermitId.isNotEmpty
+              ? dto.workPermitId
+              : (dto.workPermitSlug.isNotEmpty
+                  ? dto.workPermitSlug.toUpperCase()
+                  : 'N/A'),
           bookingId: dto.id,
           fullName: dto.name,
           country: dto.toCountry,
@@ -577,7 +579,6 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final item = itemsToUse[index];
-        final dueAmount = item.packagePrice - item.paidAmount;
 
         return Container(
           decoration: BoxDecoration(
@@ -657,100 +658,39 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                     children: [
                       Row(children: [
                         Expanded(
-                            child: _detailTile('VISA CATEGORY',
-                                item.visaCategory, Icons.article_outlined)),
+                            child: _detailTile(
+                                'BOOKING ID',
+                                item.bookingId.toString(),
+                                Icons.confirmation_number_outlined)),
                         const SizedBox(width: 14),
                         Expanded(
-                            child: _detailTile('MEETING TYPE', item.meeting,
-                                Icons.groups_outlined)),
+                            child: _detailTile('VISA CATEGORY',
+                                item.visaCategory, Icons.article_outlined)),
                       ]),
                       const SizedBox(height: 18),
                       Row(children: [
                         Expanded(
-                            child: _detailTile('DATE', item.date,
-                                Icons.calendar_today_outlined)),
+                            child: _detailTile('MEETING', item.meeting,
+                                Icons.groups_outlined)),
                         const SizedBox(width: 14),
                         Expanded(
-                            child: _detailTile(
-                                'TIME', item.time, Icons.schedule)),
+                            child: _detailTile('DATE & TIME',
+                                '${item.date} ${item.time}', Icons.schedule)),
                       ]),
                       const SizedBox(height: 18),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFF1F3FF),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0xFFBBC1D6))),
-                        child: Row(children: [
-                          const Icon(Icons.flight,
-                              color: Color(0xFF434655), size: 30),
-                          const SizedBox(width: 14),
-                          Expanded(
-                              child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('PASSPORT NUMBER',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            letterSpacing: 1,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFF737687))),
-                                    Text(item.passportNo,
-                                        style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700)),
-                                  ])),
-                          const Icon(Icons.verified,
-                              color: Color(0xFF737687), size: 28),
-                        ]),
-                      ),
-                      const SizedBox(height: 18),
-                      const Divider(color: Color(0xFFBBC1D6)),
-                      const SizedBox(height: 12),
-                      _amountRow(
-                          'Package Price',
-                          '${_formatMoney(item.packagePrice)} BDT',
-                          const Color(0xFF191B24),
-                          false),
-                      const SizedBox(height: 12),
-                      _amountRow('Paid Amount',
-                          '${_formatMoney(item.paidAmount)} BDT', AppColors.primary, true),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFFAD6D6),
-                            borderRadius: BorderRadius.circular(14)),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('DUE AMOUNT',
-                                  style: TextStyle(
-                                      color: Color(0xFF9F0E0E),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14)),
-                              Text('${_formatMoney(dueAmount)} BDT',
-                                  style: const TextStyle(
-                                      color: Color(0xFF9F0E0E),
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 16)),
-                            ]),
-                      ),
-                      const SizedBox(height: 16),
+                      _detailTile('COUNTRY', item.country, Icons.public_outlined),
+                      const SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.icon(
                           onPressed: () => _openTicket(item),
                           icon: const Icon(Icons.download, size: 22),
-                          label: const Text('Download Ticket',
+                          label: const Text('Overview',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
                           style: FilledButton.styleFrom(
-                              backgroundColor: AppPalette.borderSoftBlue,
-                              foregroundColor: AppPalette.textMuted,
+                              backgroundColor: AppPalette.brandBlue,
+                              foregroundColor: Colors.white,
                               minimumSize: const Size.fromHeight(56),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14))),
@@ -807,27 +747,6 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                     const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)))
       ]),
     ]);
-  }
-
-  Widget _amountRow(String label, String value, Color color, bool bold) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: const TextStyle(fontSize: 15, color: Color(0xFF434655))),
-      Text(value,
-          style: TextStyle(
-              fontSize: 19,
-              fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
-              color: color)),
-    ]);
-  }
-
-  String _formatMoney(int amount) {
-    final s = amount.toString();
-    final chars = s.split('').reversed.toList();
-    final parts = <String>[];
-    for (int i = 0; i < chars.length; i += 3) {
-      parts.add(chars.sublist(i, (i + 3).clamp(0, chars.length)).join());
-    }
-    return parts.join(',').split('').reversed.join();
   }
 
   void _openTicket(AppointmentBookingItem item) {
