@@ -8,6 +8,7 @@ import '../features/auth/partner_sign_up_screen.dart';
 import '../features/auth/recruiting_sign_up_screen.dart';
 import '../features/auth/sign_in_screen.dart';
 import '../features/auth/sign_up_screen.dart';
+import '../features/auth/otp_verification_screen.dart';
 import '../features/onboarding/get_started_screen.dart';
 import 'app_routes.dart';
 
@@ -37,6 +38,12 @@ final GoRouter appRouter = GoRouter(
     GoRoute(path: AppRoutes.agentSignUp, builder: (_, __) => const AgentSignUpScreen()),
     GoRoute(path: AppRoutes.agencySignUp, builder: (_, __) => const AgencySignUpScreen()),
     GoRoute(path: AppRoutes.recruitingSignUp, builder: (_, __) => const RecruitingSignUpScreen()),
+    GoRoute(
+      path: AppRoutes.otpVerify,
+      builder: (_, state) => OtpVerificationScreen(
+        username: state.uri.queryParameters['username'] ?? '',
+      ),
+    ),
     GoRoute(path: AppRoutes.tabHome, pageBuilder: (c, s) => _slideTransition(c, s, const AppScaffold(tabIndex: 0))),
     GoRoute(path: AppRoutes.tabSearch, pageBuilder: (c, s) => _slideTransition(c, s, const AppScaffold(tabIndex: 1))),
     GoRoute(path: AppRoutes.tabBooking, pageBuilder: (c, s) => _slideTransition(c, s, const AppScaffold(tabIndex: 2))),

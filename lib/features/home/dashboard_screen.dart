@@ -5,6 +5,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../common/theme/app_colors.dart';
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
+import '../../common/services/api_client.dart';
+import '../../common/services/auth_service.dart';
 import '../../common/services/profile_service.dart';
 import 'models/agency_profile.dart';
 import 'models/dashboard_models.dart';
@@ -926,6 +928,7 @@ class CustomerSidebarDrawer extends StatefulWidget {
 }
 
 class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
+  final AuthService _authService = AuthService();
   String? _openKey;
 
   void _handleNavigation(SidebarLink link) {
@@ -979,11 +982,17 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
                     color: Color(0xFF475569),
                   ),
                 ),
-                onTap: () {
+                onTap: () async {
+                  final router = GoRouter.of(context);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Logout clicked')),
-                  );
+                  try {
+                    await _authService.getSingOut();
+                  } catch (_) {
+                    // Continue local logout even if backend logout request fails.
+                  }
+                  await ApiClient().tokenStorage.clearCookies();
+                  if (!mounted) return;
+                  router.go('/login');
                 },
               ),
             ],
