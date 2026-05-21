@@ -159,8 +159,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
         final color = colors[dto.id % colors.length];
 
         return AppointmentBookingItem(
-          postId: dto.workPermitId.isNotEmpty
-              ? dto.workPermitId
+          postId: dto.workPermitId > 0
+              ? dto.workPermitId.toString()
               : (dto.workPermitSlug.isNotEmpty
                   ? dto.workPermitSlug.toUpperCase()
                   : 'N/A'),

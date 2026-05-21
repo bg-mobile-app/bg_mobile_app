@@ -888,7 +888,7 @@ class _DashboardPageScaffoldState extends State<DashboardPageScaffold> {
       endDrawer: CustomerSidebarDrawer(
         currentHref: widget.currentHref,
         fullName: owner?.fullName ?? _profile?.agencyName ?? 'User',
-        userId: owner?.userCode ?? 'N/A',
+        userId: owner?.id?.toString() ?? 'N/A',
         email: owner?.email ?? 'N/A',
         phone: owner?.phone ?? _profile?.agencyPhone ?? 'N/A',
         profileImage: _profile?.image,
@@ -957,7 +957,7 @@ class _DashboardPageScaffoldState extends State<DashboardPageScaffold> {
           const SizedBox(width: 8),
         ],
       ),
-      body: child,
+      body: widget.child,
     );
   }
 }
