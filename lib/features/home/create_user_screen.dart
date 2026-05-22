@@ -238,6 +238,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           email: _emailController.text.trim(),
           username: _usernameController.text.trim(),
           password: _passwordController.text,
+          confirmPassword: _confirmPasswordController.text,
         );
       }
 
