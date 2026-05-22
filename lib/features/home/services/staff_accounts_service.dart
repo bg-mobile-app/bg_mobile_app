@@ -77,6 +77,7 @@ class StaffAccountsService {
     required String email,
     String? username,
     String? password,
+    String? confirmPassword,
   }) async {
     final payload = <String, dynamic>{
       'fullName': fullName,
@@ -87,6 +88,8 @@ class StaffAccountsService {
       'email': email,
       if (username != null && username.isNotEmpty) 'username': username,
       if (password != null && password.isNotEmpty) 'password': password,
+      if (confirmPassword != null && confirmPassword.isNotEmpty)
+        'confirm_password': confirmPassword,
     };
 
     await _apiClient.post('/user/register/agency/staff/', data: payload);
