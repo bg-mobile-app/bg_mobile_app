@@ -49,6 +49,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(path: AppRoutes.tabBooking, pageBuilder: (c, s) => _slideTransition(c, s, const AppScaffold(tabIndex: 2))),
     GoRoute(path: AppRoutes.tabChat, pageBuilder: (c, s) => _slideTransition(c, s, const AppScaffold(tabIndex: 3))),
     GoRoute(path: AppRoutes.tabProfile, pageBuilder: (c, s) => _slideTransition(c, s, const AppScaffold(tabIndex: 4))),
+    GoRoute(path: '/logout', pageBuilder: (c, s) => _slideTransition(c, s, const AppScaffold(dashboardPath: '/logout', tabIndex: 4))),
     GoRoute(path: '/dashboard/:a', pageBuilder: (c, s) => _slideTransition(c, s, AppScaffold(dashboardPath: s.uri.path, tabIndex: 4))),
     GoRoute(path: '/dashboard/:a/:b', pageBuilder: (c, s) => _slideTransition(c, s, AppScaffold(dashboardPath: s.uri.path, tabIndex: 4))),
     GoRoute(path: '/dashboard/:a/:b/:c', pageBuilder: (c, s) => _slideTransition(c, s, AppScaffold(dashboardPath: s.uri.path, tabIndex: 4))),
