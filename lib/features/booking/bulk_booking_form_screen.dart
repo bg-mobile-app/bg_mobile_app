@@ -27,7 +27,15 @@ class _BulkBookingFormScreenState extends State<BulkBookingFormScreen> {
   final List<_BookingRowData> _rows = [_BookingRowData()];
   bool _agreedTerms = false;
   bool _isSubmitting = false;
+  bool _isLoadingBranches = true;
   final BookingService _bookingService = BookingService();
+  List<BranchItem> _branches = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBranches();
+  }
 
   @override
   void dispose() {
@@ -38,6 +46,23 @@ class _BulkBookingFormScreenState extends State<BulkBookingFormScreen> {
   }
 
   void _addRow() => setState(() => _rows.add(_BookingRowData()));
+
+  Future<void> _loadBranches() async {
+    try {
+      final branches = await _bookingService.getBranches();
+      if (!mounted) return;
+      setState(() {
+        _branches = branches;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load application centers.')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoadingBranches = false);
+    }
+  }
 
   void _removeRow(int index) {
     if (_rows.length <= 1) return;
@@ -67,7 +92,7 @@ class _BulkBookingFormScreenState extends State<BulkBookingFormScreen> {
             'gender': row.gender?.trim() ?? '',
             'fromCountry': 'BD',
             'toCountry': widget.item.countryName,
-            'branch': int.tryParse(row.branch.text.trim()) ?? 0,
+            'branch': row.branchId ?? 0,
             'appointmentDate': row.appointmentDate.text.trim(),
             'isPrivacyTerms': _agreedTerms,
           },
@@ -210,8 +235,8 @@ class _BulkBookingFormScreenState extends State<BulkBookingFormScreen> {
             _genderDropdown(row),
             _readonlyInput('From Country', 'Bangladesh (BD)'),
             _readonlyInput('To Country', widget.item.countryName),
-            _input(row.branch, 'Application Center', required: true),
-            _input(row.appointmentDate, 'Appointment Date (YYYY-MM-DD)', required: true),
+            _branchDropdown(row),
+            _datePickerInput(row),
           ],
         ),
       ),
@@ -272,6 +297,48 @@ class _BulkBookingFormScreenState extends State<BulkBookingFormScreen> {
       ),
     );
   }
+
+  Widget _branchDropdown(_BookingRowData row) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: DropdownButtonFormField<int>(
+        value: row.branchId,
+        validator: (v) => v == null || v <= 0 ? 'Required' : null,
+        decoration: _inputDecoration('Application Center'),
+        items: _branches
+            .map((branch) => DropdownMenuItem<int>(value: branch.id, child: Text(branch.name)))
+            .toList(),
+        onChanged: _isLoadingBranches ? null : (v) => setState(() => row.branchId = v),
+      ),
+    );
+  }
+
+  Widget _datePickerInput(_BookingRowData row) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextFormField(
+        controller: row.appointmentDate,
+        readOnly: true,
+        validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+        decoration: _inputDecoration('Appointment Date').copyWith(
+          suffixIcon: const Icon(Icons.calendar_today_outlined, size: 20),
+        ),
+        onTap: () async {
+          final now = DateTime.now();
+          final pickedDate = await showDatePicker(
+            context: context,
+            firstDate: DateTime(now.year - 1),
+            lastDate: DateTime(now.year + 5),
+            initialDate: now,
+          );
+          if (pickedDate == null) return;
+          final month = pickedDate.month.toString().padLeft(2, '0');
+          final day = pickedDate.day.toString().padLeft(2, '0');
+          row.appointmentDate.text = '${pickedDate.year}-$month-$day';
+        },
+      ),
+    );
+  }
 }
 
 class _BookingRowData {
@@ -280,7 +347,7 @@ class _BookingRowData {
   final email = TextEditingController();
   final passportNo = TextEditingController();
   String? gender;
-  final branch = TextEditingController();
+  int? branchId;
   final appointmentDate = TextEditingController();
 
   void dispose() {
@@ -288,7 +355,6 @@ class _BookingRowData {
     phone.dispose();
     email.dispose();
     passportNo.dispose();
-    branch.dispose();
     appointmentDate.dispose();
   }
 }
