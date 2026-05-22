@@ -418,7 +418,7 @@ class _InfoCard extends StatelessWidget {
 
   final IconData icon;
   final String title;
-  final List<_InfoRow> rows;
+  final List<Widget> rows;
 
   @override
   Widget build(BuildContext context) {
