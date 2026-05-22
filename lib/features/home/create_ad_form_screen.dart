@@ -576,6 +576,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     required List<DropdownMenuItem<int>> options,
     required ValueChanged<int?> onChanged,
   }) {
+    final hasMatchingValue = value != null && options.any((item) => item.value == value);
+    final safeValue = hasMatchingValue ? value : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -590,7 +592,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<int>(
-              value: value,
+              value: safeValue,
               isExpanded: true,
               hint: Text(hint, style: const TextStyle(fontSize: 15, color: Color(0xFF94A3B8))),
               items: options,
@@ -771,6 +773,13 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
               flex: 2,
               child: ElevatedButton(
                 onPressed: _isPublishing ? null : () {
+                  if (_currentStep == 0 && _selectedImage == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(_tr('Ad image is required to continue', 'পরবর্তী ধাপে যেতে বিজ্ঞাপনের ছবি আবশ্যক'))),
+                    );
+                    return;
+                  }
+
                   if (_currentStep < 3) {
                     setState(() => _currentStep = (_currentStep + 1).clamp(0, 3));
                   } else {
