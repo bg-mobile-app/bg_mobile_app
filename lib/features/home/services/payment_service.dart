@@ -109,7 +109,7 @@ class PaymentService {
   }) async {
     final queryParams = <String, dynamic>{};
     if (status != null && status.isNotEmpty) {
-      queryParams['status'] = status;
+      queryParams['step'] = status;
     }
     if (search != null && search.isNotEmpty) {
       queryParams['search'] = search;
@@ -117,7 +117,7 @@ class PaymentService {
     queryParams['page'] = currentPage;
 
     final response = await _apiClient.get(
-      '/payment/history-agency/',
+      '/payment/payments-history-list/',
       queryParameters: queryParams,
     );
 
