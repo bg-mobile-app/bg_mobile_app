@@ -13,7 +13,6 @@ class WorkPermitCard extends StatelessWidget {
   });
 
   static const double _imageHeight = 250;
-  static const double _titleHeight = 48;
 
   final WorkPermitItem item;
   final Color brandBlue;
@@ -49,18 +48,15 @@ class WorkPermitCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: _titleHeight,
-                    child: Text(
-                      item.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF0F172A),
-                        height: 1.2,
-                      ),
+                  Text(
+                    item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                      height: 1.2,
                     ),
                   ),
                   const SizedBox(height: 14),
