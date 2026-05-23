@@ -750,6 +750,7 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
           passportNo: item.passportNo,
           appointmentDate: '${item.date} ${item.time}',
           toCountry: item.country,
+          meetingType: item.meeting,
         ),
       ),
     );
