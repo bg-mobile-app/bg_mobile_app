@@ -306,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         onSignUp: () => context.push('/sign-up/customer'),
         onNotifications: () => context.push('/dashboard/notifications'),
-        onProfile: () => context.push('/dashboard/customer-profile'),
+        onProfile: () => context.push('/dashboard/customer/profile'),
         profileImageUrl: _profileImageUrl,
       ),
       body: SafeArea(

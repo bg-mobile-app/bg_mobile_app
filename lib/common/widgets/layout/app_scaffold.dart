@@ -16,7 +16,6 @@ import '../../../features/home/notifications_screen.dart';
 import '../../../features/home/payments_screen.dart';
 import '../../../features/home/terms_conditions_screen.dart';
 import '../../../features/home/commission_screen.dart';
-import '../../../features/home/create_ad_screen.dart';
 import '../../../features/home/unauthenticated_profile_screen.dart';
 import '../../../features/search/work_permit_list_screen.dart';
 import '../../../common/services/api_client.dart';
@@ -33,7 +32,7 @@ class AppScaffold extends StatelessWidget {
     final screens = [
       const HomeScreen(),
       const WorkPermitListScreen(),
-      const CreateAdScreen(),
+      const MyBookingScreen(),
       const ChatListScreen(),
       _DashboardHostScreen(route: dashboardPath ?? '/dashboard/agency'),
     ];
@@ -52,7 +51,7 @@ class AppScaffold extends StatelessWidget {
       case 1:
         return '/search';
       case 2:
-        return '/dashboard/ads/create';
+        return '/booking';
       case 3:
         return '/chat';
       case 4:

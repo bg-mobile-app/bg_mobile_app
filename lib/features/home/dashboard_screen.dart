@@ -531,7 +531,7 @@ class _DashboardPageScaffoldState extends State<DashboardPageScaffold> {
             tooltip: 'Notifications',
           ),
           GestureDetector(
-            onTap: () => context.push('/dashboard/customer-profile'),
+            onTap: () => context.push('/dashboard/customer/profile'),
             child: Padding(
               padding: const EdgeInsets.only(right: 8),
               child: CircleAvatar(
