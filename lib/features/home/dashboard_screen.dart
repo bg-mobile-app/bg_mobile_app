@@ -459,11 +459,6 @@ const List<SidebarLink> kDashboardSidebarLinks = [
     icon: Icons.gavel_outlined,
     href: '/dashboard/terms-and-conditions',
   ),
-  SidebarLink(
-    name: 'Logout',
-    icon: Icons.logout,
-    href: '/logout',
-  ),
 ];
 
 class DashboardPageScaffold extends StatefulWidget {
@@ -648,7 +643,7 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
                   }
                   await ApiClient().tokenStorage.clearCookies();
                   if (!mounted) return;
-                  router.go('/login');
+                  router.go('/home?refresh=${DateTime.now().millisecondsSinceEpoch}');
                 },
               ),
             ],

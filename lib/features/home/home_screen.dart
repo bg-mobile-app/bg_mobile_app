@@ -13,6 +13,7 @@ import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_spacing.dart';
 import '../../common/services/api_client.dart';
 import '../../common/services/profile_service.dart';
+import '../search/work_permit_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -528,7 +529,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: WorkPermitCard(
                       item: displayItems[index],
                       brandBlue: _brandBlue,
-                      onViewDetails: _showComingSoon,
+                      onViewDetails: () => _openWorkPermitDetails(displayItems[index]),
                       formatBdt: _formatBdt,
                       timeAgo: _timeAgo,
                     ),
@@ -563,6 +564,15 @@ class _HomeScreenState extends State<HomeScreen> {
           label: Text(actionLabel),
         ),
       ],
+    );
+  }
+
+
+  void _openWorkPermitDetails(WorkPermitItem item) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => WorkPermitDetailsScreen(item: item),
+      ),
     );
   }
 
