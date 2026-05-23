@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../common/services/api_client.dart';
 import '../home/models/home_models.dart';
 import '../home/widgets/work_permit_card.dart';
 import 'models/work_permit_details.dart';
@@ -31,6 +33,7 @@ class WorkPermitDetailsScreen extends StatefulWidget {
 
 class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
   bool _isLoading = true;
+  bool _isLoggedIn = false;
   WorkPermitDetails? _details;
   List<WorkPermitItem> _similarPermits = [];
   final WorkPermitService _service = WorkPermitService();
@@ -38,7 +41,15 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    _checkLoginStatus();
     _loadDetails();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final cookies = await ApiClient().tokenStorage.getCookies();
+    if (mounted && cookies != null && cookies.isNotEmpty) {
+      setState(() => _isLoggedIn = true);
+    }
   }
 
   Future<void> _loadDetails() async {
@@ -885,13 +896,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => BulkBookingFormScreen(item: widget.item),
-                        ),
-                      );
-                    },
+                    onPressed: () => _onApplyNowPressed(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _brandBlue,
                       foregroundColor: Colors.white,
@@ -939,6 +944,45 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _onApplyNowPressed(BuildContext context) async {
+    if (_isLoggedIn) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => BulkBookingFormScreen(item: widget.item),
+        ),
+      );
+      return;
+    }
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Need to sign in or sign up'),
+          content: const Text(
+            'Please sign in or sign up to continue with your application.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.push('/login');
+              },
+              child: const Text('Sign In'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.push('/sign-up/customer');
+              },
+              child: const Text('Sign Up'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   static String _formatMoney(int amount) {
