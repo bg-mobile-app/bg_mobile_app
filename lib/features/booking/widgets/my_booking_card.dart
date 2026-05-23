@@ -156,7 +156,7 @@ class MyBookingCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: alignEnd ? AppPalette.primary : AppPalette.textPrimary,
+              color: alignEnd ? AppPalette.brandBlue : AppPalette.textPrimary,
             ),
           ),
         ],
