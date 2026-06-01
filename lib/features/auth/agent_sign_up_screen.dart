@@ -259,59 +259,118 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
                             ),
                             const SizedBox(height: 22),
                             Flex(
-                              direction: isDesktop ? Axis.horizontal : Axis.vertical,
+                              direction: isDesktop
+                                  ? Axis.horizontal
+                                  : Axis.vertical,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Builder(builder: (_) {
-                                  final content = Column(
-                                    children: [
-                                      _sectionCard(
-                                        icon: Icons.badge_outlined,
-                                        title: 'Basic Information',
-                                        subtitle: 'Personal and agency details',
-                                        child: _grid(
-                                          children: [
-                                            _textField('Full Name', _fullNameController, hint: 'Enter your full name'),
-                                            _dropdownField(
-                                              label: 'Gender',
-                                              value: _gender,
-                                              items: _genderOptions,
-                                              hint: 'Select gender',
-                                              onChanged: (v) => setState(() => _gender = v),
-                                            ),
-                                            _textField('Agency Name', _agencyNameController, hint: 'Your registered business name', spanTwoColumns: true),
-                                            _textField('Agency Address', _agencyAddressController, hint: 'Business location details...', maxLines: 2, spanTwoColumns: true),
-                                          ],
+                                Builder(
+                                  builder: (_) {
+                                    final content = Column(
+                                      children: [
+                                        _sectionCard(
+                                          icon: Icons.badge_outlined,
+                                          title: 'Basic Information',
+                                          subtitle:
+                                              'Personal and agency details',
+                                          child: _grid(
+                                            children: [
+                                              _textField(
+                                                'Full Name',
+                                                _fullNameController,
+                                                hint: 'Enter your full name',
+                                              ),
+                                              _dropdownField(
+                                                label: 'Gender',
+                                                value: _gender,
+                                                items: _genderOptions,
+                                                hint: 'Select gender',
+                                                onChanged: (v) =>
+                                                    setState(() => _gender = v),
+                                              ),
+                                              _textField(
+                                                'Agency Name',
+                                                _agencyNameController,
+                                                hint:
+                                                    'Your registered business name',
+                                                spanTwoColumns: true,
+                                              ),
+                                              _textField(
+                                                'Agency Address',
+                                                _agencyAddressController,
+                                                hint:
+                                                    'Business location details...',
+                                                maxLines: 2,
+                                                spanTwoColumns: true,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      _sectionCard(
-                                        icon: Icons.location_on_outlined,
-                                        title: 'Permanent Address',
-                                        subtitle: 'Where you are permanently located',
-                                        child: _grid(children: [
-                                          _districtDropdown(),
-                                          _policeStationDropdown(),
-                                          _textField('Full Address', _addressController, hint: 'Street name, house number, etc.', maxLines: 3, spanTwoColumns: true),
-                                        ]),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      _sectionCard(
-                                        icon: Icons.lock_open_outlined,
-                                        title: 'Login Information',
-                                        subtitle: 'Credentials for your agent portal',
-                                        child: _grid(children: [
-                                          _textField('Email Address', _emailController, hint: 'agent@company.com'),
-                                          _textField('Phone Number', _phoneController, hint: '+880 1XXX XXXXXX'),
-                                          _textField('Password', _passwordController, hint: '••••••••', obscure: true),
-                                          _textField('Confirm Password', _confirmPasswordController, hint: '••••••••', obscure: true),
-                                        ]),
-                                      ),
-                                    ],
-                                  );
-                                  return isDesktop ? Expanded(flex: 8, child: content) : content;
-                                }),
-                                SizedBox(width: isDesktop ? 20 : 0, height: isDesktop ? 0 : 20),
+                                        const SizedBox(height: 20),
+                                        _sectionCard(
+                                          icon: Icons.location_on_outlined,
+                                          title: 'Permanent Address',
+                                          subtitle:
+                                              'Where you are permanently located',
+                                          child: _grid(
+                                            children: [
+                                              _districtDropdown(),
+                                              _policeStationDropdown(),
+                                              _textField(
+                                                'Full Address',
+                                                _addressController,
+                                                hint:
+                                                    'Street name, house number, etc.',
+                                                maxLines: 3,
+                                                spanTwoColumns: true,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        _sectionCard(
+                                          icon: Icons.lock_open_outlined,
+                                          title: 'Login Information',
+                                          subtitle:
+                                              'Credentials for your agent portal',
+                                          child: _grid(
+                                            children: [
+                                              _textField(
+                                                'Email Address',
+                                                _emailController,
+                                                hint: 'agent@company.com',
+                                              ),
+                                              _textField(
+                                                'Phone Number',
+                                                _phoneController,
+                                                hint: '+880 1XXX XXXXXX',
+                                              ),
+                                              _textField(
+                                                'Password',
+                                                _passwordController,
+                                                hint: '••••••••',
+                                                obscure: true,
+                                              ),
+                                              _textField(
+                                                'Confirm Password',
+                                                _confirmPasswordController,
+                                                hint: '••••••••',
+                                                obscure: true,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                    return isDesktop
+                                        ? Expanded(flex: 8, child: content)
+                                        : content;
+                                  },
+                                ),
+                                SizedBox(
+                                  width: isDesktop ? 20 : 0,
+                                  height: isDesktop ? 0 : 20,
+                                ),
                                 SizedBox(
                                   width: isDesktop ? 360 : double.infinity,
                                   child: _documentCard(),
@@ -332,7 +391,12 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
     );
   }
 
-  Widget _sectionCard({required IconData icon, required String title, required String subtitle, required Widget child}) {
+  Widget _sectionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Widget child,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -341,26 +405,54 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
-          BoxShadow(color: Color(0x140F172A), blurRadius: 26, offset: Offset(0, 10)),
+          BoxShadow(
+            color: Color(0x140F172A),
+            blurRadius: 26,
+            offset: Offset(0, 10),
+          ),
         ],
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(color: _brandBlue.withValues(alpha: .1), borderRadius: BorderRadius.circular(12)),
-            child: Icon(icon, color: _brandBlue),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: _brandBlue.withValues(alpha: .1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: _brandBlue),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: _brandNavy,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: _brandNavy)),
-            Text(subtitle, style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-          ]),
-        ]),
-        const SizedBox(height: 20),
-        child,
-      ]),
+          const SizedBox(height: 20),
+          child,
+        ],
+      ),
     );
   }
 
@@ -371,41 +463,80 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: const [BoxShadow(color: Color(0x140F172A), blurRadius: 26, offset: Offset(0, 10))],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('Create Agent Account', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: _brandNavy)),
-        const SizedBox(height: 6),
-        const Text('Upload required documents and submit your registration.', style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
-        const SizedBox(height: 22),
-        _UploadBox(label: 'Profile Photo', fileName: _profileImage?.name, icon: Icons.add_a_photo_outlined, onTap: () => _pickFile((f) => _profileImage = f)),
-        const SizedBox(height: 14),
-        _UploadBox(label: 'NID (Both Sides)', fileName: _nidImage?.name, icon: Icons.badge_outlined, onTap: () => _pickFile((f) => _nidImage = f)),
-        const SizedBox(height: 14),
-        _UploadBox(label: 'Trade License', fileName: _tradeLicenseImage?.name, icon: Icons.verified_user_outlined, onTap: () => _pickFile((f) => _tradeLicenseImage = f)),
-        const SizedBox(height: 10),
-        CheckboxListTile(
-          value: _agreeTerms,
-          onChanged: (v) => setState(() => _agreeTerms = v ?? false),
-          contentPadding: EdgeInsets.zero,
-          controlAffinity: ListTileControlAffinity.leading,
-          title: const Text('By signing up, I agree to the Privacy Policy and Terms & Conditions.', style: TextStyle(fontSize: 13, color: Color(0xFF475569))),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _loading ? null : _submit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _brandBlue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-            child: Text(_loading ? 'Creating...' : 'Create Agent Account'),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x140F172A),
+            blurRadius: 26,
+            offset: Offset(0, 10),
           ),
-        ),
-      ]),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Upload Your Documents',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: _brandNavy,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Upload required documents and submit your registration.',
+            style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+          ),
+          const SizedBox(height: 22),
+          _UploadBox(
+            label: 'Profile Photo',
+            fileName: _profileImage?.name,
+            icon: Icons.add_a_photo_outlined,
+            onTap: () => _pickFile((f) => _profileImage = f),
+          ),
+          const SizedBox(height: 14),
+          _UploadBox(
+            label: 'NID (Both Sides)',
+            fileName: _nidImage?.name,
+            icon: Icons.badge_outlined,
+            onTap: () => _pickFile((f) => _nidImage = f),
+          ),
+          const SizedBox(height: 14),
+          _UploadBox(
+            label: 'Trade License',
+            fileName: _tradeLicenseImage?.name,
+            icon: Icons.verified_user_outlined,
+            onTap: () => _pickFile((f) => _tradeLicenseImage = f),
+          ),
+          const SizedBox(height: 10),
+          CheckboxListTile(
+            value: _agreeTerms,
+            onChanged: (v) => setState(() => _agreeTerms = v ?? false),
+            contentPadding: EdgeInsets.zero,
+            controlAffinity: ListTileControlAffinity.leading,
+            title: const Text(
+              'By signing up, I agree to the Privacy Policy and Terms & Conditions.',
+              style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _loading ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _brandBlue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: Text(_loading ? 'Creating...' : 'Create Agent Account'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -429,89 +560,187 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
     );
   }
 
-  Widget _textField(String label, TextEditingController controller, {String? hint, bool obscure = false, int maxLines = 1, bool spanTwoColumns = false}) {
-    final field = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155))),
-      const SizedBox(height: 6),
-      TextFormField(
-        controller: controller,
-        obscureText: obscure,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          hintText: hint,
-          filled: true,
-          fillColor: const Color(0xFFF8FAFC),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: _brandBlue)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+  Widget _textField(
+    String label,
+    TextEditingController controller, {
+    String? hint,
+    bool obscure = false,
+    int maxLines = 1,
+    bool spanTwoColumns = false,
+  }) {
+    final field = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF334155),
+          ),
         ),
-        validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
-      ),
-    ]);
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          obscureText: obscure,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: const Color(0xFFF8FAFC),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: _brandBlue),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 14,
+            ),
+          ),
+          validator: (value) =>
+              (value == null || value.trim().isEmpty) ? 'Required' : null,
+        ),
+      ],
+    );
     return spanTwoColumns ? _SpanTwoColumn(field) : field;
   }
 
   Widget _districtDropdown() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('District', style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155))),
-      const SizedBox(height: 6),
-      DropdownButtonFormField<DistrictOption>(
-        value: _selectedDistrict,
-        items: _districts.map((d) => DropdownMenuItem<DistrictOption>(value: d, child: Text(d.name))).toList(),
-        onChanged: _locationsLoading ? null : (v) {
-          if (v == null) return;
-          setState(() => _selectedDistrict = v);
-          _loadPoliceStations(v.id);
-        },
-        decoration: _dropdownDecoration('Select district'),
-        validator: (v) => v == null ? 'Required' : null,
-      ),
-    ]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'District',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF334155),
+          ),
+        ),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<DistrictOption>(
+          value: _selectedDistrict,
+          items: _districts
+              .map(
+                (d) => DropdownMenuItem<DistrictOption>(
+                  value: d,
+                  child: Text(d.name),
+                ),
+              )
+              .toList(),
+          onChanged: _locationsLoading
+              ? null
+              : (v) {
+                  if (v == null) return;
+                  setState(() => _selectedDistrict = v);
+                  _loadPoliceStations(v.id);
+                },
+          decoration: _dropdownDecoration('Select district'),
+          validator: (v) => v == null ? 'Required' : null,
+        ),
+      ],
+    );
   }
 
   Widget _policeStationDropdown() {
     final enabled = _policeStations.isNotEmpty && !_locationsLoading;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('Police Station', style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155))),
-      const SizedBox(height: 6),
-      DropdownButtonFormField<PoliceStationOption>(
-        value: _selectedPoliceStation,
-        items: _policeStations.map((ps) => DropdownMenuItem<PoliceStationOption>(value: ps, child: Text(ps.name))).toList(),
-        onChanged: enabled ? (v) => setState(() => _selectedPoliceStation = v) : null,
-        decoration: _dropdownDecoration(enabled ? 'Select police station' : 'Select district first'),
-        validator: (v) => v == null ? 'Required' : null,
-      ),
-    ]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Police Station',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF334155),
+          ),
+        ),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<PoliceStationOption>(
+          value: _selectedPoliceStation,
+          items: _policeStations
+              .map(
+                (ps) => DropdownMenuItem<PoliceStationOption>(
+                  value: ps,
+                  child: Text(ps.name),
+                ),
+              )
+              .toList(),
+          onChanged: enabled
+              ? (v) => setState(() => _selectedPoliceStation = v)
+              : null,
+          decoration: _dropdownDecoration(
+            enabled ? 'Select police station' : 'Select district first',
+          ),
+          validator: (v) => v == null ? 'Required' : null,
+        ),
+      ],
+    );
   }
 
-  Widget _dropdownField({required String label, required String? value, required List<String> items, required ValueChanged<String?> onChanged, String hint = 'Select an option'}) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155))),
-      const SizedBox(height: 6),
-      DropdownButtonFormField<String>(
-        value: value,
-        items: items.map((e) => DropdownMenuItem<String>(value: e, child: Text(e))).toList(),
-        onChanged: onChanged,
-        decoration: _dropdownDecoration(hint),
-        validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
-      ),
-    ]);
+  Widget _dropdownField({
+    required String label,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+    String hint = 'Select an option',
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF334155),
+          ),
+        ),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<String>(
+          value: value,
+          items: items
+              .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+              .toList(),
+          onChanged: onChanged,
+          decoration: _dropdownDecoration(hint),
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+        ),
+      ],
+    );
   }
 
   InputDecoration _dropdownDecoration(String hint) => InputDecoration(
     hintText: hint,
     filled: true,
     fillColor: const Color(0xFFF8FAFC),
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: _brandBlue)),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: _brandBlue),
+    ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
   );
 }
 
 class _UploadBox extends StatelessWidget {
-  const _UploadBox({required this.label, required this.fileName, required this.icon, required this.onTap});
+  const _UploadBox({
+    required this.label,
+    required this.fileName,
+    required this.icon,
+    required this.onTap,
+  });
 
   final String label;
   final String? fileName;
@@ -520,30 +749,54 @@ class _UploadBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155))),
-      const SizedBox(height: 6),
-      InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFCBD5E1), style: BorderStyle.solid, width: 1.4),
-            borderRadius: BorderRadius.circular(14),
-            color: const Color(0xFFF8FAFC),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF334155),
           ),
-          child: Row(children: [
-            Icon(icon, size: 18, color: const Color(0xFF64748B)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(fileName ?? 'Tap to upload', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: fileName == null ? const Color(0xFF64748B) : const Color(0xFF0F172A))),
-            ),
-          ]),
         ),
-      ),
-    ]);
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color(0xFFCBD5E1),
+                style: BorderStyle.solid,
+                width: 1.4,
+              ),
+              borderRadius: BorderRadius.circular(14),
+              color: const Color(0xFFF8FAFC),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: 18, color: const Color(0xFF64748B)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    fileName ?? 'Tap to upload',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: fileName == null
+                          ? const Color(0xFF64748B)
+                          : const Color(0xFF0F172A),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
