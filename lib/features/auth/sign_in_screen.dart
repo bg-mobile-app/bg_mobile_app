@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../routes/app_routes.dart';
 import '../../common/services/api_client.dart';
+import '../../common/services/api_exception.dart';
 import 'package:dio/dio.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -43,7 +44,10 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _login() async {
-    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
       _showWarningDialog(
         'Validation Error',
         'Please enter username and password',
@@ -56,12 +60,12 @@ class _SignInScreenState extends State<SignInScreen> {
     });
 
     try {
-      final response = await ApiClient().post(
+      final apiClient = ApiClient();
+      await apiClient.tokenStorage.clearCookies();
+
+      final response = await apiClient.post(
         '/auth/login/',
-        data: {
-          'username': _usernameController.text,
-          'password': _passwordController.text,
-        },
+        data: {'username': username, 'password': password},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -69,8 +73,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
         final role = data?['role'] ?? data?['user']?['role'];
         if (role != 'AGENT') {
-          await ApiClient().tokenStorage
-              .clearCookies(); // Clear any saved cookies just in case
+          await apiClient.tokenStorage.clearCookies();
           if (mounted) {
             setState(() => _isLoading = false);
             _showWarningDialog(
@@ -81,7 +84,7 @@ class _SignInScreenState extends State<SignInScreen> {
           return;
         }
 
-        await ApiClient().saveCookiesFromResponse(response);
+        await apiClient.saveCookiesFromResponse(response);
         if (mounted) {
           Navigator.pop(context, true);
         }
@@ -110,6 +113,10 @@ class _SignInScreenState extends State<SignInScreen> {
         }
         _showWarningDialog('Login Failed', errMsg);
       }
+    } on ApiException catch (e) {
+      if (mounted) {
+        _showWarningDialog('Login Failed', _loginErrorMessage(e));
+      }
     } catch (e) {
       if (mounted) {
         _showWarningDialog(
@@ -124,6 +131,28 @@ class _SignInScreenState extends State<SignInScreen> {
         });
       }
     }
+  }
+
+  String _loginErrorMessage(ApiException exception) {
+    final data = exception.data;
+    if (exception.statusCode == 401) {
+      return 'No active account found with the given credentials.';
+    }
+    if (data is Map) {
+      final detail = data['detail'] ?? data['message'];
+      if (detail != null) return detail.toString();
+
+      final errors = data['errors'];
+      if (errors is Map) {
+        final errorDetail = errors['detail'];
+        if (errorDetail is List) return errorDetail.join(', ');
+        if (errorDetail != null) return errorDetail.toString();
+      }
+      if (errors != null) return errors.toString();
+    }
+    return exception.message.isNotEmpty
+        ? exception.message
+        : 'Invalid username or password.';
   }
 
   static const Color _brandBlue = Color(0xFF2563EB);

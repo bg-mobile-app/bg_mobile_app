@@ -50,9 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<CountryItem> _countries = [];
   List<WorkTypeItem> _workTypes = [];
-  List<String> _banners = [
-    'assets/img/ads/1.png',
-  ];
+  List<String> _banners = ['assets/img/ads/1.png'];
   List<WorkPermitItem> _workPermits = [];
   List<WorkPermitItem> _filteredWorkPermits = [];
 
@@ -135,8 +133,12 @@ class _HomeScreenState extends State<HomeScreen> {
       } catch (_) {}
     }
 
-    final fromDateStr = _fromDate != null ? '${_fromDate!.year}-${_fromDate!.month.toString().padLeft(2, '0')}-${_fromDate!.day.toString().padLeft(2, '0')}' : null;
-    final toDateStr = _toDate != null ? '${_toDate!.year}-${_toDate!.month.toString().padLeft(2, '0')}-${_toDate!.day.toString().padLeft(2, '0')}' : null;
+    final fromDateStr = _fromDate != null
+        ? '${_fromDate!.year}-${_fromDate!.month.toString().padLeft(2, '0')}-${_fromDate!.day.toString().padLeft(2, '0')}'
+        : null;
+    final toDateStr = _toDate != null
+        ? '${_toDate!.year}-${_toDate!.month.toString().padLeft(2, '0')}-${_toDate!.day.toString().padLeft(2, '0')}'
+        : null;
 
     final filtered = await _homeService.filterWorkPermits(
       countryCode: countryCode,
@@ -149,7 +151,9 @@ class _HomeScreenState extends State<HomeScreen> {
       toDate: toDateStr,
     );
 
-    debugPrint("HOME SCREEN: Received ${filtered.length} filtered items from API.");
+    debugPrint(
+      "HOME SCREEN: Received ${filtered.length} filtered items from API.",
+    );
 
     if (mounted) {
       setState(() {
@@ -206,14 +210,19 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.only(
             left: responsive.size(AppSpacing.md, min: 12, max: AppSpacing.md),
             right: responsive.size(AppSpacing.md, min: 12, max: AppSpacing.md),
-            bottom: MediaQuery.of(context).viewInsets.bottom +
+            bottom:
+                MediaQuery.of(context).viewInsets.bottom +
                 responsive.size(AppSpacing.md, min: 12, max: AppSpacing.md),
           ),
           child: Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(
               horizontal: responsive.size(AppSpacing.sm + 2, min: 10, max: 14),
-              vertical: responsive.size(AppSpacing.md, min: 12, max: AppSpacing.md),
+              vertical: responsive.size(
+                AppSpacing.md,
+                min: 12,
+                max: AppSpacing.md,
+              ),
             ),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -239,7 +248,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: responsive.size(56, min: 48, max: 56),
                     horizontalPadding: responsive.size(10, min: 8, max: 10),
                     fontSize: responsive.font(11, min: 10, max: 11),
-                    onChanged: (v) => setState(() => _serviceType = v ?? 'WORK_PERMIT'),
+                    onChanged: (v) =>
+                        setState(() => _serviceType = v ?? 'WORK_PERMIT'),
                   ),
                   SizedBox(height: sheetGap),
                   Row(
@@ -341,12 +351,11 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(
                 child: AnimatedCrossFade(
                   duration: const Duration(milliseconds: 300),
-                  crossFadeState: _hasActiveFilters ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                  crossFadeState: _hasActiveFilters
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
                   firstChild: Column(
-                    children: [
-                      _buildOfferBanner(),
-                      _buildServices(),
-                    ],
+                    children: [_buildOfferBanner(), _buildServices()],
                   ),
                   secondChild: const SizedBox.shrink(),
                 ),
@@ -644,12 +653,13 @@ class _HomeScreenState extends State<HomeScreen> {
             duration: const Duration(milliseconds: 350),
             transitionBuilder: (child, animation) {
               return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 0.08),
-                  end: Offset.zero,
-                ).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeOut),
-                ),
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(0, 0.08),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                    ),
                 child: FadeTransition(opacity: animation, child: child),
               );
             },
@@ -661,14 +671,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: _hasActiveFilters
                     ? const NeverScrollableScrollPhysics()
                     : const AlwaysScrollableScrollPhysics(),
-                scrollDirection:
-                    _hasActiveFilters ? Axis.vertical : Axis.horizontal,
+                scrollDirection: _hasActiveFilters
+                    ? Axis.vertical
+                    : Axis.horizontal,
                 itemCount: displayItems.length,
                 itemBuilder: (context, index) {
                   final screenWidth = MediaQuery.of(context).size.width;
                   final availableWidth = screenWidth - (horizontalPadding * 2);
-                  final cardWidth =
-                      (availableWidth * .94).clamp(220.0, 340.0).toDouble();
+                  final cardWidth = (availableWidth * .94)
+                      .clamp(220.0, 340.0)
+                      .toDouble();
                   return SizedBox(
                     width: _hasActiveFilters ? double.infinity : cardWidth,
                     child: Align(
@@ -676,16 +688,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: WorkPermitCard(
                         item: displayItems[index],
                         brandBlue: _brandBlue,
-                        onViewDetails: () => _openWorkPermitDetails(
-                          displayItems[index],
-                        ),
+                        onViewDetails: () =>
+                            _openWorkPermitDetails(displayItems[index]),
                         formatBdt: _formatBdt,
                         timeAgo: _timeAgo,
                       ),
                     ),
                   );
                 },
-                separatorBuilder: (_, __) => SizedBox(
+                separatorBuilder: (context, index) => SizedBox(
                   height: _hasActiveFilters ? separator : 0,
                   width: _hasActiveFilters ? 0 : separator,
                 ),
@@ -749,12 +760,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   void _openWorkPermitDetails(WorkPermitItem item) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => WorkPermitDetailsScreen(item: item),
-      ),
+      MaterialPageRoute(builder: (_) => WorkPermitDetailsScreen(item: item)),
     );
   }
 
@@ -854,9 +862,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     final radius = (height * 0.32).clamp(14.0, 18.0).toDouble();
     final hasValue = value != null && value.isNotEmpty;
-    final displayText = hasValue ? value! : hint;
-    final leading =
-        hasValue ? leadingBuilder?.call(value!, fontSize + 12) : null;
+    final selectedValue = value ?? '';
+    final displayText = hasValue ? selectedValue : hint;
+    final leading = hasValue
+        ? leadingBuilder?.call(selectedValue, fontSize + 12)
+        : null;
 
     return Material(
       color: Colors.transparent,
@@ -911,6 +921,20 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 width: (horizontalPadding * 0.6).clamp(4.0, 8.0).toDouble(),
               ),
+              if (hasValue) ...[
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onChanged(null),
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: const Color(0xFF64748B),
+                    size: (fontSize + 6).clamp(16.0, 19.0).toDouble(),
+                  ),
+                ),
+                SizedBox(
+                  width: (horizontalPadding * 0.45).clamp(3.0, 6.0).toDouble(),
+                ),
+              ],
               Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: Colors.black87,
@@ -937,145 +961,217 @@ class _HomeScreenState extends State<HomeScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return SafeArea(
-          child: Container(
-            width: double.infinity,
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.72,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(radius)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: responsive.size(10, min: 8, max: 10)),
-                Container(
-                  width: responsive.size(42, min: 34, max: 42),
-                  height: responsive.size(4, min: 3, max: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFCBD5E1),
-                    borderRadius: BorderRadius.circular(999),
+        var query = '';
+
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final filteredItems = query.trim().isEmpty
+                ? items
+                : items
+                      .where(
+                        (item) => item.toLowerCase().contains(
+                          query.trim().toLowerCase(),
+                        ),
+                      )
+                      .toList();
+
+            return SafeArea(
+              child: Container(
+                width: double.infinity,
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.72,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(radius),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    responsive.size(18, min: 14, max: 18),
-                    responsive.size(16, min: 12, max: 16),
-                    responsive.size(8, min: 6, max: 8),
-                    responsive.size(8, min: 6, max: 8),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: responsive.font(18, min: 15, max: 18),
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF0F172A),
-                          ),
-                        ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: responsive.size(10, min: 8, max: 10)),
+                    Container(
+                      width: responsive.size(42, min: 34, max: 42),
+                      height: responsive.size(4, min: 3, max: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFCBD5E1),
+                        borderRadius: BorderRadius.circular(999),
                       ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(
-                          Icons.close_rounded,
-                          size: responsive.size(22, min: 18, max: 22),
-                        ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        responsive.size(18, min: 14, max: 18),
+                        responsive.size(16, min: 12, max: 16),
+                        responsive.size(8, min: 6, max: 8),
+                        responsive.size(8, min: 6, max: 8),
                       ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1, color: Color(0xFFE2E8F0)),
-                Flexible(
-                  child: items.isEmpty
-                      ? Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(
-                              responsive.size(24, min: 18, max: 24),
-                            ),
+                      child: Row(
+                        children: [
+                          Expanded(
                             child: Text(
-                              'No options available',
-                              textAlign: TextAlign.center,
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: responsive.font(14, min: 12, max: 14),
-                                color: const Color(0xFF64748B),
-                                fontWeight: FontWeight.w600,
+                                fontSize: responsive.font(18, min: 15, max: 18),
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF0F172A),
                               ),
                             ),
                           ),
-                        )
-                      : ListView.separated(
-                          shrinkWrap: true,
-                          padding: EdgeInsets.symmetric(
-                            vertical: responsive.size(8, min: 6, max: 8),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: Icon(
+                              Icons.close_rounded,
+                              size: responsive.size(22, min: 18, max: 22),
+                            ),
                           ),
-                          itemCount: items.length,
-                          separatorBuilder: (_, __) => const Divider(
-                            height: 1,
-                            indent: 18,
-                            endIndent: 18,
-                            color: Color(0xFFF1F5F9),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        responsive.size(18, min: 14, max: 18),
+                        0,
+                        responsive.size(18, min: 14, max: 18),
+                        responsive.size(10, min: 8, max: 10),
+                      ),
+                      child: TextField(
+                        autofocus: true,
+                        onChanged: (value) {
+                          setSheetState(() => query = value);
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Search $title',
+                          prefixIcon: const Icon(
+                            Icons.search_rounded,
+                            color: _brandBlue,
                           ),
-                          itemBuilder: (context, index) {
-                            final item = items[index];
-                            final isSelected = item == selectedValue;
-
-                            final leading = leadingBuilder?.call(
-                              item,
-                              responsive.size(24, min: 20, max: 24),
-                            );
-
-                            return ListTile(
-                              dense: responsive.isTightPhone,
-                              leading: leading,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal:
-                                    responsive.size(18, min: 14, max: 18),
-                                vertical: responsive.size(4, min: 2, max: 4),
-                              ),
-                              title: Text(
-                                item,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: false,
-                                style: TextStyle(
-                                  fontSize:
-                                      responsive.font(15, min: 12, max: 15),
-                                  fontWeight: isSelected
-                                      ? FontWeight.w800
-                                      : FontWeight.w600,
-                                  color: const Color(0xFF0F172A),
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: responsive.size(12, min: 10, max: 12),
+                            vertical: responsive.size(12, min: 10, max: 12),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDBEAFE),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: _brandBlue,
+                              width: 1.4,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                    Flexible(
+                      child: filteredItems.isEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(
+                                  responsive.size(24, min: 18, max: 24),
+                                ),
+                                child: Text(
+                                  'No options available',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: responsive.font(
+                                      14,
+                                      min: 12,
+                                      max: 14,
+                                    ),
+                                    color: const Color(0xFF64748B),
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                              trailing: isSelected
-                                  ? Icon(
-                                      Icons.check_circle_rounded,
-                                      color: _brandBlue,
-                                      size: responsive.size(
-                                        22,
-                                        min: 18,
-                                        max: 22,
+                            )
+                          : ListView.separated(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.symmetric(
+                                vertical: responsive.size(8, min: 6, max: 8),
+                              ),
+                              itemCount: filteredItems.length,
+                              separatorBuilder: (context, index) =>
+                                  const Divider(
+                                    height: 1,
+                                    indent: 18,
+                                    endIndent: 18,
+                                    color: Color(0xFFF1F5F9),
+                                  ),
+                              itemBuilder: (context, index) {
+                                final item = filteredItems[index];
+                                final isSelected = item == selectedValue;
+
+                                final leading = leadingBuilder?.call(
+                                  item,
+                                  responsive.size(24, min: 20, max: 24),
+                                );
+
+                                return ListTile(
+                                  dense: responsive.isTightPhone,
+                                  leading: leading,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: responsive.size(
+                                      18,
+                                      min: 14,
+                                      max: 18,
+                                    ),
+                                    vertical: responsive.size(
+                                      4,
+                                      min: 2,
+                                      max: 4,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    item,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    style: TextStyle(
+                                      fontSize: responsive.font(
+                                        15,
+                                        min: 12,
+                                        max: 15,
                                       ),
-                                    )
-                                  : null,
-                              onTap: () => Navigator.pop(context, item),
-                            );
-                          },
-                        ),
+                                      fontWeight: isSelected
+                                          ? FontWeight.w800
+                                          : FontWeight.w600,
+                                      color: const Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                  trailing: isSelected
+                                      ? Icon(
+                                          Icons.check_circle_rounded,
+                                          color: _brandBlue,
+                                          size: responsive.size(
+                                            22,
+                                            min: 18,
+                                            max: 22,
+                                          ),
+                                        )
+                                      : null,
+                                  onTap: () => Navigator.pop(context, item),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
-
 
   Widget _textField(TextEditingController controller, String hint) {
     final responsive = HomeResponsive.of(context);
@@ -1113,7 +1209,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _dateButton({required String label, required VoidCallback onTap}) {
     final responsive = HomeResponsive.of(context);
 
@@ -1126,19 +1221,16 @@ class _HomeScreenState extends State<HomeScreen> {
           vertical: responsive.size(12, min: 9, max: 12),
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(responsive.size(8, min: 7, max: 8)),
+          borderRadius: BorderRadius.circular(
+            responsive.size(8, min: 7, max: 8),
+          ),
         ),
         textStyle: TextStyle(
           fontSize: responsive.font(14, min: 11, max: 14),
           fontWeight: FontWeight.w600,
         ),
       ),
-      child: Text(
-        label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
     );
   }
-
 }

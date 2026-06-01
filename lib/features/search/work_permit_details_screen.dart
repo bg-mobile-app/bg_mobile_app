@@ -28,12 +28,14 @@ class WorkPermitDetailsScreen extends StatefulWidget {
   final WorkPermitItem item;
 
   @override
-  State<WorkPermitDetailsScreen> createState() => _WorkPermitDetailsScreenState();
+  State<WorkPermitDetailsScreen> createState() =>
+      _WorkPermitDetailsScreenState();
 }
 
 class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
   bool _isLoading = true;
   bool _isLoggedIn = false;
+  bool _isBangla = false;
   WorkPermitDetails? _details;
   List<WorkPermitItem> _similarPermits = [];
   final WorkPermitService _service = WorkPermitService();
@@ -65,7 +67,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
   }
 
   WorkPermitDetails get displayDetails => _details ?? _getDummyDetails();
-  List<WorkPermitItem> get displaySimilar => _isLoading ? [widget.item, widget.item] : _similarPermits;
+  List<WorkPermitItem> get displaySimilar =>
+      _isLoading ? [widget.item, widget.item] : _similarPermits;
+  String _tr(String english, String bangla) => _isBangla ? bangla : english;
 
   WorkPermitDetails _getDummyDetails() {
     return WorkPermitDetails(
@@ -78,7 +82,12 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
       countryName: widget.item.countryName,
       countryFlag: '',
       image: widget.item.image,
-      agency: AgencyProps(id: 1, name: 'Dummy Agency Name', rlNumber: '1234', logo: ''),
+      agency: AgencyProps(
+        id: 1,
+        name: 'Dummy Agency Name',
+        rlNumber: '1234',
+        logo: '',
+      ),
       workType: WorkTypeProps(id: 1, name: 'Cleaner Worker'),
       favoriteCount: 0,
       bookedQuota: 0,
@@ -107,8 +116,16 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
       applicationDeadline: DateTime.now(),
       description: 'Dummy description...',
       paymentSteps: [
-        PaymentStepProps(name: 'Step 1: Initial Booking', amount: 50000, percentage: '30%'),
-        PaymentStepProps(name: 'Step 2: After Visa', amount: 50000, percentage: '30%'),
+        PaymentStepProps(
+          name: 'Step 1: Initial Booking',
+          amount: 50000,
+          percentage: '30%',
+        ),
+        PaymentStepProps(
+          name: 'Step 2: After Visa',
+          amount: 50000,
+          percentage: '30%',
+        ),
       ],
       advancePrice: 50000,
       afterVisa: 50000,
@@ -146,8 +163,55 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           ),
         ),
         actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: SegmentedButton<bool>(
+              segments: const [
+                ButtonSegment(
+                  value: false,
+                  icon: Icon(Icons.language, size: 15),
+                  label: Text('EN'),
+                ),
+                ButtonSegment(
+                  value: true,
+                  icon: Icon(Icons.translate, size: 15),
+                  label: Text('BN'),
+                ),
+              ],
+              selected: {_isBangla},
+              showSelectedIcon: false,
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.selected)
+                      ? Colors.white
+                      : _brandBlue,
+                ),
+                backgroundColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.selected)
+                      ? _brandBlue
+                      : _surface,
+                ),
+                side: WidgetStateProperty.all(
+                  const BorderSide(color: _brandBlue),
+                ),
+                textStyle: WidgetStateProperty.all(
+                  const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+                ),
+                padding: WidgetStateProperty.all(
+                  const EdgeInsets.symmetric(horizontal: 8),
+                ),
+              ),
+              onSelectionChanged: (selection) {
+                setState(() => _isBangla = selection.first);
+              },
+            ),
+          ),
           IconButton(
-            onPressed: () => _showMessage(context, 'Share option coming soon'),
+            onPressed: () => _showMessage(
+              context,
+              _tr('Share option coming soon', 'শেয়ার অপশন শীঘ্রই আসছে'),
+            ),
             icon: const FaIcon(
               FontAwesomeIcons.shareNodes,
               color: _mutedText,
@@ -157,7 +221,11 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
         ],
       ),
       body: _details == null && !_isLoading
-          ? const Center(child: Text('Failed to load details.'))
+          ? Center(
+              child: Text(
+                _tr('Failed to load details.', 'বিস্তারিত লোড করা যায়নি।'),
+              ),
+            )
           : Skeletonizer(
               enabled: _isLoading,
               child: SafeArea(
@@ -268,16 +336,12 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             imagePath,
             width: double.infinity,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => const SizedBox(
+            errorBuilder: (context, error, stackTrace) => const SizedBox(
               height: 220,
               child: Center(child: Icon(Icons.image_not_supported)),
             ),
           )
-        : Image.asset(
-            imagePath,
-            width: double.infinity,
-            fit: BoxFit.contain,
-          );
+        : Image.asset(imagePath, width: double.infinity, fit: BoxFit.contain);
 
     return ColoredBox(
       color: _surface,
@@ -294,23 +358,23 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     final titleFontSize = isSmallPhone
         ? 21.0
         : isMediumPhone
-            ? 24.0
-            : 30.0;
+        ? 24.0
+        : 30.0;
     final badgeFontSize = isSmallPhone
         ? 10.0
         : isMediumPhone
-            ? 11.0
-            : 12.0;
+        ? 11.0
+        : 12.0;
     final metaFontSize = isSmallPhone
         ? 11.0
         : isMediumPhone
-            ? 12.0
-            : 13.0;
+        ? 12.0
+        : 13.0;
     final iconSize = isSmallPhone
         ? 11.0
         : isMediumPhone
-            ? 13.0
-            : 14.0;
+        ? 13.0
+        : 14.0;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -320,30 +384,32 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
         0,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Wrap(
-            spacing: isSmallPhone ? 6 : 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _Pill(label: 'Recruitment Open', fontSize: badgeFontSize),
+              _Pill(
+                label: _tr('Recruitment Open', 'নিয়োগ চলছে'),
+                fontSize: badgeFontSize,
+              ),
               _IconText(
                 icon: FaIcon(
                   FontAwesomeIcons.circleCheck,
                   color: _brandBlue,
                   size: iconSize,
                 ),
-                label: 'Agency Verified',
+                label: _tr('Agency Verified', 'এজেন্সি যাচাইকৃত'),
                 color: _brandBlue,
                 bold: true,
                 fontSize: metaFontSize,
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 18),
           Text(
             displayDetails.title,
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: _text,
               fontSize: titleFontSize,
@@ -353,17 +419,24 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           ),
           const SizedBox(height: 10),
           Wrap(
+            alignment: WrapAlignment.center,
             spacing: isSmallPhone ? 12 : 18,
             runSpacing: 8,
             children: [
               _IconText(
                 icon: FaIcon(FontAwesomeIcons.calendarDays, size: iconSize),
-                label: 'Posted: ${displayDetails.createdAt.toString().split(' ')[0]}',
+                label: _tr(
+                  'Posted: ${displayDetails.createdAt.toString().split(' ')[0]}',
+                  'প্রকাশিত: ${displayDetails.createdAt.toString().split(' ')[0]}',
+                ),
                 fontSize: metaFontSize,
               ),
               _IconText(
                 icon: FaIcon(FontAwesomeIcons.fingerprint, size: iconSize),
-                label: 'Post ID: ${displayDetails.id}',
+                label: _tr(
+                  'Post ID: ${displayDetails.id}',
+                  'পোস্ট আইডি: ${displayDetails.id}',
+                ),
                 fontSize: metaFontSize,
               ),
             ],
@@ -394,8 +467,15 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                     color: _brandBlue,
                     size: 20,
                   ),
-                  label: 'Quota',
-                  value: '${displayDetails.quota}\nPositions',
+                  label: _tr('Quota', 'কোটা'),
+                  value: _tr(
+                    '${displayDetails.quota}\nPositions',
+                    '${displayDetails.quota}\nপদ',
+                  ),
+                  detail: _tr(
+                    '${displayDetails.bookedQuota} applied • ${displayDetails.availableQuota} available',
+                    '${displayDetails.bookedQuota} আবেদন • ${displayDetails.availableQuota} খালি',
+                  ),
                 ),
                 _StatCard(
                   icon: const FaIcon(
@@ -403,8 +483,11 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                     color: _brandBlue,
                     size: 20,
                   ),
-                  label: 'Work Hours',
-                  value: '${displayDetails.workingHours}h / Day',
+                  label: _tr('Work Hours', 'কর্মঘণ্টা'),
+                  value: _tr(
+                    '${displayDetails.workingHours}h / Day',
+                    'দিনে ${displayDetails.workingHours} ঘণ্টা',
+                  ),
                 ),
                 _StatCard(
                   icon: const FaIcon(
@@ -412,7 +495,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                     color: _brandBlue,
                     size: 20,
                   ),
-                  label: 'Experience',
+                  label: _tr('Experience', 'অভিজ্ঞতা'),
                   value: displayDetails.experienceRequired,
                 ),
                 _StatCard(
@@ -421,8 +504,11 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                     color: _brandBlue,
                     size: 20,
                   ),
-                  label: 'Age Range',
-                  value: '${displayDetails.minAge}-${displayDetails.maxAge} Years',
+                  label: _tr('Age Range', 'বয়সসীমা'),
+                  value: _tr(
+                    '${displayDetails.minAge}-${displayDetails.maxAge} Years',
+                    '${displayDetails.minAge}-${displayDetails.maxAge} বছর',
+                  ),
                 ),
               ],
             );
@@ -441,7 +527,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                   size: 15,
                   color: _primary,
                 ),
-                label: 'Processing Time',
+                label: _tr('Processing Time', 'প্রসেসিং সময়'),
                 value: displayDetails.processingTime,
                 color: _primary,
               ),
@@ -451,8 +537,12 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                   size: 15,
                   color: _error,
                 ),
-                label: 'Deadline',
-                value: displayDetails.applicationDeadline != null ? displayDetails.applicationDeadline.toString().split(' ')[0] : 'N/A',
+                label: _tr('Deadline', 'শেষ তারিখ'),
+                value: displayDetails.applicationDeadline != null
+                    ? displayDetails.applicationDeadline.toString().split(
+                        ' ',
+                      )[0]
+                    : _tr('N/A', 'প্রযোজ্য নয়'),
                 color: _error,
               ),
               _InfoCard(
@@ -461,7 +551,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                   size: 15,
                   color: _mutedText,
                 ),
-                label: 'Selection',
+                label: _tr('Selection', 'নির্বাচন'),
                 value: displayDetails.selectionType,
                 color: _mutedText,
               ),
@@ -514,12 +604,25 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
 
   Widget _specificationsCard() {
     final rows = [
-      _SpecItem('Country', displayDetails.countryName, FontAwesomeIcons.flag),
-      _SpecItem('Work Type', displayDetails.workType?.name ?? 'General'),
-      _SpecItem('Company Name', displayDetails.companyName),
-      _SpecItem('Accommodation', displayDetails.accommodation),
-      _SpecItem('Food Allowance', displayDetails.food),
-      _SpecItem('Contract Period', '${displayDetails.contractDuration} (${displayDetails.isRenewable ? "Renewable" : "Non-Renewable"})'),
+      _SpecItem(
+        _tr('Country', 'দেশ'),
+        displayDetails.countryName,
+        FontAwesomeIcons.flag,
+      ),
+      _SpecItem(
+        _tr('Work Type', 'কাজের ধরন'),
+        displayDetails.workType?.name ?? _tr('General', 'সাধারণ'),
+      ),
+      _SpecItem(
+        _tr('Company Name', 'কোম্পানির নাম'),
+        displayDetails.companyName,
+      ),
+      _SpecItem(_tr('Accommodation', 'আবাসন'), displayDetails.accommodation),
+      _SpecItem(_tr('Food Allowance', 'খাবার সুবিধা'), displayDetails.food),
+      _SpecItem(
+        _tr('Contract Period', 'চুক্তির মেয়াদ'),
+        '${displayDetails.contractDuration} (${displayDetails.isRenewable ? _tr("Renewable", "নবায়নযোগ্য") : _tr("Non-Renewable", "নবায়নযোগ্য নয়")})',
+      ),
     ];
 
     return _CardShell(
@@ -533,9 +636,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
               color: _surfaceLow,
               border: Border(bottom: BorderSide(color: _outline)),
             ),
-            child: const Text(
-              'Contract Specifications',
-              style: TextStyle(
+            child: Text(
+              _tr('Contract Specifications', 'চুক্তির বিবরণ'),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: _text,
@@ -570,9 +673,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Included in Package',
-          style: TextStyle(
+        Text(
+          _tr('Included in Package', 'প্যাকেজে অন্তর্ভুক্ত'),
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w800,
             color: _text,
@@ -596,7 +699,11 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const FaIcon(FontAwesomeIcons.circleCheck, size: 14, color: _brandBlue),
+                      const FaIcon(
+                        FontAwesomeIcons.circleCheck,
+                        size: 14,
+                        color: _brandBlue,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         item,
@@ -616,17 +723,47 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
   }
 
   Widget _safetyGuidelines() {
-    const tips = [
-      'ভিসা না হওয়া অব্দি কর্ম/চাকরী ছেড়ে দিবেন না।',
-      'বাংলাদেশ থেকে গেইম দিয়ে এশিয়ার দেশে গিয়ে ইউরোপের জন্য গেইম দিবেন না।',
-      'ভিসা ছাড়া বিদেশ যাওয়ার চেষ্টা করবেন না।',
-      "'১০০% গ্যারান্টি ভিসা' কথায় বিশ্বাস করবেন না।",
-      'না জেনে কোনো কাগজে সাইন করবেন না।',
-      'অতিরিক্ত ঋণ নিয়ে ঝুঁকি নেবেন না।',
-      'ভুয়া তথ্য দিয়ে ফাইল জমা দিবেন না।',
-      'শর্টকাট বা অবৈধ পথে বিদেশ যাওয়ার চেষ্টা করবেন না।',
-      'একাধিক এজেন্সিতে একসাথে ফাইল জমা দিবেন না।',
-      'পরিবারকে না জানিয়ে সিদ্ধান্ত নিবেন না।',
+    final tips = [
+      _tr(
+        'Do not leave your current work/job until your visa is confirmed.',
+        'ভিসা না হওয়া অব্দি কর্ম/চাকরী ছেড়ে দিবেন না।',
+      ),
+      _tr(
+        'Do not travel to Asia from Bangladesh through risky routes to try for Europe.',
+        'বাংলাদেশ থেকে গেইম দিয়ে এশিয়ার দেশে গিয়ে ইউরোপের জন্য গেইম দিবেন না।',
+      ),
+      _tr(
+        'Do not try to go abroad without a visa.',
+        'ভিসা ছাড়া বিদেশ যাওয়ার চেষ্টা করবেন না।',
+      ),
+      _tr(
+        "Do not trust promises of a '100% guaranteed visa'.",
+        "'১০০% গ্যারান্টি ভিসা' কথায় বিশ্বাস করবেন না।",
+      ),
+      _tr(
+        'Do not sign any document without understanding it.',
+        'না জেনে কোনো কাগজে সাইন করবেন না।',
+      ),
+      _tr(
+        'Do not take risky loans beyond your capacity.',
+        'অতিরিক্ত ঋণ নিয়ে ঝুঁকি নেবেন না।',
+      ),
+      _tr(
+        'Do not submit files with false information.',
+        'ভুয়া তথ্য দিয়ে ফাইল জমা দিবেন না।',
+      ),
+      _tr(
+        'Do not try shortcuts or illegal routes to go abroad.',
+        'শর্টকাট বা অবৈধ পথে বিদেশ যাওয়ার চেষ্টা করবেন না।',
+      ),
+      _tr(
+        'Do not submit files to multiple agencies at the same time.',
+        'একাধিক এজেন্সিতে একসাথে ফাইল জমা দিবেন না।',
+      ),
+      _tr(
+        'Do not make decisions without informing your family.',
+        'পরিবারকে না জানিয়ে সিদ্ধান্ত নিবেন না।',
+      ),
     ];
 
     final width = MediaQuery.sizeOf(context).width;
@@ -678,7 +815,10 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             ),
           ),
           title: Text(
-            'সতর্কতামূলক নিদর্শন: বিদেশ যাওয়ার আগে যা কখনো করবেন না।',
+            _tr(
+              'Safety guidelines: Things you should never do before going abroad.',
+              'সতর্কতামূলক নিদর্শন: বিদেশ যাওয়ার আগে যা কখনো করবেন না।',
+            ),
             style: TextStyle(
               color: const Color(0xFF93000A),
               fontSize: titleFontSize,
@@ -686,7 +826,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             ),
           ),
           subtitle: Text(
-            'বিস্তারিত দেখতে ট্যাপ করুন',
+            _tr('Tap to view details', 'বিস্তারিত দেখতে ট্যাপ করুন'),
             style: TextStyle(
               color: const Color(0xCC93000A),
               fontSize: subtitleFontSize,
@@ -763,9 +903,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'TOTAL CUSTOMER COST',
-            style: TextStyle(
+          Text(
+            _tr('TOTAL CUSTOMER COST', 'মোট গ্রাহক খরচ'),
+            style: const TextStyle(
               color: Color(0xCCFFFFFF),
               fontSize: 12,
               letterSpacing: 1.2,
@@ -786,14 +926,49 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           Container(height: 1, color: Colors.white24),
           const SizedBox(height: 18),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Expanded(
-                child: Text(
-                  'Monthly Salary',
-                  style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 14),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white12,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _currencyFlag(displayDetails.currency),
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      displayDetails.currency,
+                      style: const TextStyle(
+                        color: Color(0xCCFFFFFF),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _tr('Monthly Salary', 'মাসিক বেতন'),
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    color: Color(0xCCFFFFFF),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -814,7 +989,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             Container(height: 1, color: Colors.white24),
             const SizedBox(height: 14),
             _privatePriceRow(
-              title: 'Agent Price',
+              title: _tr('Agent Price', 'এজেন্ট মূল্য'),
               value: 'BDT ${_formatMoney(agentPrice)}',
             ),
             const SizedBox(height: 14),
@@ -825,18 +1000,21 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
               color: Colors.white12,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                FaIcon(
+                const FaIcon(
                   FontAwesomeIcons.moneyBillWave,
                   size: 16,
                   color: Colors.white,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Standard Overseas Benefits Apply',
-                    style: TextStyle(
+                    _tr(
+                      'Standard Overseas Benefits Apply',
+                      'স্ট্যান্ডার্ড বিদেশি সুবিধা প্রযোজ্য',
+                    ),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -876,6 +1054,35 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     );
   }
 
+  String _currencyFlag(String currency) {
+    switch (currency.toUpperCase()) {
+      case 'BDT':
+        return '🇧🇩';
+      case 'USD':
+        return '🇺🇸';
+      case 'EUR':
+        return '🇪🇺';
+      case 'GBP':
+        return '🇬🇧';
+      case 'MYR':
+        return '🇲🇾';
+      case 'SAR':
+        return '🇸🇦';
+      case 'AED':
+        return '🇦🇪';
+      case 'QAR':
+        return '🇶🇦';
+      case 'KWD':
+        return '🇰🇼';
+      case 'OMR':
+        return '🇴🇲';
+      case 'SGD':
+        return '🇸🇬';
+      default:
+        return '🏳️';
+    }
+  }
+
   Widget _paymentBreakdown() {
     if (displayDetails.paymentSteps.isEmpty) return const SizedBox.shrink();
 
@@ -883,9 +1090,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Payment Breakdown',
-            style: TextStyle(
+          Text(
+            _tr('Payment Breakdown', 'পেমেন্ট বিবরণ'),
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
               color: _text,
@@ -894,12 +1101,19 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           const SizedBox(height: 22),
           Column(
             children: [
-              for (var index = 0; index < displayDetails.paymentSteps.length; index++)
+              for (
+                var index = 0;
+                index < displayDetails.paymentSteps.length;
+                index++
+              )
                 _TimelineStep(
                   step: _PaymentStep(
                     displayDetails.paymentSteps[index].name,
                     'BDT ${_formatMoney(displayDetails.paymentSteps[index].amount.toInt())}',
-                    '${displayDetails.paymentSteps[index].percentage} of total',
+                    _tr(
+                      '${displayDetails.paymentSteps[index].percentage} of total',
+                      'মোটের ${displayDetails.paymentSteps[index].percentage}',
+                    ),
                     index == 0,
                   ),
                   isLast: index == displayDetails.paymentSteps.length - 1,
@@ -926,20 +1140,29 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: _outline),
             ),
-            child: displayDetails.agency!.logo.isNotEmpty 
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Image.network(displayDetails.agency!.logo, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Center(
-                    child: FaIcon(FontAwesomeIcons.buildingCircleCheck, color: _brandBlue, size: 24),
-                  )),
-                )
-              : const Center(
-                  child: FaIcon(
-                    FontAwesomeIcons.buildingCircleCheck,
-                    color: _brandBlue,
-                    size: 24,
+            child: displayDetails.agency!.logo.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.network(
+                      displayDetails.agency!.logo,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Center(
+                            child: FaIcon(
+                              FontAwesomeIcons.buildingCircleCheck,
+                              color: _brandBlue,
+                              size: 24,
+                            ),
+                          ),
+                    ),
+                  )
+                : const Center(
+                    child: FaIcon(
+                      FontAwesomeIcons.buildingCircleCheck,
+                      color: _brandBlue,
+                      size: 24,
+                    ),
                   ),
-                ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -956,7 +1179,10 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'RL-${displayDetails.agency!.rlNumber} • Licensed Agency',
+                  _tr(
+                    'RL-${displayDetails.agency!.rlNumber} • Licensed Agency',
+                    'আরএল-${displayDetails.agency!.rlNumber} • লাইসেন্সপ্রাপ্ত এজেন্সি',
+                  ),
                   style: const TextStyle(color: _mutedText, fontSize: 13),
                 ),
               ],
@@ -1004,9 +1230,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                       ),
                     ),
                     icon: const FaIcon(FontAwesomeIcons.paperPlane, size: 16),
-                    label: const Text(
-                      'Apply Now',
-                      style: TextStyle(
+                    label: Text(
+                      _tr('Apply Now', 'এখন আবেদন করুন'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                       ),
@@ -1016,15 +1242,20 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 SizedBox(width: compact ? 8 : 12),
                 _ActionIconButton(
                   icon: const FaIcon(FontAwesomeIcons.commentDots, size: 18),
-                  semanticLabel: 'Chat',
-                  onPressed: () =>
-                      _showMessage(context, 'Chat option coming soon'),
+                  semanticLabel: _tr('Chat', 'চ্যাট'),
+                  onPressed: () => _showMessage(
+                    context,
+                    _tr('Chat option coming soon', 'চ্যাট অপশন শীঘ্রই আসছে'),
+                  ),
                 ),
                 SizedBox(width: compact ? 8 : 12),
                 _ActionIconButton(
                   icon: const FaIcon(FontAwesomeIcons.bookmark, size: 18),
-                  semanticLabel: 'Bookmark',
-                  onPressed: () => _showMessage(context, 'Saved to bookmarks'),
+                  semanticLabel: _tr('Bookmark', 'বুকমার্ক'),
+                  onPressed: () => _showMessage(
+                    context,
+                    _tr('Saved to bookmarks', 'বুকমার্কে সংরক্ষণ করা হয়েছে'),
+                  ),
                 ),
               ],
             );
@@ -1054,9 +1285,14 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Need to sign in or sign up'),
-          content: const Text(
-            'Please sign in or sign up to continue with your application.',
+          title: Text(
+            _tr('Need to sign in or sign up', 'সাইন ইন বা সাইন আপ করতে হবে'),
+          ),
+          content: Text(
+            _tr(
+              'Please sign in or sign up to continue with your application.',
+              'আবেদন চালিয়ে যেতে অনুগ্রহ করে সাইন ইন বা সাইন আপ করুন।',
+            ),
           ),
           actions: [
             TextButton(
@@ -1064,14 +1300,14 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 Navigator.of(dialogContext).pop();
                 context.push('/login');
               },
-              child: const Text('Sign In'),
+              child: Text(_tr('Sign In', 'সাইন ইন')),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 context.push('/sign-up/customer');
               },
-              child: const Text('Sign Up'),
+              child: Text(_tr('Sign Up', 'সাইন আপ')),
             ),
           ],
         );
@@ -1089,13 +1325,14 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     }
     return buffer.toString();
   }
+
   Widget _buildSimilarPermitsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Similar Work Permits',
-          style: TextStyle(
+        Text(
+          _tr('Similar Work Permits', 'একই ধরনের ওয়ার্ক পারমিট'),
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w800,
             color: _text,
@@ -1109,14 +1346,17 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             itemCount: displaySimilar.length,
             separatorBuilder: (context, index) => const SizedBox(width: 16),
             itemBuilder: (context, index) => SizedBox(
-              width: MediaQuery.of(context).size.width > 320 ? 300 : MediaQuery.of(context).size.width * 0.85,
+              width: MediaQuery.of(context).size.width > 320
+                  ? 300
+                  : MediaQuery.of(context).size.width * 0.85,
               child: WorkPermitCard(
                 item: displaySimilar[index],
                 brandBlue: _brandBlue,
                 onViewDetails: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (_) => WorkPermitDetailsScreen(item: displaySimilar[index]),
+                      builder: (_) =>
+                          WorkPermitDetailsScreen(item: displaySimilar[index]),
                     ),
                   );
                 },
@@ -1258,11 +1498,13 @@ class _StatCard extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.value,
+    this.detail,
   });
 
   final Widget icon;
   final String label;
   final String value;
+  final String? detail;
 
   @override
   Widget build(BuildContext context) {
@@ -1273,13 +1515,7 @@ class _StatCard extends StatelessWidget {
         children: [
           icon,
           const SizedBox(height: 10),
-          Text(
-            label,
-            style: const TextStyle(
-              color: _mutedText,
-              fontSize: 12,
-            ),
-          ),
+          Text(label, style: const TextStyle(color: _mutedText, fontSize: 12)),
           const SizedBox(height: 5),
           Text(
             value,
@@ -1291,6 +1527,19 @@ class _StatCard extends StatelessWidget {
               height: 1.2,
             ),
           ),
+          if (detail != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              detail!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: _mutedText,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -1371,19 +1620,14 @@ class _SpecRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: _outline),
-        ),
+        border: Border(bottom: BorderSide(color: _outline)),
       ),
       child: Row(
         children: [
           Expanded(
             child: Text(
               item.label,
-              style: const TextStyle(
-                color: _mutedText,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: _mutedText, fontSize: 14),
             ),
           ),
           const SizedBox(width: 12),
@@ -1392,11 +1636,7 @@ class _SpecRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (item.icon != null) ...[
-                  FaIcon(
-                    item.icon,
-                    size: 14,
-                    color: _mutedText,
-                  ),
+                  FaIcon(item.icon, size: 14, color: _mutedText),
                   const SizedBox(width: 8),
                 ],
                 Flexible(
@@ -1436,9 +1676,7 @@ class _TimelineStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dotColor = step.active
-        ? _brandBlue
-        : const Color(0xFFDBE1FF);
+    final dotColor = step.active ? _brandBlue : const Color(0xFFDBE1FF);
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1455,12 +1693,7 @@ class _TimelineStep extends StatelessWidget {
                 ),
               ),
               if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    color: _outline,
-                  ),
-                ),
+                Expanded(child: Container(width: 2, color: _outline)),
             ],
           ),
           const SizedBox(width: 14),
@@ -1473,9 +1706,7 @@ class _TimelineStep extends StatelessWidget {
                   Text(
                     step.title.toUpperCase(),
                     style: TextStyle(
-                      color: step.active
-                          ? _brandBlue
-                          : _mutedText,
+                      color: step.active ? _brandBlue : _mutedText,
                       fontSize: 11,
                       letterSpacing: 0.6,
                       fontWeight: FontWeight.w900,
