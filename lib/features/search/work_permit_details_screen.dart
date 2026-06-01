@@ -745,8 +745,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
   }
 
   Widget _priceCard() {
-    final agentPrice = displayDetails.agentPrice;
-    final packagePrice = displayDetails.packagePrice;
+    final agentPrice = _isLoggedIn ? displayDetails.agentPrice : null;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -811,20 +810,13 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          if (agentPrice != null || packagePrice != null) ...[
+          if (agentPrice != null) ...[
             Container(height: 1, color: Colors.white24),
             const SizedBox(height: 14),
-            if (agentPrice != null)
-              _privatePriceRow(
-                title: 'Agent Price',
-                value: 'BDT ${_formatMoney(agentPrice)}',
-              ),
-            if (agentPrice != null && packagePrice != null) const SizedBox(height: 8),
-            if (packagePrice != null)
-              _privatePriceRow(
-                title: 'Package Price',
-                value: 'BDT ${_formatMoney(packagePrice)}',
-              ),
+            _privatePriceRow(
+              title: 'Agent Price',
+              value: 'BDT ${_formatMoney(agentPrice)}',
+            ),
             const SizedBox(height: 14),
           ],
           Container(
