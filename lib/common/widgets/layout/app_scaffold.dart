@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../common/services/auth_service.dart';
 import '../../../features/booking/appointment_booking_screen.dart';
+import '../../../features/booking/received_all_booking_screen.dart';
 import '../../../features/booking/my_booking_screen.dart';
 import '../../../features/booking/return_passport_screen.dart';
 import '../../../features/booking/success_flight_screen.dart';
@@ -150,6 +151,86 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
         return const ReturnPassportScreen();
       case '/dashboard/booking/appointment':
         return const AppointmentBookingScreen();
+      case '/dashboard/receive-booking/all-booking':
+        return const ReceivedAllBookingScreen();
+      case '/dashboard/receive-booking/applied-booking':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'APPLIED_FILE',
+          pageTitle: 'Applied Booking',
+          currentHref: '/dashboard/receive-booking/applied-booking',
+        );
+      case '/dashboard/receive-booking/bg-collect-passport':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'BG_COLLECT_PP',
+          pageTitle: 'BG Collect Passport',
+          currentHref: '/dashboard/receive-booking/bg-collect-passport',
+        );
+      case '/dashboard/receive-booking/bg-sent-passport':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'BG_SENT_PP',
+          pageTitle: 'BG Sent Passport',
+          currentHref: '/dashboard/receive-booking/bg-sent-passport',
+        );
+      case '/dashboard/receive-booking/receive-passport':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'A_RECEIVE_PP',
+          pageTitle: 'Receive Passport',
+          currentHref: '/dashboard/receive-booking/receive-passport',
+        );
+      case '/dashboard/receive-booking/under-processing':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'UNDER_PROCESSING',
+          pageTitle: 'Under Processing',
+          currentHref: '/dashboard/receive-booking/under-processing',
+        );
+      case '/dashboard/receive-booking/visa-approved':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'VISA_APPROVED',
+          pageTitle: 'Visa Approved',
+          currentHref: '/dashboard/receive-booking/visa-approved',
+        );
+      case '/dashboard/receive-booking/bmet-done':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'BMET_DONE',
+          pageTitle: 'BMET Done',
+          currentHref: '/dashboard/receive-booking/bmet-done',
+        );
+      case '/dashboard/receive-booking/ticket-done':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'TICKET_DONE',
+          pageTitle: 'Ticket Done',
+          currentHref: '/dashboard/receive-booking/ticket-done',
+        );
+      case '/dashboard/receive-booking/pp-sent-to-bg':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'PP_SENT_TO_BG',
+          pageTitle: 'PP Sent to BG',
+          currentHref: '/dashboard/receive-booking/pp-sent-to-bg',
+        );
+      case '/dashboard/receive-booking/bg-receive-passport':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'BG_RECEIVED_PP',
+          pageTitle: 'BG Receive Passport',
+          currentHref: '/dashboard/receive-booking/bg-receive-passport',
+        );
+      case '/dashboard/receive-booking/ready-for-flight':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'READY_FOR_FLIGHT',
+          pageTitle: 'Ready For Flight',
+          currentHref: '/dashboard/receive-booking/ready-for-flight',
+        );
+      case '/dashboard/receive-booking/success-flight':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'SUCCESS_FLIGHT',
+          pageTitle: 'Success Flight',
+          currentHref: '/dashboard/receive-booking/success-flight',
+        );
+      case '/dashboard/receive-booking/reject-flight':
+        return const ReceivedAllBookingScreen(
+          initialStatus: 'REJECT_FILE',
+          pageTitle: 'Reject File',
+          currentHref: '/dashboard/receive-booking/reject-flight',
+        );
       case '/dashboard/customer/profile':
         return const CustomerProfileScreen();
       case '/dashboard/customer/change-password':

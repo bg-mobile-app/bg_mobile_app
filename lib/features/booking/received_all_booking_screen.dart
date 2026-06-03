@@ -10,6 +10,42 @@ import 'widgets/received_booking_card.dart';
 import '../home/dashboard_screen.dart';
 import 'services/booking_service.dart';
 
+class _BookingStatusFilterOption {
+  const _BookingStatusFilterOption({required this.value, required this.label});
+
+  final String value;
+  final String label;
+}
+
+const List<_BookingStatusFilterOption> _bookingStatusFilterOptions = [
+  _BookingStatusFilterOption(value: '', label: 'All Booking'),
+  _BookingStatusFilterOption(value: 'APPLIED_FILE', label: 'Applied Booking'),
+  _BookingStatusFilterOption(
+    value: 'BG_COLLECT_PP',
+    label: 'BG Collect Passport',
+  ),
+  _BookingStatusFilterOption(value: 'BG_SENT_PP', label: 'BG Sent Passport'),
+  _BookingStatusFilterOption(value: 'A_RECEIVE_PP', label: 'Receive Passport'),
+  _BookingStatusFilterOption(
+    value: 'UNDER_PROCESSING',
+    label: 'Under Processing',
+  ),
+  _BookingStatusFilterOption(value: 'VISA_APPROVED', label: 'Visa Approved'),
+  _BookingStatusFilterOption(value: 'BMET_DONE', label: 'BMET Done'),
+  _BookingStatusFilterOption(value: 'TICKET_DONE', label: 'Ticket Done'),
+  _BookingStatusFilterOption(value: 'PP_SENT_TO_BG', label: 'PP Sent to BG'),
+  _BookingStatusFilterOption(
+    value: 'BG_RECEIVED_PP',
+    label: 'BG Receive Passport',
+  ),
+  _BookingStatusFilterOption(
+    value: 'READY_FOR_FLIGHT',
+    label: 'Ready For Flight',
+  ),
+  _BookingStatusFilterOption(value: 'SUCCESS_FLIGHT', label: 'Success Flight'),
+  _BookingStatusFilterOption(value: 'REJECT_FILE', label: 'Reject File'),
+];
+
 class ReceivedAllBookingScreen extends StatefulWidget {
   const ReceivedAllBookingScreen({
     super.key,
@@ -66,6 +102,13 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
     super.dispose();
   }
 
+  String get _selectedStatusLabel {
+    for (final option in _bookingStatusFilterOptions) {
+      if (option.value == _selectedStatus) return option.label;
+    }
+    return widget.pageTitle;
+  }
+
   List<BookingItem> get _filteredBookings {
     final query = _searchQuery.trim().toLowerCase();
     return _bookings.where((item) {
@@ -77,13 +120,15 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
           item.name.toLowerCase().contains(query) ||
           item.passportNo.toLowerCase().contains(query) ||
           item.statusLabel.toLowerCase().contains(query);
+      final matchesStatus =
+          _selectedStatus.isEmpty || item.status == _selectedStatus;
       final createdAt = DateTime.tryParse(item.createdAt);
       final matchesDate =
           _selectedDateRange == null ||
           (createdAt != null &&
               !createdAt.isBefore(_selectedDateRange!.start) &&
               !createdAt.isAfter(_selectedDateRange!.end));
-      return matchesQuery && matchesDate;
+      return matchesQuery && matchesStatus && matchesDate;
     }).toList();
   }
 
@@ -108,8 +153,6 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   List<BookingItem> get _visibleBookings =>
       _isLoading && _bookings.isEmpty ? _skeletonBookings : _filteredBookings;
 
-
-
   Future<void> _fetchBookings() async {
     setState(() {
       _isLoading = true;
@@ -121,8 +164,12 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
         status: _selectedStatus,
         search: _searchQuery,
         page: 1,
-        fromDate: _selectedDateRange == null ? null : _formatApiDate(_selectedDateRange!.start),
-        toDate: _selectedDateRange == null ? null : _formatApiDate(_selectedDateRange!.end),
+        fromDate: _selectedDateRange == null
+            ? null
+            : _formatApiDate(_selectedDateRange!.start),
+        toDate: _selectedDateRange == null
+            ? null
+            : _formatApiDate(_selectedDateRange!.end),
       );
 
       if (!mounted) return;
@@ -131,7 +178,9 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
       });
     } catch (_) {
       if (!mounted) return;
-      setState(() => _errorMessage = 'Failed to load bookings. Please try again.');
+      setState(
+        () => _errorMessage = 'Failed to load bookings. Please try again.',
+      );
     } finally {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -169,6 +218,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
     final day = date.day.toString().padLeft(2, '0');
     return '${date.year}-$month-$day';
   }
+
   @override
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
@@ -203,16 +253,23 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
                         Expanded(child: _dateRangeButton()),
                       ],
                     ),
+                    const SizedBox(height: 12),
+                    _statusDropdown(),
                     const SizedBox(height: 16),
                     if (_errorMessage != null)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                        child: Text(
+                          _errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
                       )
                     else
                       Skeletonizer(
                         enabled: _isLoading,
-                        child: _isCardView ? _buildCardList() : _buildTableList(),
+                        child: _isCardView
+                            ? _buildCardList()
+                            : _buildTableList(),
                       ),
                   ],
                 ),
@@ -224,46 +281,67 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
     );
   }
 
-  Widget _statusChips() {
-    const statuses = <String>[
-      '',
-      'APPLIED_FILE',
-      'BG_COLLECT_PP',
-      'BG_SENT_PP',
-      'A_RECEIVE_PP',
-      'UNDER_PROCESSING',
-      'VISA_APPROVED',
-      'BMET_DONE',
-      'TICKET_DONE',
-      'PP_SENT_TO_BG',
-      'BG_RECEIVED_PP',
-      'READY_FOR_FLIGHT',
-      'SUCCESS_FLIGHT',
-      'RETURN_REQUEST',
-      'RETURN_ACCEPTED',
-      'RETURN_PP_SENT_TO_BG',
-      'BG_COLLECT_RETURN_PP',
-      'CLEAR_FOR_HANDOVER',
-      'BG_HANDOVER_PP_TO_CUSTOMER',
-      'REJECT_FILE',
-    ];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: statuses.map((status) {
-          final selected = _selectedStatus == status;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(status.isEmpty ? 'ALL' : status.replaceAll('_', ' ')),
-              selected: selected,
-              onSelected: (_) {
-                setState(() => _selectedStatus = status);
-                _fetchBookings();
-              },
-            ),
-          );
-        }).toList(),
+  Widget _statusDropdown() {
+    final selectedStatus = _bookingStatusFilterOptions.any(
+      (option) => option.value == _selectedStatus,
+    )
+        ? _selectedStatus
+        : '';
+
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppPalette.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD8E3FA)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: selectedStatus,
+          isExpanded: true,
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: AppPalette.textStrongBlue,
+          ),
+          selectedItemBuilder: (context) => _bookingStatusFilterOptions
+              .map(
+                (option) => Row(
+                  children: [
+                    const Icon(
+                      Icons.filter_list_rounded,
+                      size: 18,
+                      color: AppPalette.textStrongBlue,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        option.label,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppPalette.textStrongBlue,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              .toList(),
+          items: _bookingStatusFilterOptions
+              .map(
+                (option) => DropdownMenuItem<String>(
+                  value: option.value,
+                  child: Text(option.label),
+                ),
+              )
+              .toList(),
+          onChanged: (status) {
+            if (status == null || status == _selectedStatus) return;
+            setState(() => _selectedStatus = status);
+            _fetchBookings();
+          },
+        ),
       ),
     );
   }
@@ -290,7 +368,7 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
         ),
         BreadCrumbItem(
           content: Text(
-            widget.pageTitle,
+            _selectedStatusLabel,
             style: TextStyle(
               color: AppPalette.textStrongBlue,
               fontSize: 12,
