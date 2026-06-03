@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -7,6 +9,7 @@ import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
 import '../../common/services/api_client.dart';
 import '../../common/services/auth_service.dart';
+import '../../common/services/expiry_reminder_dialog_service.dart';
 import '../../common/services/profile_service.dart';
 import 'models/agency_profile.dart';
 import 'models/dashboard_models.dart';
@@ -80,7 +83,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final DashboardService _dashboardService = DashboardService();
   late Future<AgencyDashboardStats> _dashboardFuture;
   String _selectedPeriod = 'This Month';
-  bool _hasShownExpiryReminderDialog = false;
+  final ExpiryReminderDialogService _expiryReminderDialogService =
+      ExpiryReminderDialogService();
+  bool _isCheckingExpiryReminderDialog = false;
 
   bool get _shouldShowExpiryReminderDialog =>
       widget.currentHref == '/dashboard/agency';
@@ -96,6 +101,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _selectedPeriod = period;
       _dashboardFuture = _dashboardService.getAgencyDashboard(_selectedPeriod);
+    });
+  }
+
+  Future<void> _scheduleExpiryReminderDialog(ExpiryReminderStats stats) async {
+    if (_isCheckingExpiryReminderDialog) return;
+    _isCheckingExpiryReminderDialog = true;
+
+    final cookies = await ApiClient().tokenStorage.getCookies();
+    final isSignedIn = cookies != null && cookies.trim().isNotEmpty;
+    final hasShown = await _expiryReminderDialogService
+        .hasShownForCurrentLogin();
+
+    if (!mounted) return;
+    if (!isSignedIn || hasShown) {
+      _isCheckingExpiryReminderDialog = false;
+      return;
+    }
+
+    await _expiryReminderDialogService.markShownForCurrentLogin();
+    if (!mounted) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isCheckingExpiryReminderDialog = false;
+      if (!mounted) return;
+      _showExpiryReminderDialog(stats);
     });
   }
 
@@ -124,14 +154,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     snapshot.data ??
                     (isLoading ? _mockStats : AgencyDashboardStats.empty());
                 final hasError = snapshot.hasError;
-                if (_shouldShowExpiryReminderDialog &&
-                    snapshot.hasData &&
-                    !_hasShownExpiryReminderDialog) {
-                  _hasShownExpiryReminderDialog = true;
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!mounted) return;
-                    _showExpiryReminderDialog(snapshot.data!.expiryReminders);
-                  });
+                if (_shouldShowExpiryReminderDialog && snapshot.hasData) {
+                  unawaited(
+                    _scheduleExpiryReminderDialog(
+                      snapshot.data!.expiryReminders,
+                    ),
+                  );
                 }
 
                 return SingleChildScrollView(

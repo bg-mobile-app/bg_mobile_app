@@ -1,11 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../routes/app_routes.dart';
 import '../../common/services/agency_access.dart';
 import '../../common/services/api_client.dart';
 import '../../common/services/api_exception.dart';
-import 'package:dio/dio.dart';
+import '../../common/services/expiry_reminder_dialog_service.dart';
+import '../../routes/app_routes.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -85,6 +86,7 @@ class _SignInScreenState extends State<SignInScreen> {
         }
 
         await apiClient.saveCookiesFromResponse(response);
+        await ExpiryReminderDialogService().markPendingForLogin();
         if (mounted) {
           Navigator.pop(context, true);
         }
