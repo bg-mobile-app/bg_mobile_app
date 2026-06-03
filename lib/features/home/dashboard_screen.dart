@@ -82,6 +82,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _selectedPeriod = 'This Month';
   bool _hasShownExpiryReminderDialog = false;
 
+  bool get _shouldShowExpiryReminderDialog =>
+      widget.currentHref == '/dashboard/agency';
+
   @override
   void initState() {
     super.initState();
@@ -121,7 +124,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     snapshot.data ??
                     (isLoading ? _mockStats : AgencyDashboardStats.empty());
                 final hasError = snapshot.hasError;
-                if (snapshot.hasData && !_hasShownExpiryReminderDialog) {
+                if (_shouldShowExpiryReminderDialog &&
+                    snapshot.hasData &&
+                    !_hasShownExpiryReminderDialog) {
                   _hasShownExpiryReminderDialog = true;
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (!mounted) return;
