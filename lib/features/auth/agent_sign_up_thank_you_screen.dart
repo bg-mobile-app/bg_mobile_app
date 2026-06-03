@@ -30,7 +30,7 @@ class AgentSignUpThankYouScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    'Your agent registration is complete. Our team will review your information and contact you shortly.',
+                    'Your registration is complete. Our team will review your information and contact you shortly.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Color(0xFF64748B)),
                   ),

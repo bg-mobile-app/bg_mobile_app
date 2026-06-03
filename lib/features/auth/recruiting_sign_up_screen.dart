@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +11,9 @@ import '../../routes/app_routes.dart';
 import 'widgets/auth_form_widgets.dart';
 
 class RecruitingSignUpScreen extends StatefulWidget {
-  const RecruitingSignUpScreen({super.key});
+  const RecruitingSignUpScreen({super.key, this.agencyType = 'recruiting'});
+
+  final String agencyType;
 
   @override
   State<RecruitingSignUpScreen> createState() => _RecruitingSignUpScreenState();
@@ -51,6 +55,17 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
   bool _locationsLoading = false;
 
   final List<String> _genderOptions = const ['MALE', 'FEMALE', 'OTHER'];
+
+  String get _agencyTitle {
+    switch (widget.agencyType) {
+      case 'hajj_umrah':
+        return 'Hajj & Umrah Agency';
+      case 'student':
+        return 'Student Consultancy';
+      default:
+        return 'Recruiting Agency';
+    }
+  }
 
   @override
   void initState() {
@@ -104,7 +119,10 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
   }
 
   Future<void> _pickFile(ValueSetter<XFile?> setter) async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    final picked = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
     if (picked == null || !mounted) return;
     setState(() => setter(picked));
   }
@@ -118,26 +136,43 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
 
     if (!_agreeTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please agree to Privacy Policy and Terms.')),
+        const SnackBar(
+          content: Text('Please agree to Privacy Policy and Terms.'),
+        ),
       );
       return;
     }
 
     if (_selectedDistrict == null || _selectedPoliceStation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select district and police station.')),
+        const SnackBar(
+          content: Text('Please select district and police station.'),
+        ),
       );
       return;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password and confirm password do not match.')),
+        const SnackBar(
+          content: Text('Password and confirm password do not match.'),
+        ),
       );
       return;
     }
 
-    if (_ownerImage == null || _nidImage == null || _tradeLicenseImage == null || _rlLicenseImage == null) {
+    final rlNo = int.tryParse(_rlNoController.text.trim());
+    if (rlNo == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid agency RL no.')),
+      );
+      return;
+    }
+
+    if (_ownerImage == null ||
+        _nidImage == null ||
+        _tradeLicenseImage == null ||
+        _rlLicenseImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please upload all required files.')),
       );
@@ -149,7 +184,7 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
       final formData = FormData.fromMap({
         'agency_name': _agencyNameController.text.trim(),
         'agency_phone': _agencyPhoneController.text.trim(),
-        'rl_no': _rlNoController.text.trim(),
+        'rl_no': rlNo,
         'service_type': 'WORK_PERMIT',
         'agency_address': _agencyAddressController.text.trim(),
         'district': _selectedDistrict!.id,
@@ -162,20 +197,27 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
         'password': _passwordController.text,
+        'is_privacy_terms': true,
         'nid_image': await _toMultipart(_nidImage!),
         'trade_license_image': await _toMultipart(_tradeLicenseImage!),
         'rl_license_image': await _toMultipart(_rlLicenseImage!),
         if (_civilAviationLicenseImage != null)
-          'civil_aviation_license_image': await _toMultipart(_civilAviationLicenseImage!),
+          'civil_aviation_license_image': await _toMultipart(
+            _civilAviationLicenseImage!,
+          ),
       });
 
       await _authService.registerRecruitingAgency(formData);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful. Please verify OTP.')),
+        const SnackBar(
+          content: Text('Registration successful. Please verify OTP.'),
+        ),
       );
-      context.go('${AppRoutes.otpVerify}?username=${Uri.encodeComponent(_emailController.text.trim())}');
+      context.go(
+        '${AppRoutes.otpVerify}?username=${Uri.encodeComponent(_emailController.text.trim())}&next=${Uri.encodeComponent(AppRoutes.agentSignUpThankYou)}',
+      );
     } on DioException catch (e) {
       if (!mounted) return;
       String message = 'Registration failed. Please try again.';
@@ -189,7 +231,9 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
           message = data['errors'].toString();
         }
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -203,7 +247,7 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Recruiting Agency Sign Up')),
+      appBar: AppBar(title: Text('$_agencyTitle Sign Up')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -219,11 +263,14 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Center(
+                        Center(
                           child: Text(
-                            'Become A Bideshgami Recruiting Agency',
+                            'Become A Bideshgami $_agencyTitle',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+                            style: const TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -262,7 +309,10 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Select Agency District *', style: TextStyle(fontWeight: FontWeight.w600)),
+                                const Text(
+                                  'Select Agency District *',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<DistrictOption>(
                                   initialValue: _selectedDistrict,
@@ -284,37 +334,54 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                                         },
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 10,
+                                    ),
                                   ),
-                                  validator: (v) => v == null ? 'Required' : null,
+                                  validator: (v) =>
+                                      v == null ? 'Required' : null,
                                 ),
                               ],
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Select Agency Police Station *', style: TextStyle(fontWeight: FontWeight.w600)),
+                                const Text(
+                                  'Select Agency Police Station *',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<PoliceStationOption>(
                                   initialValue: _selectedPoliceStation,
                                   isExpanded: true,
                                   items: _policeStations
                                       .map(
-                                        (p) => DropdownMenuItem<PoliceStationOption>(
-                                          value: p,
-                                          child: Text(p.name),
-                                        ),
+                                        (p) =>
+                                            DropdownMenuItem<
+                                              PoliceStationOption
+                                            >(value: p, child: Text(p.name)),
                                       )
                                       .toList(),
-                                  onChanged: (_selectedDistrict == null || _locationsLoading)
+                                  onChanged:
+                                      (_selectedDistrict == null ||
+                                          _locationsLoading)
                                       ? null
-                                      : (p) => setState(() => _selectedPoliceStation = p),
+                                      : (p) => setState(
+                                          () => _selectedPoliceStation = p,
+                                        ),
                                   decoration: InputDecoration(
-                                    hintText: _selectedDistrict == null ? 'Select district first' : 'Select police station',
+                                    hintText: _selectedDistrict == null
+                                        ? 'Select district first'
+                                        : 'Select police station',
                                     border: const OutlineInputBorder(),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 10,
+                                    ),
                                   ),
-                                  validator: (v) => v == null ? 'Required' : null,
+                                  validator: (v) =>
+                                      v == null ? 'Required' : null,
                                 ),
                               ],
                             ),
@@ -394,34 +461,44 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                             _UploadField(
                               label: 'Upload Trade License *',
                               file: _tradeLicenseImage,
-                              onPick: () => _pickFile((f) => _tradeLicenseImage = f),
+                              onPick: () =>
+                                  _pickFile((f) => _tradeLicenseImage = f),
                             ),
                             _UploadField(
                               label: 'Upload Recruiting License (RL) *',
                               file: _rlLicenseImage,
-                              onPick: () => _pickFile((f) => _rlLicenseImage = f),
+                              onPick: () =>
+                                  _pickFile((f) => _rlLicenseImage = f),
                             ),
                             _UploadField(
                               label: 'Upload Civil Aviation License (Optional)',
                               file: _civilAviationLicenseImage,
-                              onPick: () => _pickFile((f) => _civilAviationLicenseImage = f),
+                              onPick: () => _pickFile(
+                                (f) => _civilAviationLicenseImage = f,
+                              ),
                             ),
                           ],
                         ),
                         CheckboxListTile(
                           value: _agreeTerms,
-                          onChanged: (v) => setState(() => _agreeTerms = v ?? false),
+                          onChanged: (v) =>
+                              setState(() => _agreeTerms = v ?? false),
                           contentPadding: EdgeInsets.zero,
                           controlAffinity: ListTileControlAffinity.leading,
                           title: const Text(
                             'By continue, I agree to the website Privacy Policy and Terms & Conditions.',
-                            style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF475569),
+                            ),
                           ),
                         ),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: (_loading || _locationsLoading) ? null : _submit,
+                            onPressed: (_loading || _locationsLoading)
+                                ? null
+                                : _submit,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF2563EB),
                               foregroundColor: Colors.white,
@@ -430,7 +507,10 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Text('Create Account'),
                           ),
@@ -449,7 +529,11 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
 }
 
 class _UploadField extends StatelessWidget {
-  const _UploadField({required this.label, required this.file, required this.onPick});
+  const _UploadField({
+    required this.label,
+    required this.file,
+    required this.onPick,
+  });
 
   final String label;
   final XFile? file;
@@ -477,11 +561,67 @@ class _UploadField extends StatelessWidget {
               file == null ? 'Choose file' : file!.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: file == null ? const Color(0xFF64748B) : const Color(0xFF0F172A)),
+              style: TextStyle(
+                color: file == null
+                    ? const Color(0xFF64748B)
+                    : const Color(0xFF0F172A),
+              ),
             ),
           ),
         ),
+        if (file != null) ...[
+          const SizedBox(height: 8),
+          _SelectedImagePreview(file: file!),
+        ],
       ],
+    );
+  }
+}
+
+class _SelectedImagePreview extends StatelessWidget {
+  const _SelectedImagePreview({required this.file});
+
+  final XFile file;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Uint8List>(
+      future: file.readAsBytes(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SizedBox(
+            height: 112,
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          );
+        }
+
+        final bytes = snapshot.data;
+        if (bytes == null || bytes.isEmpty) {
+          return Container(
+            height: 112,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFF8FAFC),
+            ),
+            child: const Text(
+              'Preview unavailable',
+              style: TextStyle(color: Color(0xFF64748B), fontSize: 12),
+            ),
+          );
+        }
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            width: double.infinity,
+            height: 112,
+            color: const Color(0xFFE2E8F0),
+            child: Image.memory(bytes, fit: BoxFit.cover),
+          ),
+        );
+      },
     );
   }
 }

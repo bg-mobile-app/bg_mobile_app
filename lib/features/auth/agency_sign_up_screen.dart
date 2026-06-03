@@ -31,15 +31,20 @@ class AgencySignUpScreen extends StatelessWidget {
                       _AgencyTypeCard(
                         title: 'Recruiting Agency',
                         imagePath: 'assets/img/sign-up/recurting.jpg',
-                        onTapRoute: AppRoutes.recruitingSignUp,
+                        onTapRoute:
+                            '${AppRoutes.recruitingSignUp}?type=recruiting',
                       ),
                       _AgencyTypeCard(
                         title: 'Hajj & Umrah Agency',
                         imagePath: 'assets/img/sign-up/hajj.jpg',
+                        onTapRoute:
+                            '${AppRoutes.recruitingSignUp}?type=hajj_umrah',
                       ),
                       _AgencyTypeCard(
                         title: 'Student Consultancy',
                         imagePath: 'assets/img/sign-up/student.jpg',
+                        onTapRoute:
+                            '${AppRoutes.recruitingSignUp}?type=student',
                       ),
                     ],
                   );
@@ -67,9 +72,7 @@ class _AgencyTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTapRoute == null
-          ? null
-          : () => context.push(onTapRoute!),
+      onTap: onTapRoute == null ? null : () => context.push(onTapRoute!),
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.all(16),

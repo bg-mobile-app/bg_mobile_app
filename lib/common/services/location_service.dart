@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
 import 'api_client.dart';
 
 class DistrictOption {
@@ -30,102 +28,31 @@ class LocationService {
   final ApiClient _apiClient = ApiClient();
 
   Future<List<DistrictOption>> getDistricts() async {
-    try {
-      final response = await _apiClient.get('/main/district');
-      final raw = response.data;
-      if (raw is List) {
-        return raw
-            .whereType<Map<String, dynamic>>()
-            .map(DistrictOption.fromJson)
-            .toList();
-      }
-      if (raw is String) {
-        final decoded = jsonDecode(raw);
-        if (decoded is List) {
-          return decoded
-              .whereType<Map<String, dynamic>>()
-              .map(DistrictOption.fromJson)
-              .toList();
-        }
-      }
-      return [];
-    } catch (e) {
-      debugPrint('Primary district endpoint failed, trying fallback: $e');
-      try {
-        final response = await _apiClient.get('/locations/district/');
-        final raw = response.data;
-        if (raw is List) {
-          return raw
-              .whereType<Map<String, dynamic>>()
-              .map(DistrictOption.fromJson)
-              .toList();
-        }
-        if (raw is String) {
-          final decoded = jsonDecode(raw);
-          if (decoded is List) {
-            return decoded
-                .whereType<Map<String, dynamic>>()
-                .map(DistrictOption.fromJson)
-                .toList();
-          }
-        }
-      } catch (fallbackError) {
-        debugPrint('Error fetching districts: $fallbackError');
-      }
-      return [];
-    }
+    final response = await _apiClient.get('/common/districts/');
+    return _listFromResponse(
+      response.data,
+    ).map(DistrictOption.fromJson).toList();
   }
 
   Future<List<PoliceStationOption>> getPoliceStations(int districtId) async {
-    try {
-      final response = await _apiClient.get(
-        '/main/police-station/',
-        queryParameters: {'district': districtId},
-      );
-      final raw = response.data;
-      if (raw is List) {
-        return raw
-            .whereType<Map<String, dynamic>>()
-            .map(PoliceStationOption.fromJson)
-            .toList();
-      }
-      if (raw is String) {
-        final decoded = jsonDecode(raw);
-        if (decoded is List) {
-          return decoded
-              .whereType<Map<String, dynamic>>()
-              .map(PoliceStationOption.fromJson)
-              .toList();
-        }
-      }
-      return [];
-    } catch (e) {
-      debugPrint('Primary police-station endpoint failed, trying fallback: $e');
-      try {
-        final response = await _apiClient.get(
-          '/locations/police-station/',
-          queryParameters: {'district__id': districtId},
-        );
-        final raw = response.data;
-        if (raw is List) {
-          return raw
-              .whereType<Map<String, dynamic>>()
-              .map(PoliceStationOption.fromJson)
-              .toList();
-        }
-        if (raw is String) {
-          final decoded = jsonDecode(raw);
-          if (decoded is List) {
-            return decoded
-                .whereType<Map<String, dynamic>>()
-                .map(PoliceStationOption.fromJson)
-                .toList();
-          }
-        }
-      } catch (fallbackError) {
-        debugPrint('Error fetching police stations: $fallbackError');
-      }
-      return [];
-    }
+    final response = await _apiClient.get(
+      '/common/police-stations/',
+      queryParameters: {'district__id': districtId},
+    );
+    return _listFromResponse(
+      response.data,
+    ).map(PoliceStationOption.fromJson).toList();
+  }
+
+  List<Map<String, dynamic>> _listFromResponse(dynamic raw) {
+    final data = raw is String ? jsonDecode(raw) : raw;
+    final list = data is List
+        ? data
+        : data is Map<String, dynamic>
+        ? data['results'] ?? data['data'] ?? data['items']
+        : null;
+
+    if (list is! List) return [];
+    return list.whereType<Map<String, dynamic>>().toList();
   }
 }

@@ -72,7 +72,9 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.recruitingSignUp,
-      builder: (context, state) => const RecruitingSignUpScreen(),
+      builder: (context, state) => RecruitingSignUpScreen(
+        agencyType: state.uri.queryParameters['type'] ?? 'recruiting',
+      ),
     ),
     GoRoute(
       path: AppRoutes.agentSignUpThankYou,

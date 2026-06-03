@@ -14,6 +14,7 @@ import '../../common/theme/app_spacing.dart';
 import '../../common/theme/app_text_styles.dart';
 import '../../common/widgets/app_search_bar.dart';
 import '../../common/services/api_client.dart';
+import '../../routes/app_routes.dart';
 
 class WorkPermitListScreen extends StatefulWidget {
   const WorkPermitListScreen({super.key});
@@ -125,7 +126,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
           final result = await context.push('/login');
           if (result == true && mounted) setState(() => _isLoggedIn = true);
         },
-        onSignUp: () => context.push('/sign-up/agent'),
+        onSignUp: () => context.push(AppRoutes.agencySignUp),
         onNotifications: _showComingSoon,
         onProfile: _showComingSoon,
       ),
@@ -167,7 +168,9 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
       );
     }
     final width = MediaQuery.of(context).size.width;
-    final displayItems = _isLoading ? List.generate(4, (_) => WorkPermitItem.getDummy()) : _filteredItems;
+    final displayItems = _isLoading
+        ? List.generate(4, (_) => WorkPermitItem.getDummy())
+        : _filteredItems;
 
     return Column(
       children: [
@@ -315,7 +318,9 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 10,
-                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w600,
                       color: isSelected ? _brandBlue : const Color(0xFF64748B),
                     ),
                   ),

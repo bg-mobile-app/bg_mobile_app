@@ -15,7 +15,10 @@ class UnauthenticatedProfileScreen extends StatelessWidget {
         elevation: 0,
         title: const Text(
           'Profile',
-          style: TextStyle(color: AppPalette.textPrimary, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: AppPalette.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         centerTitle: true,
       ),
@@ -32,7 +35,10 @@ class UnauthenticatedProfileScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFEFF6FF),
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppPalette.borderSoftBlue, width: 2),
+                    border: Border.all(
+                      color: AppPalette.borderSoftBlue,
+                      width: 2,
+                    ),
                   ),
                   child: const Center(
                     child: Icon(
@@ -70,24 +76,43 @@ class UnauthenticatedProfileScreen extends StatelessWidget {
                       backgroundColor: AppPalette.brandBlue,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                       elevation: 2,
                     ),
-                    child: const Text('Sign In', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    child: const Text(
+                      'Sign In',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
-                    onPressed: () => context.push(AppRoutes.agentSignUp),
+                    onPressed: () => context.push(AppRoutes.agencySignUp),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppPalette.brandBlue,
-                      side: const BorderSide(color: AppPalette.borderSoftBlue, width: 1.5),
+                      side: const BorderSide(
+                        color: AppPalette.borderSoftBlue,
+                        width: 1.5,
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
-                    child: const Text('Create an Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    child: const Text(
+                      'Create an Account',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ],

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../common/services/api_client.dart';
+import '../../routes/app_routes.dart';
 import '../home/models/home_models.dart';
 import '../home/widgets/work_permit_card.dart';
 import 'models/work_permit_details.dart';
@@ -1467,7 +1468,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop();
-                context.push('/sign-up/customer');
+                context.push(AppRoutes.agencySignUp);
               },
               child: Text(_tr('Sign Up', 'সাইন আপ')),
             ),

@@ -45,7 +45,9 @@ class AppScaffold extends StatelessWidget {
       const WorkPermitListScreen(),
       const _BookingAuthHostScreen(),
       const ChatListScreen(),
-      _DashboardHostScreen(route: dashboardPath ?? '/dashboard/agency'),
+      tabIndex == 4
+          ? _DashboardHostScreen(route: dashboardPath ?? '/dashboard/agency')
+          : const SizedBox.shrink(),
     ];
 
     return Scaffold(
@@ -142,7 +144,8 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (!_isLoggedIn! && (widget.route == '/profile' || widget.route.startsWith('/dashboard'))) {
+    if (!_isLoggedIn! &&
+        (widget.route == '/profile' || widget.route.startsWith('/dashboard'))) {
       return const UnauthenticatedProfileScreen();
     }
 
@@ -336,18 +339,6 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
         context.go('/login');
       }
     });
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
-    );
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
-}
-
-class _DummyScreen extends StatelessWidget {
-  const _DummyScreen({required this.title});
-  final String title;
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(title)),
-    body: Center(child: Text('$title Screen (Coming Soon)')),
-  );
 }

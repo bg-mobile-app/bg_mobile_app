@@ -58,8 +58,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     if (at <= 1) return username;
     final local = username.substring(0, at);
     final domain = username.substring(at);
-    if (local.length <= 2)
+    if (local.length <= 2) {
       return '${local[0]}*${local.length > 1 ? local[1] : ''}$domain';
+    }
     return '${local.substring(0, 2)}${'*' * (local.length - 2)}$domain';
   }
 

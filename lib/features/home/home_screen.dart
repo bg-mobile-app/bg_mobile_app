@@ -14,6 +14,7 @@ import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_spacing.dart';
 import '../../common/services/api_client.dart';
 import '../../common/services/profile_service.dart';
+import '../../routes/app_routes.dart';
 import '../search/work_permit_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -367,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() => _isLoggedIn = true);
           }
         },
-        onSignUp: () => context.push('/sign-up/agent'),
+        onSignUp: () => context.push(AppRoutes.agencySignUp),
         onNotifications: () => context.push('/dashboard/notifications'),
         onProfile: () => context.push('/dashboard/customer/profile'),
         profileImageUrl: _profileImageUrl,
