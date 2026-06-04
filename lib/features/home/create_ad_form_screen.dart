@@ -338,6 +338,48 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     return null;
   }
 
+  Widget _countryOptionLeading(CountryOption country, double size) {
+    if (country.unicodeFlag.isNotEmpty) {
+      return Text(country.unicodeFlag, style: TextStyle(fontSize: size * 0.86));
+    }
+
+    final emoji = _countryCodeToEmoji(country.code);
+    if (emoji.isNotEmpty) {
+      return Text(emoji, style: TextStyle(fontSize: size * 0.86));
+    }
+
+    final flag = country.flag.trim();
+    if (flag.isNotEmpty && !flag.toLowerCase().endsWith('.svg')) {
+      final image = flag.startsWith('http')
+          ? Image.network(flag, fit: BoxFit.cover)
+          : Image.asset(flag, fit: BoxFit.cover);
+      return ClipOval(
+        child: SizedBox(width: size, height: size, child: image),
+      );
+    }
+
+    return Icon(
+      Icons.flag_outlined,
+      size: size,
+      color: const Color(0xFF64748B),
+    );
+  }
+
+  String _countryCodeToEmoji(String code) {
+    final normalized = code.trim().toUpperCase();
+    if (normalized.length != 2) return '';
+
+    final first = normalized.codeUnitAt(0);
+    final second = normalized.codeUnitAt(1);
+    if (first < 65 || first > 90 || second < 65 || second > 90) return '';
+
+    const regionalIndicatorOffset = 0x1F1E6 - 65;
+    return String.fromCharCodes([
+      first + regionalIndicatorOffset,
+      second + regionalIndicatorOffset,
+    ]);
+  }
+
   WorkTypeOption? _selectedWorkTypeOption() {
     for (final item in _workTypes) {
       if (item.id == _selectedWorkTypeId) return item;
@@ -730,7 +772,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             items: _countries,
             itemLabel: (item) => item.name,
             itemLeading: (item, size) => _countryOptionLeading(item, size),
-            onChanged: (value) => setState(() => _selectedCountryValue = value?.value),
+            onChanged: (value) =>
+                setState(() => _selectedCountryValue = value?.value),
           ),
           const SizedBox(height: 24),
           _buildOptionDropdown<WorkTypeOption>(
@@ -1549,10 +1592,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
               ),
               child: Row(
                 children: [
-                  if (leading != null) ...[
-                    leading,
-                    const SizedBox(width: 10),
-                  ],
+                  if (leading != null) ...[leading, const SizedBox(width: 10)],
                   Expanded(
                     child: Text(
                       displayText,
