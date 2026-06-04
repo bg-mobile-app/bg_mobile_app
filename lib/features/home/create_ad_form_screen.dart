@@ -18,20 +18,43 @@ class CreateAdFormScreen extends StatefulWidget {
   State<CreateAdFormScreen> createState() => _CreateAdFormScreenState();
 }
 
+enum _CreateAdDateField { applicationDeadline, startDate, endDate }
+
+class _DropdownExtraAction {
+  const _DropdownExtraAction._();
+
+  static const instance = _DropdownExtraAction._();
+}
+
 class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   final CreateAdService _createAdService = CreateAdService();
   final TextEditingController _jobTitleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _quotaController = TextEditingController();
+  final TextEditingController _newWorkTypeController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
 
   int _currentStep = 0;
   bool _isLoadingMeta = false;
   bool _isPublishing = false;
+  bool _showNewWorkTypeInput = false;
+  bool _isSuggestingWorkType = false;
   List<CountryOption> _countries = [];
   List<WorkTypeOption> _workTypes = [];
-  int? _selectedCountryId;
+  Object? _selectedCountryValue;
   int? _selectedWorkTypeId;
+  String? _selectionType;
+  DateTime? _applicationDeadline;
+  DateTime? _startDate;
+  DateTime? _endDate;
   XFile? _selectedImage;
+
+  static const List<String> _selectionTypes = [
+    'Direct',
+    'Delegate',
+    'Zoom Interview',
+    'Lottery',
+  ];
 
   String _tr(String en, String bn) => widget.isBangla ? bn : en;
 
@@ -46,6 +69,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   void dispose() {
     _jobTitleController.dispose();
     _descriptionController.dispose();
+    _quotaController.dispose();
+    _newWorkTypeController.dispose();
     super.dispose();
   }
 
@@ -62,19 +87,24 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   }
 
   Future<void> _publishAd() async {
-    if (_selectedCountryId == null || _selectedWorkTypeId == null) {
+    if (_selectedCountryValue == null || _selectedWorkTypeId == null || _selectionType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_tr('Please select country and work type', 'দেশ এবং কাজের ধরন নির্বাচন করুন'))),
+        SnackBar(content: Text(_tr('Please select country, work type and selection method', 'দেশ, কাজের ধরন এবং নির্বাচন পদ্ধতি নির্বাচন করুন'))),
       );
       return;
     }
     setState(() => _isPublishing = true);
     try {
       await _createAdService.createAd(
-        countryId: _selectedCountryId,
+        countryValue: _selectedCountryValue,
         workTypeId: _selectedWorkTypeId,
         title: _jobTitleController.text.trim(),
         description: _descriptionController.text.trim(),
+        selectionType: _selectionType!,
+        quota: int.tryParse(_quotaController.text.trim()),
+        applicationDeadline: _formatDate(_applicationDeadline),
+        startDate: _requiresInterviewDates ? _formatDate(_startDate) : null,
+        endDate: _requiresInterviewDates ? _formatDate(_endDate) : null,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,6 +141,102 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_tr('Failed to pick image', 'ছবি নির্বাচন করা যায়নি'))),
       );
+    }
+  }
+
+
+  bool get _requiresInterviewDates {
+    return _selectionType == 'Delegate' || _selectionType == 'Zoom Interview';
+  }
+
+  String? _formatDate(DateTime? date) {
+    if (date == null) return null;
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> _pickFormDate({required _CreateAdDateField field}) async {
+    final now = DateTime.now();
+    DateTime? current;
+    switch (field) {
+      case _CreateAdDateField.applicationDeadline:
+        current = _applicationDeadline;
+        break;
+      case _CreateAdDateField.startDate:
+        current = _startDate;
+        break;
+      case _CreateAdDateField.endDate:
+        current = _endDate;
+        break;
+    }
+    final picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 5),
+      initialDate: current ?? now,
+    );
+    if (picked == null) return;
+    setState(() {
+      switch (field) {
+        case _CreateAdDateField.applicationDeadline:
+          _applicationDeadline = picked;
+          break;
+        case _CreateAdDateField.startDate:
+          _startDate = picked;
+          if (_endDate != null && _endDate!.isBefore(picked)) {
+            _endDate = picked;
+          }
+          break;
+        case _CreateAdDateField.endDate:
+          _endDate = picked;
+          break;
+      }
+    });
+  }
+
+  CountryOption? _selectedCountryOption() {
+    for (final item in _countries) {
+      if (item.value == _selectedCountryValue) return item;
+    }
+    return null;
+  }
+
+  WorkTypeOption? _selectedWorkTypeOption() {
+    for (final item in _workTypes) {
+      if (item.id == _selectedWorkTypeId) return item;
+    }
+    return null;
+  }
+
+  Future<void> _suggestWorkType() async {
+    final name = _newWorkTypeController.text.trim();
+    if (name.isEmpty) return;
+
+    setState(() => _isSuggestingWorkType = true);
+    try {
+      final suggested = await _createAdService.suggestWorkType(name);
+      if (!mounted) return;
+      setState(() {
+        if (suggested != null && !_workTypes.any((item) => item.id == suggested.id)) {
+          _workTypes = [..._workTypes, suggested];
+        }
+        if (suggested != null) {
+          _selectedWorkTypeId = suggested.id;
+        }
+        _showNewWorkTypeInput = false;
+        _newWorkTypeController.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Work type submitted', 'কাজের ধরন জমা হয়েছে'))),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Failed to submit work type', 'কাজের ধরন জমা দেওয়া যায়নি'))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSuggestingWorkType = false);
+      }
     }
   }
   @override
@@ -339,67 +465,110 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             ],
           ),
           const SizedBox(height: 32),
-          _buildDropdownField(label: _tr('Country', 'দেশ'), value: _selectedCountryId, hint: _tr('Select Country', 'দেশ নির্বাচন করুন'), options: _countries.map((e) => DropdownMenuItem<int>(value: e.id, child: Text(e.name))).toList(), onChanged: (value) => setState(() => _selectedCountryId = value)),
-          const SizedBox(height: 24),
-          _buildDropdownField(label: _tr('Type of Work', 'কাজের ধরন'), value: _selectedWorkTypeId, hint: _tr('Select Work Type', 'কাজের ধরন নির্বাচন করুন'), options: _workTypes.map((e) => DropdownMenuItem<int>(value: e.id, child: Text(e.name))).toList(), onChanged: (value) => setState(() => _selectedWorkTypeId = value)),
-          const SizedBox(height: 24),
           _buildField(label: _tr('Job Title', 'পদের নাম'), hint: _tr('e.g. Electrician', 'উদাঃ ইলেকট্রিশিয়ান'), controller: _jobTitleController),
           const SizedBox(height: 24),
-          
-          Text(_tr('SALARY', 'বেতন'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: AppPalette.textMuted)),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 56, padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(18)),
-                  alignment: Alignment.centerLeft,
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: _tr('Amount', 'পরিমাণ'),
-                      hintStyle: const TextStyle(fontSize: 15, color: Color(0xFF94A3B8)),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    style: const TextStyle(fontSize: 15, color: AppPalette.textPrimary, fontWeight: FontWeight.w600),
+          _buildOptionDropdown<CountryOption>(
+            label: _tr('Country', 'দেশ'),
+            value: _selectedCountryOption(),
+            hint: _isLoadingMeta ? _tr('Loading countries...', 'দেশ লোড হচ্ছে...') : _tr('Select Country', 'দেশ নির্বাচন করুন'),
+            items: _countries,
+            itemLabel: (item) => item.name,
+            onChanged: (value) => setState(() => _selectedCountryValue = value?.value),
+          ),
+          const SizedBox(height: 24),
+          _buildOptionDropdown<WorkTypeOption>(
+            label: _tr('Type of Work', 'কাজের ধরন'),
+            value: _selectedWorkTypeOption(),
+            hint: _isLoadingMeta ? _tr('Loading work types...', 'কাজের ধরন লোড হচ্ছে...') : _tr('Select Work Type', 'কাজের ধরন নির্বাচন করুন'),
+            items: _workTypes,
+            itemLabel: (item) => item.name,
+            extraActionLabel: _tr('Add new work type', 'নতুন কাজের ধরন যোগ করুন'),
+            onExtraAction: () => setState(() => _showNewWorkTypeInput = true),
+            onChanged: (value) {
+              setState(() {
+                _selectedWorkTypeId = value?.id;
+                _showNewWorkTypeInput = false;
+              });
+            },
+          ),
+          if (_showNewWorkTypeInput) ...[
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: _buildField(
+                    label: _tr('New Work Type', 'নতুন কাজের ধরন'),
+                    hint: _tr('Enter work type', 'কাজের ধরন লিখুন'),
+                    controller: _newWorkTypeController,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 110, height: 56, padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(color: AppPalette.brandBlue.withOpacity(0.05), borderRadius: BorderRadius.circular(18)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text('SAR', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppPalette.brandBlue)),
-                    SizedBox(width: 4),
-                    Icon(Icons.expand_more, color: AppPalette.brandBlue),
-                  ],
+                const SizedBox(width: 12),
+                SizedBox(
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _isSuggestingWorkType ? null : _suggestWorkType,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppPalette.brandBlue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                    ),
+                    child: _isSuggestingWorkType
+                        ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : Text(_tr('Add', 'যোগ করুন'), style: const TextStyle(fontWeight: FontWeight.w800)),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          ],
+          const SizedBox(height: 24),
+          _buildOptionDropdown<String>(
+            label: _tr('Selection Type', 'নির্বাচন পদ্ধতি'),
+            value: _selectionType,
+            hint: _tr('Select Selection Type', 'নির্বাচন পদ্ধতি নির্বাচন করুন'),
+            items: _selectionTypes,
+            itemLabel: (item) => item,
+            onChanged: (value) {
+              setState(() {
+                _selectionType = value;
+                if (!_requiresInterviewDates) {
+                  _startDate = null;
+                  _endDate = null;
+                }
+              });
+            },
           ),
           const SizedBox(height: 24),
-
-          Row(
-            children: [
-              Expanded(child: _buildField(label: _tr('Hours', 'ঘণ্টা'), hint: '8')),
-              const SizedBox(width: 16),
-              Expanded(child: _buildField(label: _tr('Days', 'দিন'), hint: '6')),
-            ],
+          _buildField(
+            label: _tr('Quota', 'কোটা'),
+            hint: _tr('Number of open positions', 'খালি পদের সংখ্যা'),
+            controller: _quotaController,
+            keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 24),
-          _buildField(label: _tr('Contract', 'চুক্তি'), hint: _tr('2 Years', '২ বছর')),
-          const SizedBox(height: 32),
-          _buildGenderSelection(),
-          const SizedBox(height: 32),
-          _buildDocsSelection(),
-          const SizedBox(height: 32),
-          _buildPackageIncluded(),
+          _buildDateField(
+            label: _tr('Application Deadline', 'আবেদনের শেষ তারিখ'),
+            value: _applicationDeadline,
+            hint: _tr('Select application deadline', 'আবেদনের শেষ তারিখ নির্বাচন করুন'),
+            onTap: () => _pickFormDate(field: _CreateAdDateField.applicationDeadline),
+          ),
+          if (_requiresInterviewDates) ...[
+            const SizedBox(height: 24),
+            _buildDateField(
+              label: _tr('Interview Start Date', 'ইন্টারভিউ শুরুর তারিখ'),
+              value: _startDate,
+              hint: _tr('Select interview start date', 'ইন্টারভিউ শুরুর তারিখ নির্বাচন করুন'),
+              onTap: () => _pickFormDate(field: _CreateAdDateField.startDate),
+            ),
+            const SizedBox(height: 24),
+            _buildDateField(
+              label: _tr('Interview End Date', 'ইন্টারভিউ শেষের তারিখ'),
+              value: _endDate,
+              hint: _tr('Select interview end date', 'ইন্টারভিউ শেষের তারিখ নির্বাচন করুন'),
+              onTap: () => _pickFormDate(field: _CreateAdDateField.endDate),
+            ),
+          ],
         ],
       ),
     );
@@ -533,7 +702,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     );
   }
 
-  Widget _buildField({required String label, required String hint, IconData? icon, TextEditingController? controller}) {
+  Widget _buildField({required String label, required String hint, IconData? icon, TextEditingController? controller, TextInputType? keyboardType}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -551,6 +720,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
               Expanded(
                 child: TextField(
                   controller: controller,
+                  keyboardType: keyboardType,
                   decoration: InputDecoration(
                     hintText: hint,
                     hintStyle: const TextStyle(fontSize: 15, color: Color(0xFF94A3B8)),
@@ -569,34 +739,231 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     );
   }
 
-  Widget _buildDropdownField({
+  Widget _buildOptionDropdown<T>({
     required String label,
-    required int? value,
+    required T? value,
     required String hint,
-    required List<DropdownMenuItem<int>> options,
-    required ValueChanged<int?> onChanged,
+    required List<T> items,
+    required String Function(T item) itemLabel,
+    required ValueChanged<T?> onChanged,
+    String? extraActionLabel,
+    VoidCallback? onExtraAction,
   }) {
-    final hasMatchingValue = value != null && options.any((item) => item.value == value);
-    final safeValue = hasMatchingValue ? value : null;
+    final hasValue = value != null;
+    final displayText = hasValue ? itemLabel(value) : hint;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: AppPalette.textMuted)),
         const SizedBox(height: 8),
-        Container(
-          height: 56,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () async {
+              final selected = await _showFormDropdownSheet<T>(
+                title: hint,
+                items: items,
+                selectedValue: value,
+                itemLabel: itemLabel,
+                extraActionLabel: extraActionLabel,
+              );
+              if (selected == _DropdownExtraAction.instance) {
+                onExtraAction?.call();
+              } else if (selected is T) {
+                onChanged(selected);
+              }
+            },
             borderRadius: BorderRadius.circular(18),
+            child: Container(
+              height: 56,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: const Color(0xFFDBEAFE)),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: const [BoxShadow(color: Color(0x120F172A), blurRadius: 8, offset: Offset(0, 3))],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      displayText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: hasValue ? Colors.black : const Color(0xFF64748B),
+                        fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black87, size: 20),
+                ],
+              ),
+            ),
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<int>(
-              value: safeValue,
-              isExpanded: true,
-              hint: Text(hint, style: const TextStyle(fontSize: 15, color: Color(0xFF94A3B8))),
-              items: options,
-              onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
+  Future<Object?> _showFormDropdownSheet<T>({
+    required String title,
+    required List<T> items,
+    required T? selectedValue,
+    required String Function(T item) itemLabel,
+    String? extraActionLabel,
+  }) {
+    return showModalBottomSheet<Object?>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        var query = '';
+
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final mediaQuery = MediaQuery.of(context);
+            final keyboardInset = mediaQuery.viewInsets.bottom;
+            final filteredItems = query.trim().isEmpty
+                ? items
+                : items.where((item) => itemLabel(item).toLowerCase().contains(query.trim().toLowerCase())).toList();
+
+            return AnimatedPadding(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              padding: EdgeInsets.only(bottom: keyboardInset),
+              child: SafeArea(
+                top: false,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    width: double.infinity,
+                    constraints: BoxConstraints(maxHeight: mediaQuery.size.height * 0.72),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 10),
+                        Container(
+                          width: 42,
+                          height: 4,
+                          decoration: BoxDecoration(color: const Color(0xFFCBD5E1), borderRadius: BorderRadius.circular(999)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(18, 16, 8, 8),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                                ),
+                              ),
+                              IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close_rounded, size: 22)),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(18, 0, 18, 10),
+                          child: TextField(
+                            autofocus: true,
+                            textInputAction: TextInputAction.search,
+                            onChanged: (value) => setSheetState(() => query = value),
+                            decoration: InputDecoration(
+                              hintText: _tr('Search $title', '$title খুঁজুন'),
+                              prefixIcon: const Icon(Icons.search_rounded, color: AppPalette.brandBlue),
+                              filled: true,
+                              fillColor: const Color(0xFFF8FAFC),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFDBEAFE))),
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppPalette.brandBlue, width: 1.4)),
+                            ),
+                          ),
+                        ),
+                        const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                        Flexible(
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            itemCount: filteredItems.length + (extraActionLabel == null ? 0 : 1),
+                            separatorBuilder: (context, index) => const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0xFFF1F5F9)),
+                            itemBuilder: (context, index) {
+                              if (extraActionLabel != null && index == filteredItems.length) {
+                                return ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                                  leading: const Icon(Icons.add_circle_outline_rounded, color: AppPalette.brandBlue),
+                                  title: Text(extraActionLabel, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppPalette.brandBlue)),
+                                  onTap: () => Navigator.pop(context, _DropdownExtraAction.instance),
+                                );
+                              }
+
+                              final item = filteredItems[index];
+                              final isSelected = item == selectedValue;
+                              return ListTile(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                                title: Text(
+                                  itemLabel(item),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                    color: const Color(0xFF0F172A),
+                                  ),
+                                ),
+                                trailing: isSelected ? const Icon(Icons.check_circle_rounded, color: AppPalette.brandBlue, size: 22) : null,
+                                onTap: () => Navigator.pop(context, item),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildDateField({required String label, required DateTime? value, required String hint, required VoidCallback onTap}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: AppPalette.textMuted)),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            height: 56,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(18)),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value == null ? hint : _formatDate(value)!,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: value == null ? const Color(0xFF94A3B8) : AppPalette.textPrimary,
+                      fontWeight: value == null ? FontWeight.w400 : FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.calendar_today_outlined, color: Color(0xFF94A3B8), size: 20),
+              ],
             ),
           ),
         ),
