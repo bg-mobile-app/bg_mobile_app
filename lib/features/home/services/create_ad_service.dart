@@ -92,6 +92,12 @@ class CreateAdService {
     required int? workTypeId,
     required String title,
     required String description,
+    required int packagePrice,
+    required String paymentSystem,
+    required List<Map<String, dynamic>> paymentSteps,
+    required int advancePrice,
+    required int afterVisa,
+    required int beforeFlight,
   }) async {
     await _apiClient.post(
       '/work-permits/',
@@ -100,6 +106,14 @@ class CreateAdService {
         'work_type': workTypeId,
         'title': title,
         'description': description,
+        'packagePrice': packagePrice,
+        'customerPercentage': 10,
+        'agentPercentage': 5,
+        'paymentSystem': paymentSystem,
+        'paymentSteps': paymentSteps,
+        'advancePrice': advancePrice,
+        'afterVisa': afterVisa,
+        'beforeFlight': beforeFlight,
       },
     );
   }
