@@ -11,10 +11,7 @@ class CountryOption {
   final String name;
 
   factory CountryOption.fromJson(Map<String, dynamic> json) {
-    return CountryOption(
-      id: _readInt(json['id']),
-      name: _readName(json),
-    );
+    return CountryOption(id: _readInt(json['id']), name: _readName(json));
   }
 }
 
@@ -25,10 +22,7 @@ class WorkTypeOption {
   final String name;
 
   factory WorkTypeOption.fromJson(Map<String, dynamic> json) {
-    return WorkTypeOption(
-      id: _readInt(json['id']),
-      name: _readName(json),
-    );
+    return WorkTypeOption(id: _readInt(json['id']), name: _readName(json));
   }
 }
 
@@ -78,8 +72,8 @@ class CreateAdService {
         final payload = raw['data'] is Map<String, dynamic>
             ? raw['data'] as Map<String, dynamic>
             : raw['result'] is Map<String, dynamic>
-                ? raw['result'] as Map<String, dynamic>
-                : raw;
+            ? raw['result'] as Map<String, dynamic>
+            : raw;
         final option = WorkTypeOption.fromJson(payload);
         return option.id > 0 && option.name.isNotEmpty ? option : null;
       }
@@ -95,6 +89,11 @@ class CreateAdService {
     required int? workTypeId,
     required String title,
     required String description,
+    required int quota,
+    required String selectionType,
+    String? applicationDeadline,
+    String? startDate,
+    String? endDate,
     required int packagePrice,
     required String paymentSystem,
     required List<Map<String, dynamic>> paymentSteps,
@@ -109,6 +108,11 @@ class CreateAdService {
         'work_type': workTypeId,
         'title': title,
         'description': description,
+        'quota': quota,
+        'selectionType': selectionType,
+        'applicationDeadline': applicationDeadline,
+        'startDate': startDate,
+        'endDate': endDate,
         'packagePrice': packagePrice,
         'customerPercentage': 10,
         'agentPercentage': 5,
@@ -130,8 +134,8 @@ class CreateAdService {
     final source = raw is List
         ? raw
         : raw is Map<String, dynamic>
-            ? raw['results'] ?? raw['data'] ?? raw['items'] ?? const []
-            : const [];
+        ? raw['results'] ?? raw['data'] ?? raw['items'] ?? const []
+        : const [];
 
     if (source is! List) return [];
     return source
