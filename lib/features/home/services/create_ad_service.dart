@@ -12,8 +12,8 @@ class CountryOption {
 
   factory CountryOption.fromJson(Map<String, dynamic> json) {
     return CountryOption(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
+      id: _readInt(json['id']),
+      name: _readName(json),
     );
   }
 }
@@ -26,10 +26,20 @@ class WorkTypeOption {
 
   factory WorkTypeOption.fromJson(Map<String, dynamic> json) {
     return WorkTypeOption(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
+      id: _readInt(json['id']),
+      name: _readName(json),
     );
   }
+}
+
+int _readInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+String _readName(Map<String, dynamic> json) {
+  return (json['name'] ?? json['title'] ?? json['label'] ?? '').toString();
 }
 
 class CreateAdService {
@@ -38,23 +48,8 @@ class CreateAdService {
   Future<List<CountryOption>> getCountries() async {
     try {
       final response = await _apiClient.get('/main/countries/');
-      final raw = response.data;
-      if (raw is List) {
-        return raw
-            .whereType<Map<String, dynamic>>()
-            .map(CountryOption.fromJson)
-            .toList();
-      }
-      if (raw is String) {
-        final decoded = jsonDecode(raw);
-        if (decoded is List) {
-          return decoded
-              .whereType<Map<String, dynamic>>()
-              .map(CountryOption.fromJson)
-              .toList();
-        }
-      }
-      return [];
+      final raw = _decodeResponse(response.data);
+      return _extractList(raw).map(CountryOption.fromJson).toList();
     } catch (e) {
       debugPrint('Error fetching countries: $e');
       return [];
@@ -64,26 +59,34 @@ class CreateAdService {
   Future<List<WorkTypeOption>> getWorkTypes() async {
     try {
       final response = await _apiClient.get('/main/work-type/');
-      final raw = response.data;
-      if (raw is List) {
-        return raw
-            .whereType<Map<String, dynamic>>()
-            .map(WorkTypeOption.fromJson)
-            .toList();
-      }
-      if (raw is String) {
-        final decoded = jsonDecode(raw);
-        if (decoded is List) {
-          return decoded
-              .whereType<Map<String, dynamic>>()
-              .map(WorkTypeOption.fromJson)
-              .toList();
-        }
-      }
-      return [];
+      final raw = _decodeResponse(response.data);
+      return _extractList(raw).map(WorkTypeOption.fromJson).toList();
     } catch (e) {
       debugPrint('Error fetching work types: $e');
       return [];
+    }
+  }
+
+  Future<WorkTypeOption?> suggestWorkType(String name) async {
+    try {
+      final response = await _apiClient.post(
+        '/main/work-type/suggest/',
+        data: {'name': name},
+      );
+      final raw = _decodeResponse(response.data);
+      if (raw is Map<String, dynamic>) {
+        final payload = raw['data'] is Map<String, dynamic>
+            ? raw['data'] as Map<String, dynamic>
+            : raw['result'] is Map<String, dynamic>
+                ? raw['result'] as Map<String, dynamic>
+                : raw;
+        final option = WorkTypeOption.fromJson(payload);
+        return option.id > 0 && option.name.isNotEmpty ? option : null;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error suggesting work type: $e');
+      rethrow;
     }
   }
 
@@ -116,5 +119,25 @@ class CreateAdService {
         'beforeFlight': beforeFlight,
       },
     );
+  }
+
+  dynamic _decodeResponse(dynamic raw) {
+    if (raw is String) return jsonDecode(raw);
+    return raw;
+  }
+
+  List<Map<String, dynamic>> _extractList(dynamic raw) {
+    final source = raw is List
+        ? raw
+        : raw is Map<String, dynamic>
+            ? raw['results'] ?? raw['data'] ?? raw['items'] ?? const []
+            : const [];
+
+    if (source is! List) return [];
+    return source
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .where((item) => _readInt(item['id']) > 0 && _readName(item).isNotEmpty)
+        .toList();
   }
 }
