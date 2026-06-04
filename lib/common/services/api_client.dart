@@ -14,7 +14,8 @@ abstract class TokenStorage {
 // Basic in-memory storage for demonstration. Replace with actual secure storage!
 class InMemoryTokenStorage implements TokenStorage {
   String? _cookies;
-  final String _apiKey = 'eef0787fa713f76_mobile_app_key_2026 xsmtpsib-206808a735e9f7cdbff5b-cMceaL6wYHHzIFkK'; // Default API Key
+  final String _apiKey =
+      'eef0787fa713f76_mobile_app_key_2026 xsmtpsib-206808a735e9f7cdbff5b-cMceaL6wYHHzIFkK'; // Default API Key
 
   @override
   Future<String?> getCookies() async => _cookies;
@@ -36,7 +37,8 @@ class InMemoryTokenStorage implements TokenStorage {
 // Persistent cookie storage implementation using SharedPreferences
 class SharedPreferencesTokenStorage implements TokenStorage {
   static const String _cookieKey = 'auth_cookies';
-  final String _apiKey = 'eef0787fa713f76_mobile_app_key_2026 xsmtpsib-206808a735e9f7cdbff5b-cMceaL6wYHHzIFkK';
+  final String _apiKey =
+      'eef0787fa713f76_mobile_app_key_2026 xsmtpsib-206808a735e9f7cdbff5b-cMceaL6wYHHzIFkK';
 
   @override
   Future<String?> getCookies() async {
@@ -64,15 +66,17 @@ class ApiClient {
   static final ApiClient _instance = ApiClient._internal();
   late Dio _dio;
   late TokenStorage tokenStorage;
-  final String baseUrl = 'https://demoapi.bideshgami.com/api/r'; // Replace with your base URL
+  final String baseUrl =
+      'https://demoapi.bideshgami.com/api/r'; // Replace with your base URL
 
   factory ApiClient() {
     return _instance;
   }
 
   ApiClient._internal() {
-    tokenStorage = SharedPreferencesTokenStorage(); // Use real storage implementation here
-    
+    tokenStorage =
+        SharedPreferencesTokenStorage(); // Use real storage implementation here
+
     BaseOptions options = BaseOptions(
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 30),
@@ -82,7 +86,8 @@ class ApiClient {
         'Accept': 'application/json',
         'Origin': 'https://demoapi.bideshgami.com',
         'Referer': 'https://demoapi.bideshgami.com/',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       },
     );
 
@@ -122,7 +127,9 @@ class ApiClient {
         onError: (DioException e, handler) async {
           // Check for 401 Unauthorized
           if (e.response?.statusCode == 401) {
-            debugPrint("401 Unauthorized caught. Attempting to refresh token...");
+            debugPrint(
+              "401 Unauthorized caught. Attempting to refresh token...",
+            );
             final success = await _refreshToken();
             if (success) {
               try {
@@ -130,7 +137,7 @@ class ApiClient {
                 final newCookies = await tokenStorage.getCookies();
                 if (newCookies != null) {
                   e.requestOptions.headers['Cookie'] = newCookies;
-                  
+
                   // Also extract and update CSRF Token header for the retried request
                   final cookiesMap = _parseCookieString(newCookies);
                   final csrfToken = cookiesMap['csrftoken'];
@@ -138,29 +145,32 @@ class ApiClient {
                     e.requestOptions.headers['X-CSRFToken'] = csrfToken;
                   }
                 }
-                
+
                 // create a new dio instance to avoid interceptor infinite loops
-                final retryDio = Dio(BaseOptions(
-                  baseUrl: baseUrl,
-                  connectTimeout: const Duration(seconds: 30),
-                  receiveTimeout: const Duration(seconds: 30),
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Origin': 'https://demoapi.bideshgami.com',
-                    'Referer': 'https://demoapi.bideshgami.com/',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                  },
-                ));
+                final retryDio = Dio(
+                  BaseOptions(
+                    baseUrl: baseUrl,
+                    connectTimeout: const Duration(seconds: 30),
+                    receiveTimeout: const Duration(seconds: 30),
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json',
+                      'Origin': 'https://demoapi.bideshgami.com',
+                      'Referer': 'https://demoapi.bideshgami.com/',
+                      'User-Agent':
+                          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    },
+                  ),
+                );
                 final response = await retryDio.fetch(e.requestOptions);
                 return handler.resolve(response);
               } on DioException catch (retryError) {
                 return handler.next(retryError);
               }
             } else {
-                debugPrint("Token refresh failed. User needs to login again.");
-                await tokenStorage.clearCookies();
-                // Here you might want to dispatch an event or use a global key to navigate to login screen
+              debugPrint("Token refresh failed. User needs to login again.");
+              await tokenStorage.clearCookies();
+              // Here you might want to dispatch an event or use a global key to navigate to login screen
             }
           }
           return handler.next(e);
@@ -171,23 +181,26 @@ class ApiClient {
 
   Future<bool> _refreshToken() async {
     try {
-      final refreshDio = Dio(BaseOptions(
-        baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': 'https://demoapi.bideshgami.com',
-          'Referer': 'https://demoapi.bideshgami.com/',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        },
-      ));
-      
+      final refreshDio = Dio(
+        BaseOptions(
+          baseUrl: baseUrl,
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Origin': 'https://demoapi.bideshgami.com',
+            'Referer': 'https://demoapi.bideshgami.com/',
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          },
+        ),
+      );
+
       // Get current cookies to send with refresh request
       final currentCookies = await tokenStorage.getCookies();
       final apiKey = await tokenStorage.getApiKey();
-      
+
       final headers = <String, dynamic>{};
       if (currentCookies != null) {
         headers['Cookie'] = currentCookies;
@@ -208,14 +221,14 @@ class ApiClient {
         // Extract new set-cookie header case-insensitively
         final setCookieHeaders = response.headers['set-cookie'];
         if (setCookieHeaders != null && setCookieHeaders.isNotEmpty) {
-           await _updateAndSaveCookies(setCookieHeaders);
+          await _updateAndSaveCookies(setCookieHeaders);
         }
         return true;
       }
       return false;
     } catch (e) {
-       debugPrint("Exception during token refresh: $e");
-       return false;
+      debugPrint("Exception during token refresh: $e");
+      return false;
     }
   }
 
@@ -264,10 +277,11 @@ class ApiClient {
           final value = pair.substring(eqIndex + 1).trim();
           if (key.isNotEmpty) {
             // Check for cookie deletion instructions from the server
-            final isExpired = value.isEmpty || 
-                              value.toLowerCase() == 'deleted' || 
-                              header.contains('Max-Age=0') || 
-                              header.contains('expires=Thu, 01 Jan 1970');
+            final isExpired =
+                value.isEmpty ||
+                value.toLowerCase() == 'deleted' ||
+                header.contains('Max-Age=0') ||
+                header.contains('expires=Thu, 01 Jan 1970');
             if (isExpired) {
               cookiesMap.remove(key);
             } else {
@@ -285,41 +299,89 @@ class ApiClient {
 
   Dio get dio => _dio;
 
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.get(path, queryParameters: queryParameters, options: options);
+      return await _dio.get(
+        path,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } on DioException catch (e) {
       throw _handleError(e);
     }
   }
 
-  Future<Response> post(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> post(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.post(path, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.post(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } on DioException catch (e) {
       throw _handleError(e);
     }
   }
 
-  Future<Response> put(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> put(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.put(path, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.put(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } on DioException catch (e) {
       throw _handleError(e);
     }
   }
 
-  Future<Response> patch(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> patch(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.patch(path, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.patch(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } on DioException catch (e) {
       throw _handleError(e);
     }
   }
 
-  Future<Response> delete(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> delete(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.delete(path, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } on DioException catch (e) {
       throw _handleError(e);
     }
@@ -328,14 +390,39 @@ class ApiClient {
   ApiException _handleError(DioException e) {
     if (e.response != null) {
       return ApiException(
-        message: e.response?.data?['message'] ?? e.message ?? 'Unknown error occurred',
+        message: _extractErrorMessage(e.response?.data, e.message),
         statusCode: e.response?.statusCode,
         data: e.response?.data,
       );
     } else {
-      return ApiException(
-        message: e.message ?? 'Connection error',
-      );
+      return ApiException(message: e.message ?? 'Connection error');
     }
+  }
+
+  String _extractErrorMessage(dynamic data, String? fallback) {
+    if (data is Map) {
+      final errors = data['errors'];
+      if (errors is Map && errors.isNotEmpty) {
+        final messages = <String>[];
+        for (final entry in errors.entries) {
+          final field = entry.key.toString();
+          final value = entry.value;
+          if (value is List) {
+            messages.add('$field: ${value.join(', ')}');
+          } else {
+            messages.add('$field: $value');
+          }
+        }
+        return messages.join('\n');
+      }
+
+      final message = data['message'];
+      if (message != null && message.toString().trim().isNotEmpty) {
+        return message.toString();
+      }
+    }
+
+    if (data is String && data.trim().isNotEmpty) return data;
+    return fallback ?? 'Unknown error occurred';
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../common/services/api_exception.dart';
 import '../../common/theme/app_palette.dart';
 import 'services/create_ad_service.dart';
 import 'dashboard_screen.dart';
@@ -211,6 +212,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     if (_selectedCountryValue == null ||
         _selectedWorkTypeId == null ||
         _selectionType == null ||
+        _selectedImage == null ||
         title.isEmpty ||
         quota == null ||
         applicationDeadline == null) {
@@ -218,8 +220,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         SnackBar(
           content: Text(
             _tr(
-              'Please complete title, country, work type, selection method, quota and deadline',
-              'পদের নাম, দেশ, কাজের ধরন, নির্বাচন পদ্ধতি, কোটা এবং শেষ তারিখ পূরণ করুন',
+              'Please complete title, country, work type, selection method, quota, deadline and image',
+              'পদের নাম, দেশ, কাজের ধরন, নির্বাচন পদ্ধতি, কোটা, শেষ তারিখ এবং ছবি পূরণ করুন',
             ),
           ),
         ),
@@ -233,13 +235,14 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         workTypeId: _selectedWorkTypeId!,
         title: title,
         description: _descriptionController.text.trim(),
-        selectionType: _apiEnumValue(_selectionType!),
+        selectionType: _apiSelectionTypeValue(_selectionType!),
         quota: quota,
         applicationDeadline: applicationDeadline,
         packagePrice: _packagePrice,
         paymentSystem: _paymentSystem,
         paymentSteps: _paymentSteps,
         isBn: widget.isBangla,
+        imagePath: _selectedImage!.path,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -250,7 +253,15 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         ),
       );
       _exitForm();
-    } catch (e) {
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      final message = e.message.trim().isNotEmpty
+          ? e.message
+          : _tr('Failed to publish ad', 'বিজ্ঞাপন প্রকাশ করা যায়নি');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -310,7 +321,17 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     return _selectedCountryValue?.toString().trim() ?? '';
   }
 
-  String _apiEnumValue(String value) {
+  String _apiSelectionTypeValue(String value) {
+    switch (value) {
+      case 'Direct':
+        return 'PUSHING';
+      case 'Delegate':
+        return 'DELEGATE';
+      case 'Zoom Interview':
+        return 'ZOOM_INTERVIEW';
+      case 'Lottery':
+        return 'LOTTERY';
+    }
     return value.trim().toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]+'), '_');
   }
 
@@ -1814,6 +1835,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                                   horizontal: 18,
                                   vertical: 4,
                                 ),
+                                leading: leading,
                                 title: Text(
                                   itemLabel(item),
                                   maxLines: 1,

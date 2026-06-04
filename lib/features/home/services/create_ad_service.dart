@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../common/services/api_client.dart';
@@ -37,8 +38,8 @@ class CountryOption {
           .toString(),
       flag: (json['flag'] ?? json['country_flag'] ?? json['countryFlag'] ?? '')
           .toString(),
-      unicodeFlag:
-          (json['unicodeFlag'] ?? json['unicode_flag'] ?? '').toString(),
+      unicodeFlag: (json['unicodeFlag'] ?? json['unicode_flag'] ?? '')
+          .toString(),
     );
   }
 }
@@ -50,10 +51,7 @@ class WorkTypeOption {
   final String name;
 
   factory WorkTypeOption.fromJson(Map<String, dynamic> json) {
-    return WorkTypeOption(
-      id: _readInt(json['id']),
-      name: _readName(json),
-    );
+    return WorkTypeOption(id: _readInt(json['id']), name: _readName(json));
   }
 }
 
@@ -128,8 +126,8 @@ class CreateAdService {
         final payload = raw['data'] is Map<String, dynamic>
             ? raw['data'] as Map<String, dynamic>
             : raw['result'] is Map<String, dynamic>
-                ? raw['result'] as Map<String, dynamic>
-                : raw;
+            ? raw['result'] as Map<String, dynamic>
+            : raw;
         final option = WorkTypeOption.fromJson(payload);
         return option.id > 0 && option.name.isNotEmpty ? option : null;
       }
@@ -152,26 +150,32 @@ class CreateAdService {
     required String paymentSystem,
     required List<Map<String, dynamic>> paymentSteps,
     required bool isBn,
+    required String imagePath,
   }) async {
-    final payload = {
+    final payload = <String, dynamic>{
       'title': title,
       'country': country,
       'workType': workTypeId,
-      'companyName': 'Example Company Name',
+      'companyName': title,
+      'companyAddress': title,
+      'visaSponsorName': title,
       'selectionType': selectionType,
+      'visaOccupation': title,
       'salary': 50000,
       'currency': 'BDT',
       'minAge': '25',
       'maxAge': '40',
+      'iqama': 'SELF',
       'food': 'COMPANY',
       'workingHours': '8',
       'quota': quota,
-      'contractDuration': 'TWO_YEAR',
+      'contractDuration': '2_YEAR',
+      'isRenewable': false,
       'accommodation': 'COMPANY',
       'gender': 'MALE',
-      'documentsRequired': ['PASSPORT'],
-      'packageIncludes': ['VISA'],
-      'experienceRequired': 'ONE_YEAR',
+      'documentsRequired': ['Passport'],
+      'packageIncludes': ['Visa'],
+      'experienceRequired': '',
       'applicationDeadline': applicationDeadline,
       'processingTime': '30 days',
       'packagePrice': packagePrice,
@@ -191,7 +195,12 @@ class CreateAdService {
     );
 
     try {
-      final response = await _apiClient.post('/work-permits/', data: payload);
+      final requestData = await _buildMultipartPayload(payload, imagePath);
+      final response = await _apiClient.post(
+        '/work-permits/',
+        data: requestData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
       debugPrint(
         'CreateAdService.createAd success: '
         'statusCode=${response.statusCode}, data=${_safeEncode(response.data)}',
@@ -204,6 +213,32 @@ class CreateAdService {
       debugPrintStack(stackTrace: stackTrace);
       rethrow;
     }
+  }
+
+  Future<FormData> _buildMultipartPayload(
+    Map<String, dynamic> payload,
+    String imagePath,
+  ) async {
+    final formData = FormData();
+    for (final entry in payload.entries) {
+      final value = entry.value;
+      if (value is List || value is Map) {
+        formData.fields.add(MapEntry(entry.key, jsonEncode(value)));
+      } else {
+        formData.fields.add(MapEntry(entry.key, value.toString()));
+      }
+    }
+
+    formData.files.add(
+      MapEntry(
+        'image',
+        await MultipartFile.fromFile(
+          imagePath,
+          filename: imagePath.split(RegExp(r'[/\\]')).last,
+        ),
+      ),
+    );
+    return formData;
   }
 
   void _logCreateAdFailure(ApiException error, StackTrace stackTrace) {
@@ -229,13 +264,10 @@ class CreateAdService {
   }
 
   List<Map<String, dynamic>> _extractCountries(dynamic raw) {
-    final source = _extractSource(raw, preferredKeys: const [
-      'results',
-      'data',
-      'countries',
-      'country',
-      'items',
-    ]);
+    final source = _extractSource(
+      raw,
+      preferredKeys: const ['results', 'data', 'countries', 'country', 'items'],
+    );
 
     if (source is List) {
       return source
