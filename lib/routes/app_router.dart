@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../common/widgets/layout/app_scaffold.dart';
-import '../features/auth/agency_sign_up_screen.dart';
 import '../features/auth/agent_sign_up_thank_you_screen.dart';
 import '../features/auth/recruiting_sign_up_screen.dart';
 import '../features/auth/sign_in_screen.dart';
@@ -12,6 +11,12 @@ import '../features/onboarding/splash_screen.dart';
 import 'app_routes.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
+Widget _recruitingAgencySignUpScreen(BuildContext context, GoRouterState state) {
+  return RecruitingSignUpScreen(
+    agencyType: state.uri.queryParameters['type'] ?? 'recruiting',
+  );
+}
 
 CustomTransitionPage _slideTransition(
   BuildContext context,
@@ -53,28 +58,26 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.signUpCustomer,
-      // Keep legacy path, but only allow agency sign up.
-      builder: (context, state) => const AgencySignUpScreen(),
+      // Keep legacy paths, but send users directly to recruiting agency sign up.
+      builder: _recruitingAgencySignUpScreen,
     ),
     GoRoute(
       path: AppRoutes.signUpPartner,
-      // Keep legacy path, but only allow agency sign up.
-      builder: (context, state) => const AgencySignUpScreen(),
+      // Keep legacy paths, but send users directly to recruiting agency sign up.
+      builder: _recruitingAgencySignUpScreen,
     ),
     GoRoute(
       path: AppRoutes.agentSignUp,
-      // Keep legacy path, but only allow agency sign up.
-      builder: (context, state) => const AgencySignUpScreen(),
+      // Keep legacy paths, but send users directly to recruiting agency sign up.
+      builder: _recruitingAgencySignUpScreen,
     ),
     GoRoute(
       path: AppRoutes.agencySignUp,
-      builder: (context, state) => const AgencySignUpScreen(),
+      builder: _recruitingAgencySignUpScreen,
     ),
     GoRoute(
       path: AppRoutes.recruitingSignUp,
-      builder: (context, state) => RecruitingSignUpScreen(
-        agencyType: state.uri.queryParameters['type'] ?? 'recruiting',
-      ),
+      builder: _recruitingAgencySignUpScreen,
     ),
     GoRoute(
       path: AppRoutes.agentSignUpThankYou,
