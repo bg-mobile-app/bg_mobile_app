@@ -556,10 +556,6 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           const SizedBox(height: 16),
           _paymentBreakdown(),
         ],
-        if (_isLoggedIn && displayDetails.agency != null) ...[
-          const SizedBox(height: 16),
-          _agencyInfo(),
-        ],
       ],
     );
   }
@@ -1259,112 +1255,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     );
   }
 
-  Widget _agencyInfo() {
-    if (displayDetails.agency == null) return const SizedBox.shrink();
 
-    return _CardShell(
-      color: _surfaceLow,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final compact = constraints.maxWidth < 360;
-          final logo = Container(
-            width: 62,
-            height: 62,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _outline),
-            ),
-            child: displayDetails.agency!.logo.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Image.network(
-                      displayDetails.agency!.logo,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Center(
-                            child: FaIcon(
-                              FontAwesomeIcons.buildingCircleCheck,
-                              color: _brandBlue,
-                              size: 24,
-                            ),
-                          ),
-                    ),
-                  )
-                : const Center(
-                    child: FaIcon(
-                      FontAwesomeIcons.buildingCircleCheck,
-                      color: _brandBlue,
-                      size: 24,
-                    ),
-                  ),
-          );
-          final details = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                displayDetails.agency!.name,
-                maxLines: compact ? null : 2,
-                overflow: compact
-                    ? TextOverflow.visible
-                    : TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: _text,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _tr(
-                  'RL-${displayDetails.agency!.rlNumber} • Licensed Agency',
-                  'আরএল-${displayDetails.agency!.rlNumber} • লাইসেন্সপ্রাপ্ত এজেন্সি',
-                ),
-                style: const TextStyle(
-                  color: _mutedText,
-                  fontSize: 13,
-                  height: 1.35,
-                ),
-              ),
-              if (displayDetails.agency!.phone.isNotEmpty) ...[
-                const SizedBox(height: 6),
-                Text(
-                  displayDetails.agency!.phone,
-                  style: const TextStyle(
-                    color: _mutedText,
-                    fontSize: 13,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-              if (displayDetails.agency!.status.isNotEmpty) ...[
-                const SizedBox(height: 6),
-                _Pill(
-                  label: _formatEnum(displayDetails.agency!.status),
-                  fontSize: 10,
-                ),
-              ],
-            ],
-          );
-
-          if (compact) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [logo, const SizedBox(height: 12), details],
-            );
-          }
-
-          return Row(
-            children: [
-              logo,
-              const SizedBox(width: 16),
-              Expanded(child: details),
-            ],
-          );
-        },
-      ),
-    );
-  }
 
   Widget _bottomActions(BuildContext context) {
     return SafeArea(

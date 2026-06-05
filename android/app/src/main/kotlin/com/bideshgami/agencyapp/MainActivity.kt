@@ -1,4 +1,4 @@
-package com.example.bg_demo_mobile
+package com.bideshgami.agencyapp
 
 import io.flutter.embedding.android.FlutterActivity
 

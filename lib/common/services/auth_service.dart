@@ -25,7 +25,7 @@ class AuthService {
   }
 
   Future<Response> resendOtp({required String username}) async {
-    return _apiClient.post('/user/resend-otp/', data: {'username': username});
+    return _apiClient.post('/auth/otp/resend/', data: {'username': username});
   }
 
   Future<Response> verifyOtp({
@@ -33,7 +33,7 @@ class AuthService {
     required String otp,
   }) async {
     return _apiClient.post(
-      '/user/verify-otp/',
+      '/auth/otp/verify/',
       data: {'username': username, 'otp': otp},
     );
   }

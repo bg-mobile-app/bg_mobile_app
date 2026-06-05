@@ -201,11 +201,7 @@ class AppBottomNav extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(
-                width: double.infinity,
-                height: 22,
-                child: ColoredBox(color: AppPalette.appcolor),
-              ),
+
             ],
           ),
         ),

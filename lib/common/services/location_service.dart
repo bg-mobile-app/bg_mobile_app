@@ -28,7 +28,7 @@ class LocationService {
   final ApiClient _apiClient = ApiClient();
 
   Future<List<DistrictOption>> getDistricts() async {
-    final response = await _apiClient.get('/common/districts/');
+    final response = await _apiClient.get('/main/district/');
     return _listFromResponse(
       response.data,
     ).map(DistrictOption.fromJson).toList();
@@ -36,8 +36,8 @@ class LocationService {
 
   Future<List<PoliceStationOption>> getPoliceStations(int districtId) async {
     final response = await _apiClient.get(
-      '/common/police-stations/',
-      queryParameters: {'district__id': districtId},
+      '/main/police-station/',
+      queryParameters: {'district': districtId},
     );
     return _listFromResponse(
       response.data,
