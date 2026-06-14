@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../common/services/api_client.dart';
 import '../../routes/app_routes.dart';
 
 class GetStartedScreen extends StatefulWidget {
@@ -13,6 +14,26 @@ class GetStartedScreen extends StatefulWidget {
 class _GetStartedScreenState extends State<GetStartedScreen> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
+  bool _isCheckingAuth = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAlreadyLoggedIn();
+  }
+
+  Future<void> _checkAlreadyLoggedIn() async {
+    final cookies = await ApiClient().tokenStorage.getCookies();
+    if (cookies != null && cookies.isNotEmpty) {
+      if (mounted) {
+        context.go(AppRoutes.home);
+      }
+      return;
+    }
+    if (mounted) {
+      setState(() => _isCheckingAuth = false);
+    }
+  }
 
   static const List<String> _slides = [
     'assets/img/ads/1.png',
@@ -28,6 +49,13 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isCheckingAuth) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -78,12 +106,14 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => context.go(AppRoutes.home),
+                      onPressed: () => context.go(AppRoutes.login),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2563EB),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       child: const Text('Get Started'),
                     ),

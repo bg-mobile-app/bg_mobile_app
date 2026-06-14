@@ -1,23 +1,41 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../features/home/models/agency_profile.dart';
 import 'api_client.dart';
 
 class ProfileService {
+  RecruitingAgencyMeDetailsProps? _cachedProfile;
+  DateTime? _cachedAt;
+  static const Duration _cacheDuration = Duration(minutes: 5);
   final ApiClient _apiClient = ApiClient();
 
   Future<RecruitingAgencyMeDetailsProps?> getAgencyProfile() async {
+    final now = DateTime.now();
+    if (_cachedProfile != null &&
+        _cachedAt != null &&
+        now.difference(_cachedAt!) < _cacheDuration) {
+      return _cachedProfile;
+    }
+
     try {
       final response = await _apiClient.get('/profile/agency/me/');
       if (response.statusCode == 200 && response.data != null) {
-        return _profileFromResponseData(response.data);
+        _cachedProfile = _profileFromResponseData(response.data);
+        _cachedAt = now;
+        return _cachedProfile;
       }
-      return null;
+      return _cachedProfile;
     } catch (e) {
       debugPrint('Error fetching agency profile: $e');
-      return null;
+      return _cachedProfile;
     }
+  }
+
+  void invalidateCache() {
+    _cachedProfile = null;
+    _cachedAt = null;
   }
 
   Future<RecruitingAgencyMeDetailsProps?> updateAgencyProfile(
@@ -30,6 +48,7 @@ class ProfileService {
         options: Options(headers: {'Content-Type': 'multipart/form-data'}),
       );
       if (response.statusCode == 204) {
+        invalidateCache();
         return getAgencyProfile();
       }
 
@@ -38,7 +57,11 @@ class ProfileService {
               response.statusCode == 202) &&
           response.data != null) {
         final profile = _profileFromResponseData(response.data);
-        return profile ?? getAgencyProfile();
+        if (profile != null) {
+          _cachedProfile = profile;
+          _cachedAt = DateTime.now();
+        }
+        return profile ?? _cachedProfile;
       }
       return null;
     } catch (e) {

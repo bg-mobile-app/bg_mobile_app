@@ -113,7 +113,18 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
 flutter_launcher_icons:
+  image_path: "assets/img/logo/bideshgamiAgency.png"
   android: true
   ios: true
-  image_path: assets/img/logo/Favicon_agency_app.png
   remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/img/logo/bideshgamiAgency.png"
+    background_color: "#2563EB"
+    theme_color: "#2563EB"
+  windows:
+    generate: true
+    image_path: "assets/img/logo/bideshgamiAgency.png"
+  macos:
+    generate: true
+    image_path: "assets/img/logo/bideshgamiAgency.png"

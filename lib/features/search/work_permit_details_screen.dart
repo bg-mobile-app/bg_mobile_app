@@ -552,11 +552,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           const SizedBox(height: 16),
           _documentsRequired(),
         ],
-        if (displayDetails.paymentSteps.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          _paymentBreakdown(),
         ],
-      ],
     );
   }
 
@@ -599,9 +595,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
         FontAwesomeIcons.moneyBillWave,
       ),
       _SpecItem(
-        _tr('Age Range', 'বয়সসীমা'),
-        _ageRangeInline(),
-        FontAwesomeIcons.userClock,
+        _tr('Monthly Salary', 'মাসিক বেতন'),
+        '${displayDetails.salary} ${displayDetails.currency}',
+        FontAwesomeIcons.moneyBillWave,
       ),
       _SpecItem(
         _tr('Gender', 'লিঙ্গ'),
@@ -924,7 +920,6 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
 
   Widget _priceCard() {
     final agentSpending = _isLoggedIn ? displayDetails.agentPrice : null;
-    final ownSpending = _isLoggedIn ? displayDetails.packagePrice : null;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -969,60 +964,40 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           const SizedBox(height: 22),
           Container(height: 1, color: Colors.white24),
           const SizedBox(height: 18),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _currencyBadge(),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      _tr('Monthly Salary', 'মাসিক বেতন'),
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        color: Color(0xCCFFFFFF),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      '${displayDetails.salary} ${displayDetails.currency}',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        height: 1.15,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (agentSpending != null || ownSpending != null) ...[
-            Container(height: 1, color: Colors.white24),
+          if (agentSpending != null) ...[
+            _privatePriceRow(
+              title: _tr('Agent Spending', 'এজেন্ট খরচ'),
+              value: 'BDT ${_formatMoney(agentSpending)}',
+            ),
             const SizedBox(height: 14),
-            if (agentSpending != null) ...[
-              _privatePriceRow(
-                title: _tr('Agent Spending', 'এজেন্ট খরচ'),
-                value: 'BDT ${_formatMoney(agentSpending)}',
+            Container(height: 1, color: Colors.white24),
+            const SizedBox(height: 18),
+          ],
+          if (displayDetails.paymentSteps.isNotEmpty) ...[
+            Text(
+              _tr('Payment Breakdown', 'পেমেন্ট বিবরণ'),
+              style: const TextStyle(
+                color: Color(0xCCFFFFFF),
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(height: 12),
-            ],
-            if (ownSpending != null) ...[
-              _privatePriceRow(
-                title: _tr('Own Spending', 'নিজস্ব খরচ'),
-                value: 'BDT ${_formatMoney(ownSpending)}',
-              ),
-              const SizedBox(height: 12),
-            ],
+            ),
+            const SizedBox(height: 14),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var step in displayDetails.paymentSteps) ...[
+                  _privatePriceRow(
+                    title: step.name,
+                    value: 'BDT ${_formatMoney(step.amount.toInt())}',
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ],
+            ),
+            const SizedBox(height: 14),
+            Container(height: 1, color: Colors.white24),
+            const SizedBox(height: 18),
           ],
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1090,78 +1065,6 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     );
   }
 
-  Widget _currencyBadge() {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 112),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white12,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(_currencyMarker(), style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                displayDetails.currency,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Color(0xCCFFFFFF),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _currencyMarker() {
-    final flag = displayDetails.currencyFlag.trim();
-    if (flag.isNotEmpty &&
-        !flag.startsWith('http') &&
-        !flag.contains('/') &&
-        flag.length <= 8) {
-      return flag;
-    }
-    return _currencyFlag(displayDetails.currency);
-  }
-
-  String _currencyFlag(String currency) {
-    switch (currency.toUpperCase()) {
-      case 'BDT':
-        return '🇧🇩';
-      case 'USD':
-        return '🇺🇸';
-      case 'EUR':
-        return '🇪🇺';
-      case 'GBP':
-        return '🇬🇧';
-      case 'MYR':
-        return '🇲🇾';
-      case 'SAR':
-        return '🇸🇦';
-      case 'AED':
-        return '🇦🇪';
-      case 'QAR':
-        return '🇶🇦';
-      case 'KWD':
-        return '🇰🇼';
-      case 'OMR':
-        return '🇴🇲';
-      case 'SGD':
-        return '🇸🇬';
-      default:
-        return '🏳️';
-    }
-  }
-
   String _ageRangeValue() {
     final minAge = displayDetails.minAge;
     final maxAge = displayDetails.maxAge;
@@ -1172,20 +1075,6 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     if (minAge > 0) return _tr('$minAge+\nYears', '$minAge+\nবছর');
     if (maxAge > 0) {
       return _tr('Up to $maxAge\nYears', '$maxAge বছর পর্যন্ত');
-    }
-    return _tr('N/A', 'প্রযোজ্য নয়');
-  }
-
-  String _ageRangeInline() {
-    final minAge = displayDetails.minAge;
-    final maxAge = displayDetails.maxAge;
-
-    if (minAge > 0 && maxAge > 0) {
-      return _tr('$minAge - $maxAge Years', '$minAge - $maxAge বছর');
-    }
-    if (minAge > 0) return _tr('$minAge+ Years', '$minAge+ বছর');
-    if (maxAge > 0) {
-      return _tr('Up to $maxAge Years', '$maxAge বছর পর্যন্ত');
     }
     return _tr('N/A', 'প্রযোজ্য নয়');
   }
@@ -1209,50 +1098,6 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           return '${lower[0].toUpperCase()}${lower.substring(1)}';
         })
         .join(' ');
-  }
-
-  Widget _paymentBreakdown() {
-    if (displayDetails.paymentSteps.isEmpty) return const SizedBox.shrink();
-
-    return _CardShell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            _tr('Payment Breakdown', 'পেমেন্ট বিবরণ'),
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              color: _text,
-            ),
-          ),
-          const SizedBox(height: 22),
-          Column(
-            children: [
-              for (
-                var index = 0;
-                index < displayDetails.paymentSteps.length;
-                index++
-              )
-                _TimelineStep(
-                  step: _PaymentStep(
-                    displayDetails.paymentSteps[index].name,
-                    'BDT ${_formatMoney(displayDetails.paymentSteps[index].amount.toInt())}',
-                    displayDetails.paymentSteps[index].percentage.isNotEmpty
-                        ? _tr(
-                            '${displayDetails.paymentSteps[index].percentage} of total',
-                            'মোটের ${displayDetails.paymentSteps[index].percentage}',
-                          )
-                        : _tr('Payment step', 'পেমেন্ট ধাপ'),
-                    index == 0,
-                  ),
-                  isLast: index == displayDetails.paymentSteps.length - 1,
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _bottomActions(BuildContext context) {
@@ -1472,19 +1317,17 @@ class _CardShell extends StatelessWidget {
   const _CardShell({
     required this.child,
     this.padding = const EdgeInsets.all(18),
-    this.color = _surface,
   });
 
   final Widget child;
   final EdgeInsets padding;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: color,
+        color: _surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _outline),
       ),
@@ -1762,83 +1605,3 @@ class _PackageTag extends StatelessWidget {
   }
 }
 
-class _PaymentStep {
-  const _PaymentStep(this.title, this.amount, this.description, this.active);
-
-  final String title;
-  final String amount;
-  final String description;
-  final bool active;
-}
-
-class _TimelineStep extends StatelessWidget {
-  const _TimelineStep({required this.step, required this.isLast});
-
-  final _PaymentStep step;
-  final bool isLast;
-
-  @override
-  Widget build(BuildContext context) {
-    final dotColor = step.active ? _brandBlue : const Color(0xFFDBE1FF);
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            children: [
-              Container(
-                width: 18,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: dotColor,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 4),
-                ),
-              ),
-              if (!isLast)
-                Expanded(child: Container(width: 2, color: _outline)),
-            ],
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 22),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    step.title.toUpperCase(),
-                    style: TextStyle(
-                      color: step.active ? _brandBlue : _mutedText,
-                      fontSize: 11,
-                      letterSpacing: 0.6,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    step.amount,
-                    style: const TextStyle(
-                      color: _text,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    step.description,
-                    style: const TextStyle(
-                      color: _mutedText,
-                      fontSize: 13,
-                      height: 1.35,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

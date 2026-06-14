@@ -21,6 +21,26 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool _showPassword = false;
   bool _isLoading = false;
+  bool _isCheckingAuth = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAlreadyLoggedIn();
+  }
+
+  Future<void> _checkAlreadyLoggedIn() async {
+    final cookies = await ApiClient().tokenStorage.getCookies();
+    if (cookies != null && cookies.isNotEmpty) {
+      if (mounted) {
+        context.go(AppRoutes.home);
+      }
+      return;
+    }
+    if (mounted) {
+      setState(() => _isCheckingAuth = false);
+    }
+  }
 
   void _showWarningDialog(String title, String message) {
     showDialog(
@@ -88,7 +108,7 @@ class _SignInScreenState extends State<SignInScreen> {
         await apiClient.saveCookiesFromResponse(response);
         await ExpiryReminderDialogService().markPendingForLogin();
         if (mounted) {
-          Navigator.pop(context, true);
+          context.go(AppRoutes.home);
         }
       }
     } on DioException catch (e) {
@@ -169,121 +189,131 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FBFF), Color(0xFFEEF4FF)],
-          ),
-        ),
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final isDesktop = constraints.maxWidth >= 900;
+    if (_isCheckingAuth) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 24,
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight - 48,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFF8FBFF), Color(0xFFEEF4FF)],
+            ),
+          ),
+          child: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isDesktop = constraints.maxWidth >= 900;
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 24,
                   ),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1180),
-                      child: IntrinsicHeight(
-                        child: Flex(
-                          direction: isDesktop
-                              ? Axis.horizontal
-                              : Axis.vertical,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            if (isDesktop)
-                              Expanded(
-                                child: Container(
-                                  margin: const EdgeInsets.only(right: 24),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(24),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Color(0x1F0F172A),
-                                        blurRadius: 30,
-                                        offset: Offset(0, 14),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(24),
-                                    child: Stack(
-                                      fit: StackFit.expand,
-                                      children: [
-                                        Image.asset(
-                                          'assets/img/sign-in/login.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                        Container(
-                                          decoration: const BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                              colors: [
-                                                Color(0x660F172A),
-                                                Color(0xAA0F172A),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        const Positioned(
-                                          left: 30,
-                                          right: 30,
-                                          bottom: 30,
-                                          child: Text(
-                                            'Manage your visa and travel workflow with confidence.',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.w600,
-                                              height: 1.3,
-                                            ),
-                                          ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight - 48,
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1180),
+                        child: IntrinsicHeight(
+                          child: Flex(
+                            direction: isDesktop
+                                ? Axis.horizontal
+                                : Axis.vertical,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (isDesktop)
+                                Flexible(
+                                  fit: FlexFit.loose,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 24),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(24),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Color(0x1F0F172A),
+                                          blurRadius: 30,
+                                          offset: Offset(0, 14),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ),
-                              ),
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(24),
-                                  border: Border.all(
-                                    color: const Color(0xFFE2E8F0),
-                                  ),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0x140F172A),
-                                      blurRadius: 30,
-                                      offset: Offset(0, 12),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(24),
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          Image.asset(
+                                            'assets/img/sign-in/login.jpg',
+                                            fit: BoxFit.cover,
+                                          ),
+                                          Container(
+                                            decoration: const BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [
+                                                  Color(0x660F172A),
+                                                  Color(0xAA0F172A),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          const Positioned(
+                                            left: 30,
+                                            right: 30,
+                                            bottom: 30,
+                                            child: Text(
+                                              'Manage your visa and travel workflow with confidence.',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.w600,
+                                                height: 1.3,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                                child: _buildLoginCard(),
+                              Flexible(
+                                fit: FlexFit.loose,
+                                child: Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: const Color(0xFFE2E8F0),
+                                    ),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Color(0x140F172A),
+                                        blurRadius: 30,
+                                        offset: Offset(0, 12),
+                                      ),
+                                    ],
+                                  ),
+                                  child: _buildLoginCard(),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -328,14 +358,6 @@ class _SignInScreenState extends State<SignInScreen> {
           const SizedBox(height: 14),
           _buildPasswordField(),
           const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {},
-              child: const Text('Forgot Password?'),
-            ),
-          ),
-          const SizedBox(height: 8),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -374,7 +396,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   style: TextStyle(color: Color(0xFF64748B)),
                 ),
                 TextButton(
-                  onPressed: () => context.push(AppRoutes.agencySignUp),
+                  onPressed: () => context.push(AppRoutes.recruitingSignUp),
                   child: const Text(
                     'Create an account',
                     style: TextStyle(fontWeight: FontWeight.w700),

@@ -11,6 +11,7 @@ import '../../common/services/api_client.dart';
 import '../../common/services/auth_service.dart';
 import '../../common/services/expiry_reminder_dialog_service.dart';
 import '../../common/services/profile_service.dart';
+import '../../routes/app_routes.dart';
 import 'models/agency_profile.dart';
 import 'models/dashboard_models.dart';
 import 'services/dashboard_service.dart';
@@ -1260,7 +1261,7 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
                   }
                   await ApiClient().tokenStorage.clearCookies();
                   if (!mounted) return;
-                  router.go('/login');
+                  router.go(AppRoutes.login);
                 },
               ),
             ],

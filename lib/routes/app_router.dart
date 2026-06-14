@@ -62,11 +62,6 @@ final GoRouter appRouter = GoRouter(
       builder: _recruitingAgencySignUpScreen,
     ),
     GoRoute(
-      path: AppRoutes.signUpPartner,
-      // Keep legacy paths, but send users directly to recruiting agency sign up.
-      builder: _recruitingAgencySignUpScreen,
-    ),
-    GoRoute(
       path: AppRoutes.agentSignUp,
       // Keep legacy paths, but send users directly to recruiting agency sign up.
       builder: _recruitingAgencySignUpScreen,
