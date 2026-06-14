@@ -1400,8 +1400,7 @@ class _SidebarNavTile extends StatelessWidget {
             ),
           ),
           iconColor: activeColor,
-          collapsedIconColor:
-              isActive ? activeColor : const Color(0xFF64748B),
+          collapsedIconColor: isActive ? activeColor : const Color(0xFF64748B),
           children: link.children
               .map(
                 (child) => _SidebarChildLink(

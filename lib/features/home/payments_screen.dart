@@ -89,7 +89,17 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
           list = list.where((p) => p.step == _status).toList();
         }
         if (_debouncedSearch.isNotEmpty) {
-          list = list.where((p) => p.passportNo.toLowerCase().contains(_debouncedSearch.toLowerCase()) || p.bookingId.toLowerCase().contains(_debouncedSearch.toLowerCase())).toList();
+          list = list
+              .where(
+                (p) =>
+                    p.passportNo.toLowerCase().contains(
+                      _debouncedSearch.toLowerCase(),
+                    ) ||
+                    p.bookingId.toLowerCase().contains(
+                      _debouncedSearch.toLowerCase(),
+                    ),
+              )
+              .toList();
         }
         setState(() {
           _payments = list;
@@ -118,7 +128,17 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
         list = list.where((p) => p.step == _status).toList();
       }
       if (_debouncedSearch.isNotEmpty) {
-        list = list.where((p) => p.passportNo.toLowerCase().contains(_debouncedSearch.toLowerCase()) || p.bookingId.toLowerCase().contains(_debouncedSearch.toLowerCase())).toList();
+        list = list
+            .where(
+              (p) =>
+                  p.passportNo.toLowerCase().contains(
+                    _debouncedSearch.toLowerCase(),
+                  ) ||
+                  p.bookingId.toLowerCase().contains(
+                    _debouncedSearch.toLowerCase(),
+                  ),
+            )
+            .toList();
       }
       setState(() {
         _payments = list;
@@ -151,14 +171,20 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Payments History',
-                  style: AppTextStyles.headline2.copyWith(fontSize: 25, fontWeight: FontWeight.w800, color: AppPalette.textPrimary),
+                  style: AppTextStyles.headline2.copyWith(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                    color: AppPalette.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _isInitialLoading
                       ? 'Loading your payment history...'
                       : 'See history of your payment plan invoice (${_payments.length})',
-                  style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted),
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppPalette.textMuted,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 _topControls(),
@@ -170,7 +196,9 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 else
                   Skeletonizer(
                     enabled: _isInitialLoading,
-                    child: _cardView ? _cardContent(displayItems) : _tableContent(displayItems),
+                    child: _cardView
+                        ? _cardContent(displayItems)
+                        : _tableContent(displayItems),
                   ),
                 const SizedBox(height: 16),
                 Skeletonizer(
@@ -189,16 +217,26 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     return BreadCrumb(
       items: <BreadCrumbItem>[
         BreadCrumbItem(
-          content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted)),
+          content: Text(
+            'Dashboard',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
         ),
         BreadCrumbItem(
           content: Text(
             'Payments',
-            style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700),
+            style: AppTextStyles.caption.copyWith(
+              color: AppPalette.textStrongBlue,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
-      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+      divider: const Icon(
+        Icons.chevron_right_rounded,
+        size: 16,
+        color: Color(0xFF94A3B8),
+      ),
     );
   }
 
@@ -255,7 +293,11 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
         child: DropdownButtonFormField<String>(
           initialValue: _status.isEmpty ? null : _status,
           isExpanded: true,
-          style: const TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
           dropdownColor: Colors.white,
           iconEnabledColor: AppPalette.brandBlue,
           decoration: const InputDecoration(
@@ -263,17 +305,16 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
             fillColor: Colors.white,
             hintText: 'All Status',
             hintStyle: TextStyle(color: AppPalette.textMuted, fontSize: 13),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 8,
-            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
           ),
           items: [
             const DropdownMenuItem(value: '', child: Text('All Status')),
-            ...bookingStatus.map((e) => DropdownMenuItem(value: e, child: Text(e))),
+            ...bookingStatus.map(
+              (e) => DropdownMenuItem(value: e, child: Text(e)),
+            ),
           ],
           onChanged: (value) {
             setState(() {
@@ -308,16 +349,32 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
           .map(
             (item) => DataRow(
               cells: [
-                DataCell(Text('#INV-${item.id}', style: const TextStyle(fontWeight: FontWeight.w700))),
+                DataCell(
+                  Text(
+                    '#INV-${item.id}',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
                 DataCell(Text(item.terminal)),
                 DataCell(Text(item.bookingId)),
                 DataCell(Text(item.postId)),
                 DataCell(Text(_formatListDate(item.collectedAt))),
                 DataCell(Text(item.passportNo)),
-                DataCell(Text('৳ ${_money(item.amount)}', style: const TextStyle(fontWeight: FontWeight.w700))),
-                DataCell(Text(item.transactionType.isEmpty ? '-' : item.transactionType)),
+                DataCell(
+                  Text(
+                    '৳ ${_money(item.amount)}',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    item.transactionType.isEmpty ? '-' : item.transactionType,
+                  ),
+                ),
                 DataCell(Text(item.step.isEmpty ? '-' : item.step)),
-                DataCell(_statusChip(item.status.isEmpty ? item.step : item.status)),
+                DataCell(
+                  _statusChip(item.status.isEmpty ? item.step : item.status),
+                ),
               ],
             ),
           )
@@ -330,9 +387,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
       return _emptyState();
     }
 
-    return Column(
-      children: items.map(_paymentCard).toList(),
-    );
+    return Column(children: items.map(_paymentCard).toList());
   }
 
   Widget _paymentCard(PaymentsHistory item) {
@@ -369,12 +424,18 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: isReturn ? const Color(0xFFFAD6D6) : const Color(0xFFD8E6FF),
+                    color: isReturn
+                        ? const Color(0xFFFAD6D6)
+                        : const Color(0xFFD8E6FF),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Icon(
-                    isReturn ? Icons.keyboard_return_rounded : Icons.payments_outlined,
-                    color: isReturn ? const Color(0xFF9F0E0E) : AppPalette.brandBlue,
+                    isReturn
+                        ? Icons.keyboard_return_rounded
+                        : Icons.payments_outlined,
+                    color: isReturn
+                        ? const Color(0xFF9F0E0E)
+                        : AppPalette.brandBlue,
                     size: 34,
                   ),
                 ),
@@ -385,7 +446,11 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                     children: [
                       Text(
                         '#INV-${item.id}',
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Color(0xFF191B24)),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF191B24),
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Wrap(
@@ -393,14 +458,40 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                         runSpacing: 8,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(color: const Color(0xFFD8E6FF), borderRadius: BorderRadius.circular(8)),
-                            child: Text('Post: ${item.postId}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF38485D))),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFD8E6FF),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'Post: ${item.postId}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF38485D),
+                              ),
+                            ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(color: const Color(0xFFEAF4FF), borderRadius: BorderRadius.circular(8)),
-                            child: Text('Booking: ${item.bookingId}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF38485D))),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEAF4FF),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'Booking: ${item.bookingId}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF38485D),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -418,38 +509,83 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: _detailTile('PAYMENT DATE', _formatListDate(item.collectedAt), Icons.calendar_today_outlined)),
+                    Expanded(
+                      child: _detailTile(
+                        'PAYMENT DATE',
+                        _formatListDate(item.collectedAt),
+                        Icons.calendar_today_outlined,
+                      ),
+                    ),
                     const SizedBox(width: 14),
-                    Expanded(child: _detailTile('PAYMENT TIME', _formatTime(item.collectedAt), Icons.schedule)),
+                    Expanded(
+                      child: _detailTile(
+                        'PAYMENT TIME',
+                        _formatTime(item.collectedAt),
+                        Icons.schedule,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    Expanded(child: _detailTile('PASSPORT NO', item.passportNo, Icons.badge_outlined)),
+                    Expanded(
+                      child: _detailTile(
+                        'PASSPORT NO',
+                        item.passportNo,
+                        Icons.badge_outlined,
+                      ),
+                    ),
                     const SizedBox(width: 14),
-                    Expanded(child: _detailTile('SERVICE TYPE', item.terminal, Icons.miscellaneous_services_outlined)),
+                    Expanded(
+                      child: _detailTile(
+                        'SERVICE TYPE',
+                        item.terminal,
+                        Icons.miscellaneous_services_outlined,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    Expanded(child: _detailTile('TRANSACTION TYPE', item.transactionType, Icons.compare_arrows_rounded)),
+                    Expanded(
+                      child: _detailTile(
+                        'TRANSACTION TYPE',
+                        item.transactionType,
+                        Icons.compare_arrows_rounded,
+                      ),
+                    ),
                     const SizedBox(width: 14),
-                    Expanded(child: _detailTile('STEP', item.step, Icons.linear_scale_rounded)),
+                    Expanded(
+                      child: _detailTile(
+                        'STEP',
+                        item.step,
+                        Icons.linear_scale_rounded,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    Expanded(child: _detailTile('STATUS', item.status.isEmpty ? item.step : item.status, Icons.verified_outlined)),
+                    Expanded(
+                      child: _detailTile(
+                        'STATUS',
+                        item.status.isEmpty ? item.step : item.status,
+                        Icons.verified_outlined,
+                      ),
+                    ),
                     const SizedBox(width: 14),
                     const Expanded(child: SizedBox()),
                   ],
                 ),
                 const SizedBox(height: 18),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF1F3FF),
                     borderRadius: BorderRadius.circular(14),
@@ -457,18 +593,47 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.account_balance_wallet_outlined, color: Color(0xFF434655), size: 30),
+                      const Icon(
+                        Icons.account_balance_wallet_outlined,
+                        color: Color(0xFF434655),
+                        size: 30,
+                      ),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('AMOUNT', style: TextStyle(fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
-                            Text('৳ ${_money(item.amount)}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: isReturn ? const Color(0xFF9F0E0E) : AppPalette.textPrimary)),
+                            const Text(
+                              'AMOUNT',
+                              style: TextStyle(
+                                fontSize: 10,
+                                letterSpacing: 1,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF737687),
+                              ),
+                            ),
+                            Text(
+                              '৳ ${_money(item.amount)}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: isReturn
+                                    ? const Color(0xFF9F0E0E)
+                                    : AppPalette.textPrimary,
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      Icon(isReturn ? Icons.trending_down_rounded : Icons.trending_up_rounded, color: isReturn ? const Color(0xFF9F0E0E) : const Color(0xFF166534), size: 28),
+                      Icon(
+                        isReturn
+                            ? Icons.trending_down_rounded
+                            : Icons.trending_up_rounded,
+                        color: isReturn
+                            ? const Color(0xFF9F0E0E)
+                            : const Color(0xFF166534),
+                        size: 28,
+                      ),
                     ],
                   ),
                 ),
@@ -500,9 +665,23 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('TOTAL PROCESSED', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700)),
+              const Text(
+                'TOTAL PROCESSED',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 6),
-              Text('৳ ${_money(totalProcessed)}', style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800)),
+              Text(
+                '৳ ${_money(totalProcessed)}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 40,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ],
           ),
         ),
@@ -519,11 +698,22 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('PENDING CLAIMS', style: TextStyle(color: AppPalette.textMuted, fontSize: 12, fontWeight: FontWeight.w700)),
+              const Text(
+                'PENDING CLAIMS',
+                style: TextStyle(
+                  color: AppPalette.textMuted,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 8),
               Text(
                 '$pendingCount',
-                style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w700, color: AppPalette.textPrimary),
+                style: const TextStyle(
+                  fontSize: 42,
+                  fontWeight: FontWeight.w700,
+                  color: AppPalette.textPrimary,
+                ),
               ),
               const SizedBox(height: 12),
               ClipRRect(
@@ -554,11 +744,18 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.payments_outlined, size: 60, color: AppPalette.textMuted),
+          const Icon(
+            Icons.payments_outlined,
+            size: 60,
+            color: AppPalette.textMuted,
+          ),
           const SizedBox(height: 16),
           Text(
             'No payments history found',
-            style: AppTextStyles.subtitle1.copyWith(color: AppPalette.textPrimary, fontWeight: FontWeight.bold),
+            style: AppTextStyles.subtitle1.copyWith(
+              color: AppPalette.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -582,12 +779,19 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
       ),
       child: Column(
         children: [
-          const Icon(Icons.error_outline_rounded, size: 48, color: Colors.redAccent),
+          const Icon(
+            Icons.error_outline_rounded,
+            size: 48,
+            color: Colors.redAccent,
+          ),
           const SizedBox(height: 14),
           Text(
             _error ?? 'Failed to load payments',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -597,7 +801,9 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppPalette.brandBlue,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ],
@@ -609,13 +815,29 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            letterSpacing: 1,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF737687),
+          ),
+        ),
         const SizedBox(height: 6),
         Row(
           children: [
             Icon(icon, size: 22, color: AppPalette.brandBlue),
             const SizedBox(width: 8),
-            Expanded(child: Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
         ),
       ],
@@ -639,8 +861,14 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: fg),
+      ),
     );
   }
 
@@ -652,7 +880,20 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
   }
 
   String _formatListDate(DateTime date) {
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day.toString().padLeft(2, '0')} ${monthNames[date.month - 1]}, ${date.year}';
   }
 

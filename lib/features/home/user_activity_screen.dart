@@ -22,10 +22,46 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
   int _currentPage = 1;
 
   final List<UserActivityItem> _allResults = const [
-    UserActivityItem(id: 101, fullName: 'Jane Doe', email: 'jane.doe@example.com', phone: '+1987654321', userCode: 'USR-54321', userRole: 'AGENCY_ADMIN', changes: 'User successfully logged in.', createdAt: '2023-10-27T14:30:00Z'),
-    UserActivityItem(id: 102, fullName: 'Jane Doe', email: 'jane.doe@example.com', phone: '+1987654321', userCode: 'USR-54321', userRole: 'AGENCY_ADMIN', changes: 'Viewed the main dashboard.', createdAt: '2023-10-27T14:30:15Z'),
-    UserActivityItem(id: 103, fullName: 'Jane Doe', email: 'jane.doe@example.com', phone: '+1987654321', userCode: 'USR-54321', userRole: 'AGENCY_ADMIN', changes: 'Updated profile contact number.', createdAt: '2023-10-27T14:32:45Z'),
-    UserActivityItem(id: 104, fullName: 'Jane Doe', email: 'jane.doe@example.com', phone: '+1987654321', userCode: 'USR-54321', userRole: 'AGENCY_ADMIN', changes: "Created a new staff account for 'John Smith'.", createdAt: '2023-10-28T09:15:10Z'),
+    UserActivityItem(
+      id: 101,
+      fullName: 'Jane Doe',
+      email: 'jane.doe@example.com',
+      phone: '+1987654321',
+      userCode: 'USR-54321',
+      userRole: 'AGENCY_ADMIN',
+      changes: 'User successfully logged in.',
+      createdAt: '2023-10-27T14:30:00Z',
+    ),
+    UserActivityItem(
+      id: 102,
+      fullName: 'Jane Doe',
+      email: 'jane.doe@example.com',
+      phone: '+1987654321',
+      userCode: 'USR-54321',
+      userRole: 'AGENCY_ADMIN',
+      changes: 'Viewed the main dashboard.',
+      createdAt: '2023-10-27T14:30:15Z',
+    ),
+    UserActivityItem(
+      id: 103,
+      fullName: 'Jane Doe',
+      email: 'jane.doe@example.com',
+      phone: '+1987654321',
+      userCode: 'USR-54321',
+      userRole: 'AGENCY_ADMIN',
+      changes: 'Updated profile contact number.',
+      createdAt: '2023-10-27T14:32:45Z',
+    ),
+    UserActivityItem(
+      id: 104,
+      fullName: 'Jane Doe',
+      email: 'jane.doe@example.com',
+      phone: '+1987654321',
+      userCode: 'USR-54321',
+      userRole: 'AGENCY_ADMIN',
+      changes: "Created a new staff account for 'John Smith'.",
+      createdAt: '2023-10-28T09:15:10Z',
+    ),
   ];
 
   int get _totalCount => 23;
@@ -53,13 +89,16 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () => context.go('/dashboard/user/manage-user'),
+                      onPressed: () =>
+                          context.go('/dashboard/user/manage-user'),
                       icon: const Icon(Icons.arrow_back),
                       tooltip: 'Back',
                     ),
                     Text(
                       'User Activity',
-                      style: AppTextStyles.headline1.copyWith(color: AppPalette.textStrongBlue),
+                      style: AppTextStyles.headline1.copyWith(
+                        color: AppPalette.textStrongBlue,
+                      ),
                     ),
                   ],
                 ),
@@ -68,12 +107,16 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'Viewing activity logs for user ID: ${widget.userId}',
-                  style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted),
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppPalette.textMuted,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   'Scroll horizontally to view all columns. Pagination appears below the table.',
-                  style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppPalette.textMuted,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 StyledDataTableCard(
@@ -93,7 +136,9 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
                         DataCell(Text(item.phone)),
                         DataCell(Text(item.userRole)),
                         DataCell(Text(_prettyDate(item.createdAt))),
-                        DataCell(SizedBox(width: 280, child: Text(item.changes))),
+                        DataCell(
+                          SizedBox(width: 280, child: Text(item.changes)),
+                        ),
                       ],
                     );
                   }).toList(),
@@ -103,14 +148,21 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     OutlinedButton(
-                      onPressed: _currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                      onPressed: _currentPage > 1
+                          ? () => setState(() => _currentPage--)
+                          : null,
                       child: const Text('Previous'),
                     ),
                     const SizedBox(width: AppSpacing.sm),
-                    Text('Page $_currentPage of $_totalPages', style: AppTextStyles.body2),
+                    Text(
+                      'Page $_currentPage of $_totalPages',
+                      style: AppTextStyles.body2,
+                    ),
                     const SizedBox(width: AppSpacing.sm),
                     OutlinedButton(
-                      onPressed: _currentPage < _totalPages ? () => setState(() => _currentPage++) : null,
+                      onPressed: _currentPage < _totalPages
+                          ? () => setState(() => _currentPage++)
+                          : null,
                       child: const Text('Next'),
                     ),
                   ],
@@ -126,19 +178,51 @@ class _UserActivityScreenState extends State<UserActivityScreen> {
   Widget _breadcrumb() {
     return BreadCrumb(
       items: <BreadCrumbItem>[
-        BreadCrumbItem(content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
-        BreadCrumbItem(content: Text('Manage User', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
-        BreadCrumbItem(content: Text('User Activity', style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700))),
+        BreadCrumbItem(
+          content: Text(
+            'Dashboard',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
+        ),
+        BreadCrumbItem(
+          content: Text(
+            'Manage User',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
+        ),
+        BreadCrumbItem(
+          content: Text(
+            'User Activity',
+            style: AppTextStyles.caption.copyWith(
+              color: AppPalette.textStrongBlue,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
       ],
-      divider: const Icon(Icons.chevron_right, size: 16, color: AppPalette.textMuted),
+      divider: const Icon(
+        Icons.chevron_right,
+        size: 16,
+        color: AppPalette.textMuted,
+      ),
     );
   }
 
-  String _prettyDate(String iso) => DateTime.parse(iso).toLocal().toString().replaceFirst('.000', '');
+  String _prettyDate(String iso) =>
+      DateTime.parse(iso).toLocal().toString().replaceFirst('.000', '');
 }
 
 class UserActivityItem {
-  const UserActivityItem({required this.id, required this.fullName, required this.email, required this.phone, required this.userCode, required this.userRole, required this.changes, required this.createdAt});
+  const UserActivityItem({
+    required this.id,
+    required this.fullName,
+    required this.email,
+    required this.phone,
+    required this.userCode,
+    required this.userRole,
+    required this.changes,
+    required this.createdAt,
+  });
 
   final int id;
   final String fullName;

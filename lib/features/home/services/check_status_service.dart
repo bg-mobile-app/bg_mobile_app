@@ -12,17 +12,17 @@ class CheckStatusService {
     try {
       final response = await _apiClient.get(
         '/booking/wp/status/my-bookings/',
-        queryParameters: {
-          'id': bookingId,
-          'passport_no': passportNo,
-        },
+        queryParameters: {'id': bookingId, 'passport_no': passportNo},
       );
 
       final data = response.data;
       if (data is List) {
         return data
             .whereType<Map>()
-            .map((item) => BookingStatusDto.fromJson(Map<String, dynamic>.from(item)))
+            .map(
+              (item) =>
+                  BookingStatusDto.fromJson(Map<String, dynamic>.from(item)),
+            )
             .toList();
       }
 
@@ -73,16 +73,25 @@ class BookingStatusDto {
     }
 
     return BookingStatusDto(
-      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
       name: pickString(['name']) ?? '',
       passportNo: pickString(['passportNo', 'passport_no']) ?? '',
       toCountry: pickString(['toCountry', 'to_country']) ?? '',
       serviceType: pickString(['serviceType', 'service_type']) ?? '',
       branch: pickString(['branch']) ?? '',
       statusLabel: pickString(['statusLabel', 'status_label']) ?? '',
-      appointmentDate: pickString(['appointmentDate', 'appointment_date']) ?? '',
-      medicalExpiryDate: pickString(['medicalExpiryDate', 'medical_expiry_date']),
-      policeClearanceExpiryDate: pickString(['policeClearanceExpiryDate', 'police_clearance_expiry_date']),
+      appointmentDate:
+          pickString(['appointmentDate', 'appointment_date']) ?? '',
+      medicalExpiryDate: pickString([
+        'medicalExpiryDate',
+        'medical_expiry_date',
+      ]),
+      policeClearanceExpiryDate: pickString([
+        'policeClearanceExpiryDate',
+        'police_clearance_expiry_date',
+      ]),
       visaExpiryDate: pickString(['visaExpiryDate', 'visa_expiry_date']),
     );
   }

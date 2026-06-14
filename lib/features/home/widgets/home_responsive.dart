@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 class HomeResponsive {
   HomeResponsive._(this.width)
-      : scale = (width / 390).clamp(0.78, 1.08).toDouble(),
-        textScale = (width / 390).clamp(0.82, 1.0).toDouble();
+    : scale = (width / 390).clamp(0.78, 1.08).toDouble(),
+      textScale = (width / 390).clamp(0.82, 1.0).toDouble();
 
   factory HomeResponsive.of(BuildContext context) {
     return HomeResponsive._(MediaQuery.of(context).size.width);

@@ -72,8 +72,16 @@ class ReceivedBookingCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: const Color(0x334B5D7A), width: 1.2),
           boxShadow: const [
-            BoxShadow(color: Color(0x0D000000), blurRadius: 26, offset: Offset(0, 12)),
-            BoxShadow(color: Color(0x122563EB), blurRadius: 8, offset: Offset(0, 1)),
+            BoxShadow(
+              color: Color(0x0D000000),
+              blurRadius: 26,
+              offset: Offset(0, 12),
+            ),
+            BoxShadow(
+              color: Color(0x122563EB),
+              blurRadius: 8,
+              offset: Offset(0, 1),
+            ),
           ],
         ),
         child: Column(
@@ -115,7 +123,10 @@ class ReceivedBookingCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [style.badgeBg, style.badgeBg.withValues(alpha: 0.72)],
+                  colors: [
+                    style.badgeBg,
+                    style.badgeBg.withValues(alpha: 0.72),
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(999),
               ),
@@ -151,7 +162,10 @@ class ReceivedBookingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 8),
           _pill('Passport: $passportNo', AppPalette.textMuted),
           const SizedBox(height: 8),
@@ -174,10 +188,7 @@ class ReceivedBookingCard extends StatelessWidget {
       child: Column(
         children: [
           _routeRow(),
-          if (hasClearance) ...[
-            const SizedBox(height: 14),
-            _clearanceRow(),
-          ],
+          if (hasClearance) ...[const SizedBox(height: 14), _clearanceRow()],
         ],
       ),
     );
@@ -198,18 +209,28 @@ class ReceivedBookingCard extends StatelessWidget {
             child: Text(
               fromCountry,
               textAlign: TextAlign.left,
-              style: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textPrimary),
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppPalette.textPrimary,
+              ),
             ),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(Icons.flight_takeoff_rounded, size: 18, color: AppPalette.textStrongBlue),
+            child: Icon(
+              Icons.flight_takeoff_rounded,
+              size: 18,
+              color: AppPalette.textStrongBlue,
+            ),
           ),
           Expanded(
             child: Text(
               toCountry,
               textAlign: TextAlign.right,
-              style: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textPrimary),
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppPalette.textPrimary,
+              ),
             ),
           ),
         ],
@@ -220,11 +241,25 @@ class ReceivedBookingCard extends StatelessWidget {
   Widget _clearanceRow() {
     final cells = <Widget>[
       if (showMedical)
-        Expanded(child: _clearanceCell('Medical', medicalText, Icons.medical_services_outlined)),
+        Expanded(
+          child: _clearanceCell(
+            'Medical',
+            medicalText,
+            Icons.medical_services_outlined,
+          ),
+        ),
       if (showVisa)
-        Expanded(child: _clearanceCell('Visa', visaText, Icons.verified_user_outlined)),
+        Expanded(
+          child: _clearanceCell('Visa', visaText, Icons.verified_user_outlined),
+        ),
       if (showPoliceClear)
-        Expanded(child: _clearanceCell('Police Clear', policeClearText, Icons.gavel_rounded)),
+        Expanded(
+          child: _clearanceCell(
+            'Police Clear',
+            policeClearText,
+            Icons.gavel_rounded,
+          ),
+        ),
     ];
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -233,9 +268,7 @@ class ReceivedBookingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0x334B5D7A)),
       ),
-      child: Row(
-        children: _withDividers(cells),
-      ),
+      child: Row(children: _withDividers(cells)),
     );
   }
 
@@ -245,7 +278,12 @@ class ReceivedBookingCard extends StatelessWidget {
     for (var i = 0; i < children.length; i++) {
       output.add(children[i]);
       if (i != children.length - 1) {
-        output.add(const SizedBox(height: 28, child: VerticalDivider(color: Color(0x334B5D7A), thickness: 1)));
+        output.add(
+          const SizedBox(
+            height: 28,
+            child: VerticalDivider(color: Color(0x334B5D7A), thickness: 1),
+          ),
+        );
       }
     }
     return output;
@@ -330,11 +368,17 @@ class ReceivedBookingCard extends StatelessWidget {
   Widget _payoutIndicators() {
     return Row(
       children: [
-        Expanded(child: _payoutChip('ADVANCE', hasAdvancePayout, Icons.check_circle)),
+        Expanded(
+          child: _payoutChip('ADVANCE', hasAdvancePayout, Icons.check_circle),
+        ),
         const SizedBox(width: 8),
-        Expanded(child: _payoutChip('PRE-VISA', hasAfterVisaPayout, Icons.pending)),
+        Expanded(
+          child: _payoutChip('PRE-VISA', hasAfterVisaPayout, Icons.pending),
+        ),
         const SizedBox(width: 8),
-        Expanded(child: _payoutChip('PRE-FLIGHT', hasBeforeFlightPayout, Icons.flight)),
+        Expanded(
+          child: _payoutChip('PRE-FLIGHT', hasBeforeFlightPayout, Icons.flight),
+        ),
       ],
     );
   }
@@ -350,7 +394,11 @@ class ReceivedBookingCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 14, color: done ? const Color(0xFF15803D) : const Color(0xFF737686)),
+          Icon(
+            icon,
+            size: 14,
+            color: done ? const Color(0xFF15803D) : const Color(0xFF737686),
+          ),
           const SizedBox(width: 4),
           Text(
             label,

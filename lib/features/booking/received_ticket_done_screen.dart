@@ -58,9 +58,9 @@ class _ReceivedTicketDoneScreenState extends State<ReceivedTicketDoneScreen> {
     final ticketDoneOnly = _bookings
         .where((item) => item.status == 'TICKET_DONE')
         .toList();
-        
+
     final query = _searchQuery.trim().toLowerCase();
-    
+
     final seeded = ticketDoneOnly.isEmpty
         ? const [
             BookingItem(
@@ -79,7 +79,7 @@ class _ReceivedTicketDoneScreenState extends State<ReceivedTicketDoneScreen> {
             ),
           ]
         : ticketDoneOnly;
-        
+
     return seeded.where((item) {
       final matchesQuery =
           query.isEmpty ||
@@ -117,8 +117,10 @@ class _ReceivedTicketDoneScreenState extends State<ReceivedTicketDoneScreen> {
                     const SizedBox(height: 14),
                     AppSearchBar(
                       controller: _searchController,
-                      hintText: 'Search by booking ID, name, passport or status',
-                      onChanged: (value) => setState(() => _searchQuery = value),
+                      hintText:
+                          'Search by booking ID, name, passport or status',
+                      onChanged: (value) =>
+                          setState(() => _searchQuery = value),
                       onSearchTap: () =>
                           setState(() => _searchQuery = _searchController.text),
                     ),
@@ -348,9 +350,15 @@ class _ReceivedTicketDoneScreenState extends State<ReceivedTicketDoneScreen> {
           createdAtText: _displayDate(item.createdAt),
           fromCountry: item.fromCountry,
           toCountry: item.toCountry,
-          medicalText: item.medicalExpiryDate == null ? '22/08/2026' : _displayDate(item.medicalExpiryDate!),
-          visaText: item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
-          policeClearText: item.policeClearanceExpiryDate == null ? '22/08/2026' : _displayDate(item.policeClearanceExpiryDate!),
+          medicalText: item.medicalExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.medicalExpiryDate!),
+          visaText: item.visaExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.visaExpiryDate!),
+          policeClearText: item.policeClearanceExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.policeClearanceExpiryDate!),
           totalCostText: '৳ ${_money(item.agencyTotalCost)}',
           hasAdvancePayout: item.hasAdvancePayout,
           hasAfterVisaPayout: item.hasAfterVisaPayout,
@@ -431,7 +439,10 @@ class _ReceivedTicketDoneScreenState extends State<ReceivedTicketDoneScreen> {
             children: [
               Text(
                 'Actions • ${row.statusLabel}',
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 12),
               if (actions.isEmpty)

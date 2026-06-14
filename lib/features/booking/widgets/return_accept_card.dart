@@ -59,9 +59,7 @@ class ReturnAcceptCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.only(bottom: 16),
             decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Color(0xFFF1F5F9)),
-              ),
+              border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,7 +211,9 @@ class ReturnAcceptCard extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            fromCountry.length > 3 ? fromCountry.substring(0, 2).toUpperCase() : fromCountry,
+                            fromCountry.length > 3
+                                ? fromCountry.substring(0, 2).toUpperCase()
+                                : fromCountry,
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -221,10 +221,16 @@ class ReturnAcceptCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(Icons.arrow_forward, size: 14, color: Color(0xFF1E293B)),
+                          const Icon(
+                            Icons.arrow_forward,
+                            size: 14,
+                            color: Color(0xFF1E293B),
+                          ),
                           const SizedBox(width: 4),
                           Text(
-                            toCountry.length > 3 ? toCountry.substring(0, 3).toUpperCase() : toCountry,
+                            toCountry.length > 3
+                                ? toCountry.substring(0, 3).toUpperCase()
+                                : toCountry,
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -287,9 +293,7 @@ class ReturnAcceptCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.only(top: 12),
             decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Color(0xFFF1F5F9)),
-              ),
+              border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
             ),
             child: Row(
               children: [
@@ -325,7 +329,10 @@ class ReturnAcceptCard extends StatelessWidget {
                       padding: const EdgeInsets.all(8),
                       child: const Column(
                         children: [
-                          Icon(Icons.description_outlined, color: Color(0xFF64748B)),
+                          Icon(
+                            Icons.description_outlined,
+                            color: Color(0xFF64748B),
+                          ),
                           SizedBox(height: 4),
                           Text(
                             'DOCS',
@@ -353,7 +360,10 @@ class ReturnAcceptCard extends StatelessWidget {
                       ),
                       child: const Column(
                         children: [
-                          Icon(Icons.send_outlined, color: AppPalette.brandBlue),
+                          Icon(
+                            Icons.send_outlined,
+                            color: AppPalette.brandBlue,
+                          ),
                           SizedBox(height: 4),
                           Text(
                             'SEND TO BG',

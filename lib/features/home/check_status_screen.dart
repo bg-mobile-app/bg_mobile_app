@@ -94,9 +94,20 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
               children: [
                 _breadcrumb(),
                 const SizedBox(height: 8),
-                Text('Check Status', style: AppTextStyles.headline2.copyWith(fontSize: 25, fontWeight: FontWeight.w800)),
+                Text(
+                  'Check Status',
+                  style: AppTextStyles.headline2.copyWith(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('Track your file status using passport and booking ID.', style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted)),
+                Text(
+                  'Track your file status using passport and booking ID.',
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppPalette.textMuted,
+                  ),
+                ),
                 const SizedBox(height: 14),
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -116,17 +127,35 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
                             if (isNarrow) {
                               return Column(
                                 children: [
-                                  _inputField(label: 'Passport Number', controller: _passportController, autofocus: true),
+                                  _inputField(
+                                    label: 'Passport Number',
+                                    controller: _passportController,
+                                    autofocus: true,
+                                  ),
                                   const SizedBox(height: 12),
-                                  _inputField(label: 'Booking ID', controller: _bookingIdController),
+                                  _inputField(
+                                    label: 'Booking ID',
+                                    controller: _bookingIdController,
+                                  ),
                                 ],
                               );
                             }
                             return Row(
                               children: [
-                                Expanded(child: _inputField(label: 'Passport Number', controller: _passportController, autofocus: true)),
+                                Expanded(
+                                  child: _inputField(
+                                    label: 'Passport Number',
+                                    controller: _passportController,
+                                    autofocus: true,
+                                  ),
+                                ),
                                 const SizedBox(width: 12),
-                                Expanded(child: _inputField(label: 'Booking ID', controller: _bookingIdController)),
+                                Expanded(
+                                  child: _inputField(
+                                    label: 'Booking ID',
+                                    controller: _bookingIdController,
+                                  ),
+                                ),
                               ],
                             );
                           },
@@ -138,7 +167,9 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
                           children: [
                             FilledButton(
                               onPressed: _isSubmitting ? null : _submit,
-                              style: FilledButton.styleFrom(backgroundColor: AppPalette.brandBlue),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppPalette.brandBlue,
+                              ),
                               child: _isSubmitting
                                   ? const SizedBox(
                                       height: 18,
@@ -152,7 +183,11 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
                             ),
                             OutlinedButton(
                               onPressed: _clear,
-                              style: OutlinedButton.styleFrom(side: const BorderSide(color: AppPalette.borderSoftBlue)),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(
+                                  color: AppPalette.borderSoftBlue,
+                                ),
+                              ),
                               child: const Text('Clear'),
                             ),
                           ],
@@ -194,10 +229,12 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
                   else
                     Column(
                       children: _data
-                          .map((item) => Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: _statusCard(item: item),
-                              ))
+                          .map(
+                            (item) => Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: _statusCard(item: item),
+                            ),
+                          )
                           .toList(),
                     ),
                 ],
@@ -212,16 +249,35 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
   Widget _breadcrumb() {
     return BreadCrumb(
       items: <BreadCrumbItem>[
-        BreadCrumbItem(content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
         BreadCrumbItem(
-          content: Text('Check Status', style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700)),
+          content: Text(
+            'Dashboard',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
+        ),
+        BreadCrumbItem(
+          content: Text(
+            'Check Status',
+            style: AppTextStyles.caption.copyWith(
+              color: AppPalette.textStrongBlue,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
       ],
-      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+      divider: const Icon(
+        Icons.chevron_right_rounded,
+        size: 16,
+        color: Color(0xFF94A3B8),
+      ),
     );
   }
 
-  Widget _inputField({required String label, required TextEditingController controller, bool autofocus = false}) {
+  Widget _inputField({
+    required String label,
+    required TextEditingController controller,
+    bool autofocus = false,
+  }) {
     return TextFormField(
       controller: controller,
       autofocus: autofocus,
@@ -230,8 +286,14 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
         hintText: label,
         filled: true,
         fillColor: AppPalette.surface,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppPalette.borderSoftBlue)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppPalette.borderSoftBlue)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppPalette.borderSoftBlue),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppPalette.borderSoftBlue),
+        ),
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
@@ -259,7 +321,13 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
               color: Color(0x1A2563EB),
               borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
             ),
-            child: Text('Booking ID #${item.id}', style: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textStrongBlue)),
+            child: Text(
+              'Booking ID #${item.id}',
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppPalette.textStrongBlue,
+              ),
+            ),
           ),
           _tableRow('Full Name', item.name),
           _tableRow('Passport Number', item.passportNo),
@@ -268,9 +336,15 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
           _tableRow('Meeting Type', 'Physical'),
           _tableRow('File Process Branch', item.branch),
           _tableRow('Status', item.statusLabel),
-          if (item.medicalExpiryDate != null) _tableRow('Medical Expiry Date', item.medicalExpiryDate!),
-          if (item.policeClearanceExpiryDate != null) _tableRow('Police Clearance Expiry Date', item.policeClearanceExpiryDate!),
-          if (item.visaExpiryDate != null) _tableRow('Visa Expiry Date', item.visaExpiryDate!),
+          if (item.medicalExpiryDate != null)
+            _tableRow('Medical Expiry Date', item.medicalExpiryDate!),
+          if (item.policeClearanceExpiryDate != null)
+            _tableRow(
+              'Police Clearance Expiry Date',
+              item.policeClearanceExpiryDate!,
+            ),
+          if (item.visaExpiryDate != null)
+            _tableRow('Visa Expiry Date', item.visaExpiryDate!),
           _tableRow('Appointment Date', item.appointmentDate, isLast: true),
         ],
       ),
@@ -280,7 +354,9 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
   Widget _tableRow(String label, String value, {bool isLast = false}) {
     return Container(
       decoration: BoxDecoration(
-        border: isLast ? null : const Border(bottom: BorderSide(color: AppPalette.borderNeutral)),
+        border: isLast
+            ? null
+            : const Border(bottom: BorderSide(color: AppPalette.borderNeutral)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -289,11 +365,20 @@ class _CheckStatusScreenState extends State<CheckStatusScreen> {
           children: [
             Expanded(
               flex: 3,
-              child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700, color: AppPalette.textMuted)),
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: AppPalette.textMuted,
+                ),
+              ),
             ),
             Expanded(
               flex: 7,
-              child: Text(value, style: const TextStyle(color: AppPalette.textPrimary)),
+              child: Text(
+                value,
+                style: const TextStyle(color: AppPalette.textPrimary),
+              ),
             ),
           ],
         ),

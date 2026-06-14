@@ -75,7 +75,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardPageScaffold(
-      currentHref: _isEditMode ? '/dashboard/user/manage-user' : '/dashboard/user/create-user',
+      currentHref: _isEditMode
+          ? '/dashboard/user/manage-user'
+          : '/dashboard/user/create-user',
       child: Container(
         color: const Color(0xFFD5E1F2),
         child: SafeArea(
@@ -93,7 +95,12 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                         const SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(_isEditMode ? 'Update Staff Account' : 'Onboard New Talent', style: AppTextStyles.headline2),
+                          child: Text(
+                            _isEditMode
+                                ? 'Update Staff Account'
+                                : 'Onboard New Talent',
+                            style: AppTextStyles.headline2,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -109,8 +116,18 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           title: 'Basic Information',
                           child: Column(
                             children: [
-                              _input('Full Name', 'John Doe', controller: _fullNameController, requiredField: true),
-                              _input('Contact Number', '+1 234 567 8900', controller: _contactNoController, requiredField: true),
+                              _input(
+                                'Full Name',
+                                'John Doe',
+                                controller: _fullNameController,
+                                requiredField: true,
+                              ),
+                              _input(
+                                'Contact Number',
+                                '+1 234 567 8900',
+                                controller: _contactNoController,
+                                requiredField: true,
+                              ),
                               Row(
                                 children: [
                                   Expanded(child: _genderInput()),
@@ -135,7 +152,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           title: 'Login Information',
                           child: Column(
                             children: [
-                              _input('Username (Optional)', 'john_doe', controller: _usernameController),
+                              _input(
+                                'Username (Optional)',
+                                'john_doe',
+                                controller: _usernameController,
+                              ),
                               _input(
                                 'Email Address',
                                 'john@example.com',
@@ -144,7 +165,12 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                                 keyboardType: TextInputType.emailAddress,
                                 validator: _validateEmail,
                               ),
-                              _input('Password', 'Demo@123', controller: _passwordController, eye: true),
+                              _input(
+                                'Password',
+                                'Demo@123',
+                                controller: _passwordController,
+                                eye: true,
+                              ),
                               _input(
                                 'Confirm Password',
                                 'Demo@123',
@@ -160,20 +186,33 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: (_isSubmitting || _isLoadingUser) ? null : _submit,
+                            onPressed: (_isSubmitting || _isLoadingUser)
+                                ? null
+                                : _submit,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF0C4ACD),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             child: (_isSubmitting || _isLoadingUser)
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   )
                                 : Text(
-                                    _isEditMode ? 'Update Staff Account' : 'Create Staff Account',
-                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                                    _isEditMode
+                                        ? 'Update Staff Account'
+                                        : 'Create Staff Account',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
                                   ),
                           ),
                         ),
@@ -182,14 +221,22 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           width: double.infinity,
                           height: 48,
                           child: OutlinedButton(
-                            onPressed: (_isSubmitting || _isLoadingUser) ? null : _resetForm,
+                            onPressed: (_isSubmitting || _isLoadingUser)
+                                ? null
+                                : _resetForm,
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Color(0xFF9EB7E3)),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             child: const Text(
                               'Cancel',
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0C4ACD)),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF0C4ACD),
+                              ),
                             ),
                           ),
                         ),
@@ -220,13 +267,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         await _staffAccountsService.updateRecruitingAgencyStaff(
           userId: widget.userId!,
           fullName: _fullNameController.text.trim(),
-            contactNo: _contactNoController.text.trim(),
-            gender: _selectedGender,
-            designation: _designationController.text.trim(),
-            permissions: _selectedPermissions.toList(),
-            email: _emailController.text.trim(),
-            username: _usernameController.text.trim(),
-            password: _passwordController.text,
+          contactNo: _contactNoController.text.trim(),
+          gender: _selectedGender,
+          designation: _designationController.text.trim(),
+          permissions: _selectedPermissions.toList(),
+          email: _emailController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
         );
       } else {
         await _staffAccountsService.createRecruitingAgencyStaff(
@@ -242,17 +289,24 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         );
       }
 
-      _showMessage(_isEditMode ? 'Staff account updated successfully.' : 'Staff account created successfully.');
+      _showMessage(
+        _isEditMode
+            ? 'Staff account updated successfully.'
+            : 'Staff account created successfully.',
+      );
       if (mounted) Navigator.of(context).maybePop();
     } catch (e, st) {
       debugPrint('CreateUserScreen submit error: $e\n$st');
-      _showMessage(_isEditMode ? 'Failed to update staff account: $e' : 'Failed to create staff account: $e', isError: true);
+      _showMessage(
+        _isEditMode
+            ? 'Failed to update staff account: $e'
+            : 'Failed to create staff account: $e',
+        isError: true,
+      );
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
-
-
 
   Future<void> _loadUserData() async {
     setState(() => _isLoadingUser = true);
@@ -273,7 +327,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
       }
       if (mounted) setState(() {});
     } catch (e, st) {
-      debugPrint('CreateUserScreen load user error for userId=${widget.userId}: $e\n$st');
+      debugPrint(
+        'CreateUserScreen load user error for userId=${widget.userId}: $e\n$st',
+      );
       _showMessage('Failed to load user details: $e', isError: true);
     } finally {
       if (mounted) setState(() => _isLoadingUser = false);
@@ -299,7 +355,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     final email = value?.trim() ?? '';
     if (email.isEmpty) return 'Email is required';
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(email)) return 'Please enter a valid email address';
+    if (!emailRegex.hasMatch(email))
+      return 'Please enter a valid email address';
     return null;
   }
 
@@ -319,125 +376,182 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     );
   }
 
-  Widget _formCard({required IconData icon, required String title, required Widget child}) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: const Color(0xFFEFF4FF),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: const Color(0xFFDCE2F7)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _formCard({
+    required IconData icon,
+    required String title,
+    required Widget child,
+  }) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+      color: const Color(0xFFEFF4FF),
+      borderRadius: BorderRadius.circular(28),
+      border: Border.all(color: const Color(0xFFDCE2F7)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                Icon(icon, color: const Color(0xFF0C4ACD), size: 23),
-                const SizedBox(width: 10),
-                Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-              ],
+            Icon(icon, color: const Color(0xFF0C4ACD), size: 23),
+            const SizedBox(width: 10),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 16),
-            child,
           ],
         ),
-      );
+        const SizedBox(height: 16),
+        child,
+      ],
+    ),
+  );
 
   Widget _breadcrumb() {
     return BreadCrumb(
       items: <BreadCrumbItem>[
-        BreadCrumbItem(content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
-        BreadCrumbItem(content: Text('Manage User', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
+        BreadCrumbItem(
+          content: Text(
+            'Dashboard',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
+        ),
+        BreadCrumbItem(
+          content: Text(
+            'Manage User',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
+        ),
         BreadCrumbItem(
           content: Text(
             _isEditMode ? 'Update User' : 'Create User',
-            style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700),
+            style: AppTextStyles.caption.copyWith(
+              color: AppPalette.textStrongBlue,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
-      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+      divider: const Icon(
+        Icons.chevron_right_rounded,
+        size: 16,
+        color: Color(0xFF94A3B8),
+      ),
     );
   }
 
   Widget _genderInput() => Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Gender', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3E4A5F))),
-          const SizedBox(height: 6),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFDBEAFE)),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                isExpanded: true,
-                value: _selectedGender,
-                style: AppTextStyles.body2.copyWith(color: const Color(0xFF667085)),
-                icon: const Icon(Icons.expand_more, color: Color(0xFF6B7280)),
-                items: _genders.map((gender) => DropdownMenuItem<String>(value: gender, child: Text(gender))).toList(),
-                onChanged: (value) {
-                  if (value == null) return;
-                  setState(() => _selectedGender = value);
-                },
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Gender',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF3E4A5F),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: const Color(0xFFDBEAFE)),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: _selectedGender,
+              style: AppTextStyles.body2.copyWith(
+                color: const Color(0xFF667085),
               ),
+              icon: const Icon(Icons.expand_more, color: Color(0xFF6B7280)),
+              items: _genders
+                  .map(
+                    (gender) => DropdownMenuItem<String>(
+                      value: gender,
+                      child: Text(gender),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() => _selectedGender = value);
+              },
             ),
           ),
-        ]),
-      );
+        ),
+      ],
+    ),
+  );
 
   Widget _permissionsInput() => Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Permissions', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3E4A5F))),
-          const SizedBox(height: 6),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFDBEAFE)),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                title: Text(
-                  _selectedPermissions.isEmpty ? 'Select permissions...' : '${_selectedPermissions.length} permission(s) selected',
-                  style: AppTextStyles.body2.copyWith(color: const Color(0xFF667085)),
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Permissions',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF3E4A5F),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: const Color(0xFFDBEAFE)),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              title: Text(
+                _selectedPermissions.isEmpty
+                    ? 'Select permissions...'
+                    : '${_selectedPermissions.length} permission(s) selected',
+                style: AppTextStyles.body2.copyWith(
+                  color: const Color(0xFF667085),
                 ),
-                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _allPermissions
-                          .map(
-                            (permission) => _PermissionChip(
-                              label: permission,
-                              selected: _selectedPermissions.contains(permission),
-                              onTap: () {
-                                setState(() {
-                                  if (_selectedPermissions.contains(permission)) {
-                                    _selectedPermissions.remove(permission);
-                                  } else {
-                                    _selectedPermissions.add(permission);
-                                  }
-                                });
-                              },
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ),
-                ],
               ),
+              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _allPermissions
+                        .map(
+                          (permission) => _PermissionChip(
+                            label: permission,
+                            selected: _selectedPermissions.contains(permission),
+                            onTap: () {
+                              setState(() {
+                                if (_selectedPermissions.contains(permission)) {
+                                  _selectedPermissions.remove(permission);
+                                } else {
+                                  _selectedPermissions.add(permission);
+                                }
+                              });
+                            },
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ],
             ),
           ),
-        ]),
-      );
+        ),
+      ],
+    ),
+  );
 
   Widget _input(
     String label,
@@ -447,38 +561,74 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     bool requiredField = false,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
-  }) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3E4A5F))),
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: controller,
-            keyboardType: keyboardType,
-            obscureText: eye,
-            validator: validator ??
-                (requiredField
-                    ? (value) => (value == null || value.trim().isEmpty) ? '$label is required' : null
-                    : null),
-            decoration: InputDecoration(
-              hintText: placeholder,
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF0C4ACD))),
-              errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
-              focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
-              suffixIcon: eye ? const Icon(Icons.visibility_outlined, color: Color(0xFF6B7280)) : null,
-            ),
+  }) => Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF3E4A5F),
           ),
-        ]),
-      );
+        ),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          obscureText: eye,
+          validator:
+              validator ??
+              (requiredField
+                  ? (value) => (value == null || value.trim().isEmpty)
+                        ? '$label is required'
+                        : null
+                  : null),
+          decoration: InputDecoration(
+            hintText: placeholder,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF0C4ACD)),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+            suffixIcon: eye
+                ? const Icon(
+                    Icons.visibility_outlined,
+                    color: Color(0xFF6B7280),
+                  )
+                : null,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _PermissionChip extends StatelessWidget {
-  const _PermissionChip({required this.label, this.selected = false, this.onTap});
+  const _PermissionChip({
+    required this.label,
+    this.selected = false,
+    this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -494,16 +644,30 @@ class _PermissionChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? const Color(0xFFE9F0FF) : const Color(0xFFE6EBF6),
           borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: selected ? const Color(0xFF0C4ACD) : const Color(0xFFB9C2D3)),
+          border: Border.all(
+            color: selected ? const Color(0xFF0C4ACD) : const Color(0xFFB9C2D3),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(selected ? Icons.check_box : Icons.check_box_outline_blank, size: 18, color: selected ? const Color(0xFF0C4ACD) : const Color(0xFFC7CDD8)),
+            Icon(
+              selected ? Icons.check_box : Icons.check_box_outline_blank,
+              size: 18,
+              color: selected
+                  ? const Color(0xFF0C4ACD)
+                  : const Color(0xFFC7CDD8),
+            ),
             const SizedBox(width: 6),
             Text(
               label,
-              style: TextStyle(fontSize: 15, color: selected ? const Color(0xFF0C4ACD) : const Color(0xFF222938), fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 15,
+                color: selected
+                    ? const Color(0xFF0C4ACD)
+                    : const Color(0xFF222938),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),

@@ -6,6 +6,7 @@ import 'common/theme/app_palette.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // Default navigation bar color for unauthenticated state
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: AppPalette.brandBlue,

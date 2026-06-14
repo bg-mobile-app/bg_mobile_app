@@ -4,7 +4,8 @@ import '../../../common/services/api_client.dart';
 import '../models/dashboard_models.dart';
 
 class DashboardService {
-  DashboardService({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
+  DashboardService({ApiClient? apiClient})
+    : _apiClient = apiClient ?? ApiClient();
 
   final ApiClient _apiClient;
 

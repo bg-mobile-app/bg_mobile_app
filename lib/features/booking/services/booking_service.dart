@@ -176,10 +176,7 @@ class BookingService {
     num? requestAmount,
     String? costDetails,
   }) async {
-    final payload = <String, dynamic>{
-      'bookingId': bookingId,
-      'reason': reason,
-    };
+    final payload = <String, dynamic>{'bookingId': bookingId, 'reason': reason};
     if (costAmount != null) payload['costAmount'] = costAmount;
     if (requestAmount != null) payload['requestAmount'] = requestAmount;
     if (costDetails != null && costDetails.trim().isNotEmpty) {

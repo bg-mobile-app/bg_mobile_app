@@ -12,7 +12,10 @@ import 'app_routes.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
-Widget _recruitingAgencySignUpScreen(BuildContext context, GoRouterState state) {
+Widget _recruitingAgencySignUpScreen(
+  BuildContext context,
+  GoRouterState state,
+) {
   return RecruitingSignUpScreen(
     agencyType: state.uri.queryParameters['type'] ?? 'recruiting',
   );

@@ -18,10 +18,12 @@ class FilterBottomSheet extends StatelessWidget {
             heightFactor: 0.85,
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: FilterSidebar(onApply: (value) {
-                onApply(value);
-                Navigator.pop(context);
-              }),
+              child: FilterSidebar(
+                onApply: (value) {
+                  onApply(value);
+                  Navigator.pop(context);
+                },
+              ),
             ),
           ),
         );

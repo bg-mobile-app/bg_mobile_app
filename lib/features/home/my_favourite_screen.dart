@@ -71,7 +71,11 @@ class _MyFavouriteScreenState extends State<MyFavouriteScreen> {
 
   void _filter(String query) {
     setState(() {
-      _filteredItems = _allItems.where((item) => item.title.toLowerCase().contains(query.toLowerCase())).toList();
+      _filteredItems = _allItems
+          .where(
+            (item) => item.title.toLowerCase().contains(query.toLowerCase()),
+          )
+          .toList();
     });
   }
 
@@ -85,14 +89,29 @@ class _MyFavouriteScreenState extends State<MyFavouriteScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('My Favourite', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: Color(0xFF0B1E6D))),
+              const Text(
+                'My Favourite',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF0B1E6D),
+                ),
+              ),
               const SizedBox(height: 4),
-              const Text('Saved work permit cards', style: TextStyle(color: Color(0xFF64748B))),
+              const Text(
+                'Saved work permit cards',
+                style: TextStyle(color: Color(0xFF64748B)),
+              ),
               const SizedBox(height: 12),
               _searchBar(),
               const SizedBox(height: 18),
               if (_filteredItems.isEmpty)
-                const Center(child: Padding(padding: EdgeInsets.only(top: 30), child: Text('No favourites found.')))
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 30),
+                    child: Text('No favourites found.'),
+                  ),
+                )
               else
                 GridView.builder(
                   shrinkWrap: true,
@@ -107,7 +126,13 @@ class _MyFavouriteScreenState extends State<MyFavouriteScreen> {
                   itemBuilder: (context, index) => WorkPermitCard(
                     item: _filteredItems[index],
                     brandBlue: _brandBlue,
-                    onViewDetails: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => WorkPermitDetailsScreen(item: _filteredItems[index]))),
+                    onViewDetails: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => WorkPermitDetailsScreen(
+                          item: _filteredItems[index],
+                        ),
+                      ),
+                    ),
                     formatBdt: _formatBdt,
                     timeAgo: _timeAgo,
                   ),
@@ -143,7 +168,10 @@ class _MyFavouriteScreenState extends State<MyFavouriteScreen> {
           ),
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: _brandBlue, borderRadius: BorderRadius.circular(14)),
+            decoration: BoxDecoration(
+              color: _brandBlue,
+              borderRadius: BorderRadius.circular(14),
+            ),
             child: const Icon(Icons.search, size: 20, color: Colors.white),
           ),
         ],
@@ -158,7 +186,11 @@ class _MyFavouriteScreenState extends State<MyFavouriteScreen> {
     for (var i = 0; i < chars.length; i += 3) {
       chunks.add(chars.skip(i).take(3).join());
     }
-    return chunks.map((c) => c.split('').reversed.join()).toList().reversed.join(',');
+    return chunks
+        .map((c) => c.split('').reversed.join())
+        .toList()
+        .reversed
+        .join(',');
   }
 
   String _timeAgo(DateTime date) {

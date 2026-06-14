@@ -92,7 +92,11 @@ class WorkTypeItem {
 const List<NavLinkItem> navLinkData = [
   NavLinkItem(name: 'Home', href: '/', icon: RegularRounded.HOME),
   NavLinkItem(name: 'Flight Booking', href: '', icon: RegularRounded.PLANE),
-  NavLinkItem(name: 'Work Abroad', href: '/search', icon: RegularRounded.BRIEFCASE),
+  NavLinkItem(
+    name: 'Work Abroad',
+    href: '/search',
+    icon: RegularRounded.BRIEFCASE,
+  ),
   NavLinkItem(name: 'Study Abroad', href: '', icon: RegularRounded.BOOK),
   NavLinkItem(name: 'Hajj & Umrah', href: '', icon: RegularRounded.PYRAMID),
   NavLinkItem(name: 'Visa Services', href: '', icon: RegularRounded.ID_BADGE),

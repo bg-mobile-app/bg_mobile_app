@@ -80,7 +80,8 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
   @override
   void didUpdateWidget(covariant MyBookingScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.currentHref != widget.currentHref || oldWidget.initialStatus != widget.initialStatus) {
+    if (oldWidget.currentHref != widget.currentHref ||
+        oldWidget.initialStatus != widget.initialStatus) {
       _status = widget.initialStatus;
       _searchController.clear();
       _search = '';
@@ -90,20 +91,22 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
   }
 
   List<_BookingItem> get _filtered => _bookings.where((item) {
-        final q = _search.trim().toLowerCase();
-        final matchesQuery = q.isEmpty ||
-            item.postId.toLowerCase().contains(q) ||
-            item.bookingId.toString().contains(q) ||
-            item.serviceType.toLowerCase().contains(q) ||
-            item.customerInfo.toLowerCase().contains(q) ||
-            item.statusLabel.toLowerCase().contains(q);
-        final createdAt = DateTime.tryParse(item.date);
-        final matchesDate = _dateRange == null ||
-            (createdAt != null &&
-                !createdAt.isBefore(_dateRange!.start) &&
-                !createdAt.isAfter(_dateRange!.end.add(const Duration(days: 1))));
-        return matchesQuery && matchesDate;
-      }).toList();
+    final q = _search.trim().toLowerCase();
+    final matchesQuery =
+        q.isEmpty ||
+        item.postId.toLowerCase().contains(q) ||
+        item.bookingId.toString().contains(q) ||
+        item.serviceType.toLowerCase().contains(q) ||
+        item.customerInfo.toLowerCase().contains(q) ||
+        item.statusLabel.toLowerCase().contains(q);
+    final createdAt = DateTime.tryParse(item.date);
+    final matchesDate =
+        _dateRange == null ||
+        (createdAt != null &&
+            !createdAt.isBefore(_dateRange!.start) &&
+            !createdAt.isAfter(_dateRange!.end.add(const Duration(days: 1))));
+    return matchesQuery && matchesDate;
+  }).toList();
 
   Future<void> _loadBookings() async {
     setState(() {
@@ -119,7 +122,9 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         toDate: _dateRange == null ? null : _apiDate(_dateRange!.end),
       );
       if (!mounted) return;
-      setState(() => _bookings = response.results.map(_BookingItem.fromDto).toList());
+      setState(
+        () => _bookings = response.results.map(_BookingItem.fromDto).toList(),
+      );
     } catch (_) {
       if (!mounted) return;
       setState(() => _error = 'Failed to load bookings. Please try again.');
@@ -130,7 +135,9 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final items = _isLoading && _bookings.isEmpty ? List.generate(6, (i) => _BookingItem.skeleton(i, _status)) : _filtered;
+    final items = _isLoading && _bookings.isEmpty
+        ? List.generate(6, (i) => _BookingItem.skeleton(i, _status))
+        : _filtered;
     return DashboardPageScaffold(
       currentHref: widget.currentHref,
       child: Container(
@@ -138,26 +145,76 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              BreadCrumb(items: [
-                BreadCrumbItem(content: const Text('Recruitment Portal', style: TextStyle(color: AppPalette.textMuted, fontSize: 12))),
-                BreadCrumbItem(content: Text(widget.breadcrumbCurrent, style: const TextStyle(color: AppPalette.textStrongBlue, fontSize: 12, fontWeight: FontWeight.w700))),
-              ], divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8))),
-              const SizedBox(height: 8),
-              Text(widget.pageTitle, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w800, color: AppPalette.textPrimary)),
-              const SizedBox(height: 14),
-              AppSearchBar(controller: _searchController, hintText: 'Search by booking ID, name, passport or status', onChanged: (v)=>setState(()=>_search=v), onSearchTap: _loadBookings),
-              const SizedBox(height: 14),
-              Row(children: [
-                ViewToggleButton(isCardView: _isCardView, onChanged: (v)=>setState(()=>_isCardView=v)),
-                const SizedBox(width: 10),
-                Expanded(child: _dateBtn()),
-              ]),
-              const SizedBox(height: 14),
-              _statusDropdown(),
-              const SizedBox(height: 16),
-              if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)) else Skeletonizer(enabled: _isLoading, child: _isCardView ? _card(items) : _table(items)),
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BreadCrumb(
+                  items: [
+                    BreadCrumbItem(
+                      content: const Text(
+                        'Recruitment Portal',
+                        style: TextStyle(
+                          color: AppPalette.textMuted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    BreadCrumbItem(
+                      content: Text(
+                        widget.breadcrumbCurrent,
+                        style: const TextStyle(
+                          color: AppPalette.textStrongBlue,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                  divider: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 16,
+                    color: Color(0xFF94A3B8),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.pageTitle,
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                    color: AppPalette.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                AppSearchBar(
+                  controller: _searchController,
+                  hintText: 'Search by booking ID, name, passport or status',
+                  onChanged: (v) => setState(() => _search = v),
+                  onSearchTap: _loadBookings,
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    ViewToggleButton(
+                      isCardView: _isCardView,
+                      onChanged: (v) => setState(() => _isCardView = v),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(child: _dateBtn()),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                _statusDropdown(),
+                const SizedBox(height: 16),
+                if (_error != null)
+                  Text(_error!, style: const TextStyle(color: Colors.red))
+                else
+                  Skeletonizer(
+                    enabled: _isLoading,
+                    child: _isCardView ? _card(items) : _table(items),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -269,11 +326,35 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
     );
   }
 
-  Widget _table(List<_BookingItem> items) => StyledDataTableCard(columns: const [
-    DataColumn(label: Text('Post ID')), DataColumn(label: Text('Booking ID')), DataColumn(label: Text('Service Type')), DataColumn(label: Text('Date')), DataColumn(label: Text('Customer Info')), DataColumn(label: Text('Package Price')), DataColumn(label: Text('Paid Amount')), DataColumn(label: Text('Status')),
-  ], rows: items.map((e)=>DataRow(cells: [
-    DataCell(Text(e.postId)), DataCell(Text(e.bookingId.toString())), DataCell(Text(e.serviceType)), DataCell(Text(e.date.split('T').first)), DataCell(Text(e.customerInfo)), DataCell(Text('৳ ${e.packagePrice}')), DataCell(Text('৳ ${e.paidAmount}')), DataCell(Text(e.statusLabel)),
-  ], onLongPress: ()=>_showActions(e))).toList());
+  Widget _table(List<_BookingItem> items) => StyledDataTableCard(
+    columns: const [
+      DataColumn(label: Text('Post ID')),
+      DataColumn(label: Text('Booking ID')),
+      DataColumn(label: Text('Service Type')),
+      DataColumn(label: Text('Date')),
+      DataColumn(label: Text('Customer Info')),
+      DataColumn(label: Text('Package Price')),
+      DataColumn(label: Text('Paid Amount')),
+      DataColumn(label: Text('Status')),
+    ],
+    rows: items
+        .map(
+          (e) => DataRow(
+            cells: [
+              DataCell(Text(e.postId)),
+              DataCell(Text(e.bookingId.toString())),
+              DataCell(Text(e.serviceType)),
+              DataCell(Text(e.date.split('T').first)),
+              DataCell(Text(e.customerInfo)),
+              DataCell(Text('৳ ${e.packagePrice}')),
+              DataCell(Text('৳ ${e.paidAmount}')),
+              DataCell(Text(e.statusLabel)),
+            ],
+            onLongPress: () => _showActions(e),
+          ),
+        )
+        .toList(),
+  );
 
   Future<void> _showActions(_BookingItem item) async {
     await showModalBottomSheet<void>(
@@ -281,31 +362,50 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       builder: (context) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Text('Booking #${item.bookingId}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-            const SizedBox(height: 12),
-            if (item.status == 'APPLIED_FILE')
-              ElevatedButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await _bookingService.updateBookingStatus(bookingId: item.bookingId, status: 'REJECT_FILE');
-                  await _loadBookings();
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('Reject File', style: TextStyle(color: Colors.white)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Booking #${item.bookingId}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
               ),
-            if (!_hiddenReturnStatuses.contains(item.status))
-              OutlinedButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  final reason = await _askReturnReason();
-                  if (reason == null || reason.trim().isEmpty) return;
-                  await _bookingService.submitReturnRequest(bookingId: item.bookingId, reason: reason.trim());
-                  await _loadBookings();
-                },
-                child: const Text('Request Return Passport'),
-              ),
-          ]),
+              const SizedBox(height: 12),
+              if (item.status == 'APPLIED_FILE')
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await _bookingService.updateBookingStatus(
+                      bookingId: item.bookingId,
+                      status: 'REJECT_FILE',
+                    );
+                    await _loadBookings();
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: const Text(
+                    'Reject File',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              if (!_hiddenReturnStatuses.contains(item.status))
+                OutlinedButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    final reason = await _askReturnReason();
+                    if (reason == null || reason.trim().isEmpty) return;
+                    await _bookingService.submitReturnRequest(
+                      bookingId: item.bookingId,
+                      reason: reason.trim(),
+                    );
+                    await _loadBookings();
+                  },
+                  child: const Text('Request Return Passport'),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -317,46 +417,120 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Return Passport Request'),
-        content: TextField(controller: controller, maxLines: 3, decoration: const InputDecoration(hintText: 'Enter reason')),
+        content: TextField(
+          controller: controller,
+          maxLines: 3,
+          decoration: const InputDecoration(hintText: 'Enter reason'),
+        ),
         actions: [
-          TextButton(onPressed: ()=>Navigator.pop(context), child: const Text('Cancel')),
-          FilledButton(onPressed: ()=>Navigator.pop(context, controller.text), child: const Text('Submit')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: const Text('Submit'),
+          ),
         ],
       ),
     );
   }
 
   Widget _card(List<_BookingItem> items) => Column(
-    children: items.map((e) => MyBookingCard(
-      postId: e.postId,
-      bookingId: e.bookingId,
-      serviceType: e.serviceType,
-      statusLabel: e.statusLabel,
-      customerName: e.customerName,
-      passportNo: e.passportNo,
-      packagePrice: e.packagePrice,
-      paidAmount: e.paidAmount,
-      dateText: _prettyDate(e.date),
-      onLongPress: () => _showActions(e),
-    )).toList(),
+    children: items
+        .map(
+          (e) => MyBookingCard(
+            postId: e.postId,
+            bookingId: e.bookingId,
+            serviceType: e.serviceType,
+            statusLabel: e.statusLabel,
+            customerName: e.customerName,
+            passportNo: e.passportNo,
+            packagePrice: e.packagePrice,
+            paidAmount: e.paidAmount,
+            dateText: _prettyDate(e.date),
+            onLongPress: () => _showActions(e),
+          ),
+        )
+        .toList(),
   );
 
   String _prettyDate(String raw) {
     final dt = DateTime.tryParse(raw);
     if (dt == null) return raw;
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final hour = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
     final min = dt.minute.toString().padLeft(2, '0');
     final amPm = dt.hour >= 12 ? 'PM' : 'AM';
     return '${months[dt.month - 1]} ${dt.day}, ${dt.year} • $hour:$min $amPm';
   }
 
-  String _apiDate(DateTime date) => '${date.year}-${date.month.toString().padLeft(2,'0')}-${date.day.toString().padLeft(2,'0')}';
+  String _apiDate(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 }
 
 class _BookingItem {
-  const _BookingItem({required this.postId, required this.bookingId, required this.serviceType, required this.date, required this.customerInfo, required this.customerName, required this.passportNo, required this.packagePrice, required this.paidAmount, required this.statusLabel, required this.status});
-  final String postId; final int bookingId; final String serviceType; final String date; final String customerInfo; final String customerName; final String passportNo; final int packagePrice; final int paidAmount; final String statusLabel; final String status;
-  factory _BookingItem.fromDto(ReceiveBookingItemDto dto) => _BookingItem(postId: dto.workPermitId, bookingId: dto.id, serviceType: dto.serviceType, date: dto.createdAt, customerInfo: '${dto.name} (${dto.passportNo ?? '-'})', customerName: dto.name, passportNo: dto.passportNo ?? '-', packagePrice: dto.agencyTotalCost ?? 0, paidAmount: dto.paidAmount ?? 0, statusLabel: dto.statusLabel, status: dto.status);
-  factory _BookingItem.skeleton(int i, String status) => _BookingItem(postId: 'WP-XXXX', bookingId: 1000+i, serviceType: 'Work Permit', date: '2026-01-01', customerInfo: 'Loading (P000)', customerName: 'Loading', passportNo: 'P000', packagePrice: 0, paidAmount: 0, statusLabel: status.isEmpty ? 'Loading' : status, status: status);
+  const _BookingItem({
+    required this.postId,
+    required this.bookingId,
+    required this.serviceType,
+    required this.date,
+    required this.customerInfo,
+    required this.customerName,
+    required this.passportNo,
+    required this.packagePrice,
+    required this.paidAmount,
+    required this.statusLabel,
+    required this.status,
+  });
+  final String postId;
+  final int bookingId;
+  final String serviceType;
+  final String date;
+  final String customerInfo;
+  final String customerName;
+  final String passportNo;
+  final int packagePrice;
+  final int paidAmount;
+  final String statusLabel;
+  final String status;
+  factory _BookingItem.fromDto(ReceiveBookingItemDto dto) => _BookingItem(
+    postId: dto.workPermitId,
+    bookingId: dto.id,
+    serviceType: dto.serviceType,
+    date: dto.createdAt,
+    customerInfo: '${dto.name} (${dto.passportNo ?? '-'})',
+    customerName: dto.name,
+    passportNo: dto.passportNo ?? '-',
+    packagePrice: dto.agencyTotalCost ?? 0,
+    paidAmount: dto.paidAmount ?? 0,
+    statusLabel: dto.statusLabel,
+    status: dto.status,
+  );
+  factory _BookingItem.skeleton(int i, String status) => _BookingItem(
+    postId: 'WP-XXXX',
+    bookingId: 1000 + i,
+    serviceType: 'Work Permit',
+    date: '2026-01-01',
+    customerInfo: 'Loading (P000)',
+    customerName: 'Loading',
+    passportNo: 'P000',
+    packagePrice: 0,
+    paidAmount: 0,
+    statusLabel: status.isEmpty ? 'Loading' : status,
+    status: status,
+  );
 }

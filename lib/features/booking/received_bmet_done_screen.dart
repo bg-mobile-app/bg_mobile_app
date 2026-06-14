@@ -12,8 +12,7 @@ class ReceivedBmetDoneScreen extends StatefulWidget {
   const ReceivedBmetDoneScreen({super.key});
 
   @override
-  State<ReceivedBmetDoneScreen> createState() =>
-      _ReceivedBmetDoneScreenState();
+  State<ReceivedBmetDoneScreen> createState() => _ReceivedBmetDoneScreenState();
 }
 
 class _ReceivedBmetDoneScreenState extends State<ReceivedBmetDoneScreen> {
@@ -59,9 +58,9 @@ class _ReceivedBmetDoneScreenState extends State<ReceivedBmetDoneScreen> {
     final bmetDoneOnly = _bookings
         .where((item) => item.status == 'BMET_DONE')
         .toList();
-        
+
     final query = _searchQuery.trim().toLowerCase();
-    
+
     final seeded = bmetDoneOnly.isEmpty
         ? const [
             BookingItem(
@@ -80,7 +79,7 @@ class _ReceivedBmetDoneScreenState extends State<ReceivedBmetDoneScreen> {
             ),
           ]
         : bmetDoneOnly;
-        
+
     return seeded.where((item) {
       final matchesQuery =
           query.isEmpty ||
@@ -118,8 +117,10 @@ class _ReceivedBmetDoneScreenState extends State<ReceivedBmetDoneScreen> {
                     const SizedBox(height: 14),
                     AppSearchBar(
                       controller: _searchController,
-                      hintText: 'Search by booking ID, name, passport or status',
-                      onChanged: (value) => setState(() => _searchQuery = value),
+                      hintText:
+                          'Search by booking ID, name, passport or status',
+                      onChanged: (value) =>
+                          setState(() => _searchQuery = value),
                       onSearchTap: () =>
                           setState(() => _searchQuery = _searchController.text),
                     ),
@@ -349,9 +350,15 @@ class _ReceivedBmetDoneScreenState extends State<ReceivedBmetDoneScreen> {
           createdAtText: _displayDate(item.createdAt),
           fromCountry: item.fromCountry,
           toCountry: item.toCountry,
-          medicalText: item.medicalExpiryDate == null ? '22/08/2026' : _displayDate(item.medicalExpiryDate!),
-          visaText: item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
-          policeClearText: item.policeClearanceExpiryDate == null ? '22/08/2026' : _displayDate(item.policeClearanceExpiryDate!),
+          medicalText: item.medicalExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.medicalExpiryDate!),
+          visaText: item.visaExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.visaExpiryDate!),
+          policeClearText: item.policeClearanceExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.policeClearanceExpiryDate!),
           totalCostText: '৳ ${_money(item.agencyTotalCost)}',
           hasAdvancePayout: item.hasAdvancePayout,
           hasAfterVisaPayout: item.hasAfterVisaPayout,
@@ -432,7 +439,10 @@ class _ReceivedBmetDoneScreenState extends State<ReceivedBmetDoneScreen> {
             children: [
               Text(
                 'Actions • ${row.statusLabel}',
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 12),
               if (actions.isEmpty)

@@ -232,10 +232,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                     'Failed to load ad data',
                     'বিজ্ঞাপনের তথ্য লোড করা যায়নি',
                   )
-                : _tr(
-                    'Failed to load form data',
-                    'ফর্মের তথ্য লোড করা যায়নি',
-                  ),
+                : _tr('Failed to load form data', 'ফর্মের তথ্য লোড করা যায়নি'),
           ),
         ),
       );
@@ -289,9 +286,10 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         ? details.beforeFlight.toString()
         : '';
     for (final step in details.paymentSteps) {
-      final normalized = step.name
-          .toUpperCase()
-          .replaceAll(RegExp(r'[^A-Z0-9]+'), '_');
+      final normalized = step.name.toUpperCase().replaceAll(
+        RegExp(r'[^A-Z0-9]+'),
+        '_',
+      );
       final amount = step.amount.toInt();
       if (amount <= 0) continue;
       if (normalized.contains('ADVANCE')) {

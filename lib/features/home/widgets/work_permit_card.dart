@@ -88,15 +88,25 @@ class WorkPermitCard extends StatelessWidget {
                               height: 1.2,
                             ),
                           ),
-                          SizedBox(height: responsive.size(14, min: 10, max: 14)),
+                          SizedBox(
+                            height: responsive.size(14, min: 10, max: 14),
+                          ),
                           Row(
                             children: [
-                              _buildMetaCell('Job Type', item.workType, responsive),
+                              _buildMetaCell(
+                                'Job Type',
+                                item.workType,
+                                responsive,
+                              ),
                               Container(
                                 width: 1,
                                 height: responsive.size(34, min: 28, max: 34),
                                 margin: EdgeInsets.symmetric(
-                                  horizontal: responsive.size(14, min: 8, max: 14),
+                                  horizontal: responsive.size(
+                                    14,
+                                    min: 8,
+                                    max: 14,
+                                  ),
                                 ),
                                 color: const Color(0xFFE2E8F0),
                               ),
@@ -123,21 +133,33 @@ class WorkPermitCard extends StatelessWidget {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        fontSize: responsive.font(10, min: 8, max: 10),
+                                        fontSize: responsive.font(
+                                          10,
+                                          min: 8,
+                                          max: 10,
+                                        ),
                                         letterSpacing: 0.8,
                                         fontWeight: FontWeight.w700,
                                         color: const Color(0xFF94A3B8),
                                       ),
                                     ),
                                     SizedBox(
-                                      height: responsive.size(4, min: 3, max: 4),
+                                      height: responsive.size(
+                                        4,
+                                        min: 3,
+                                        max: 4,
+                                      ),
                                     ),
                                     Text(
                                       'BDT ${formatBdt(item.customerPrice)}',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        fontSize: responsive.font(22, min: 16, max: 22),
+                                        fontSize: responsive.font(
+                                          22,
+                                          min: 16,
+                                          max: 22,
+                                        ),
                                         fontWeight: FontWeight.w800,
                                         color: const Color(0xFF0F172A),
                                       ),
@@ -145,15 +167,25 @@ class WorkPermitCard extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              SizedBox(width: responsive.size(12, min: 8, max: 12)),
+                              SizedBox(
+                                width: responsive.size(12, min: 8, max: 12),
+                              ),
                               ElevatedButton(
                                 onPressed: onViewDetails,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: brandBlue,
                                   foregroundColor: Colors.white,
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: responsive.size(18, min: 12, max: 18),
-                                    vertical: responsive.size(14, min: 10, max: 14),
+                                    horizontal: responsive.size(
+                                      18,
+                                      min: 12,
+                                      max: 18,
+                                    ),
+                                    vertical: responsive.size(
+                                      14,
+                                      min: 10,
+                                      max: 14,
+                                    ),
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(
@@ -167,7 +199,11 @@ class WorkPermitCard extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: responsive.font(13, min: 11, max: 13),
+                                    fontSize: responsive.font(
+                                      13,
+                                      min: 11,
+                                      max: 13,
+                                    ),
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -195,10 +231,7 @@ class WorkPermitCard extends StatelessWidget {
         errorBuilder: (context, error, stackTrace) => Container(
           color: const Color(0xFFF1F5F9),
           child: const Center(
-            child: Icon(
-              Icons.image_not_supported,
-              color: Color(0xFF94A3B8),
-            ),
+            child: Icon(Icons.image_not_supported, color: Color(0xFF94A3B8)),
           ),
         ),
       );

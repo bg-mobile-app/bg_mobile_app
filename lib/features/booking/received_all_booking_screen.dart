@@ -135,22 +135,22 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   }
 
   List<BookingItem> get _skeletonBookings => List.generate(
-        6,
-        (index) => BookingItem(
-          workPermitId: 'WP-XXXX',
-          id: 1000 + index,
-          serviceType: 'Work Permit',
-          createdAt: '2026-01-01T00:00:00Z',
-          name: 'Loading Name',
-          passportNo: 'P0000000',
-          fromCountry: 'Bangladesh',
-          toCountry: 'Saudi Arabia',
-          agencyTotalCost: 0,
-          paidAmount: 0,
-          status: _selectedStatus.isEmpty ? 'APPLIED_FILE' : _selectedStatus,
-          statusLabel: 'Loading',
-        ),
-      );
+    6,
+    (index) => BookingItem(
+      workPermitId: 'WP-XXXX',
+      id: 1000 + index,
+      serviceType: 'Work Permit',
+      createdAt: '2026-01-01T00:00:00Z',
+      name: 'Loading Name',
+      passportNo: 'P0000000',
+      fromCountry: 'Bangladesh',
+      toCountry: 'Saudi Arabia',
+      agencyTotalCost: 0,
+      paidAmount: 0,
+      status: _selectedStatus.isEmpty ? 'APPLIED_FILE' : _selectedStatus,
+      statusLabel: 'Loading',
+    ),
+  );
 
   List<BookingItem> get _visibleBookings =>
       _isLoading && _bookings.isEmpty ? _skeletonBookings : _filteredBookings;
@@ -289,15 +289,15 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
         status: status,
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(successMessage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(successMessage)));
       await _fetchBookings();
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
     }
   }
 
@@ -331,9 +331,9 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
             FilledButton(
               onPressed: () {
                 final rawAmount = amountController.text.trim().replaceAll(
-                      ',',
-                      '',
-                    );
+                  ',',
+                  '',
+                );
                 final amount = rawAmount.isEmpty
                     ? null
                     : num.tryParse(rawAmount);
@@ -372,7 +372,9 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Payment Request submitted successfully.')),
+        const SnackBar(
+          content: Text('Payment Request submitted successfully.'),
+        ),
       );
       await _fetchBookings();
     } catch (_) {
@@ -764,8 +766,10 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
                     const SizedBox(height: 14),
                     AppSearchBar(
                       controller: _searchController,
-                      hintText: 'Search by booking ID, name, passport or status',
-                      onChanged: (value) => setState(() => _searchQuery = value),
+                      hintText:
+                          'Search by booking ID, name, passport or status',
+                      onChanged: (value) =>
+                          setState(() => _searchQuery = value),
                       onSearchTap: () {
                         setState(() => _searchQuery = _searchController.text);
                         _fetchBookings();
@@ -808,9 +812,10 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
   }
 
   Widget _statusDropdown() {
-    final selectedStatus = _bookingStatusFilterOptions.any(
-      (option) => option.value == _selectedStatus,
-    )
+    final selectedStatus =
+        _bookingStatusFilterOptions.any(
+          (option) => option.value == _selectedStatus,
+        )
         ? _selectedStatus
         : '';
 
@@ -1028,11 +1033,29 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
             ),
           ),
           if (_selectedStatus == 'UNDER_PROCESSING')
-            DataCell(Text(item.medicalExpiryDate == null ? '-' : _displayDate(item.medicalExpiryDate!))),
+            DataCell(
+              Text(
+                item.medicalExpiryDate == null
+                    ? '-'
+                    : _displayDate(item.medicalExpiryDate!),
+              ),
+            ),
           if (_selectedStatus == 'UNDER_PROCESSING')
-            DataCell(Text(item.policeClearanceExpiryDate == null ? '-' : _displayDate(item.policeClearanceExpiryDate!))),
+            DataCell(
+              Text(
+                item.policeClearanceExpiryDate == null
+                    ? '-'
+                    : _displayDate(item.policeClearanceExpiryDate!),
+              ),
+            ),
           if (_selectedStatus == 'VISA_APPROVED')
-            DataCell(Text(item.visaExpiryDate == null ? '-' : _displayDate(item.visaExpiryDate!))),
+            DataCell(
+              Text(
+                item.visaExpiryDate == null
+                    ? '-'
+                    : _displayDate(item.visaExpiryDate!),
+              ),
+            ),
           const DataCell(
             Icon(
               Icons.more_horiz_rounded,
@@ -1086,9 +1109,15 @@ class _ReceivedAllBookingScreenState extends State<ReceivedAllBookingScreen> {
           createdAtText: _displayDate(item.createdAt),
           fromCountry: item.fromCountry,
           toCountry: item.toCountry,
-          medicalText: item.medicalExpiryDate == null ? '-' : _displayDate(item.medicalExpiryDate!),
-          visaText: item.visaExpiryDate == null ? '-' : _displayDate(item.visaExpiryDate!),
-          policeClearText: item.policeClearanceExpiryDate == null ? '-' : _displayDate(item.policeClearanceExpiryDate!),
+          medicalText: item.medicalExpiryDate == null
+              ? '-'
+              : _displayDate(item.medicalExpiryDate!),
+          visaText: item.visaExpiryDate == null
+              ? '-'
+              : _displayDate(item.visaExpiryDate!),
+          policeClearText: item.policeClearanceExpiryDate == null
+              ? '-'
+              : _displayDate(item.policeClearanceExpiryDate!),
           totalCostText: '৳ ${_money(item.agencyTotalCost)}',
           hasAdvancePayout: item.hasAdvancePayout,
           hasAfterVisaPayout: item.hasAfterVisaPayout,

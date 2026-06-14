@@ -33,11 +33,17 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
                   children: [
                     _breadcrumb(),
                     const SizedBox(height: 8),
-                    Text('Create Post', style: AppTextStyles.headline2.copyWith(fontSize: 26)),
+                    Text(
+                      'Create Post',
+                      style: AppTextStyles.headline2.copyWith(fontSize: 26),
+                    ),
                     const SizedBox(height: 24),
                     _buildRecommendBanner(),
                     const SizedBox(height: 32),
-                    Text('Choose Language', style: AppTextStyles.headline2.copyWith(fontSize: 22)),
+                    Text(
+                      'Choose Language',
+                      style: AppTextStyles.headline2.copyWith(fontSize: 22),
+                    ),
                     const SizedBox(height: 16),
                     _languageCard(
                       index: 0,
@@ -159,7 +165,11 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
     return InkWell(
       onTap: () {
         setState(() => _selectedLanguage = index);
-        context.go(index == 0 ? '/dashboard/ads/create/form/bn' : '/dashboard/ads/create/form/en');
+        context.go(
+          index == 0
+              ? '/dashboard/ads/create/form/bn'
+              : '/dashboard/ads/create/form/en',
+        );
       },
       borderRadius: BorderRadius.circular(28),
       child: AnimatedContainer(
@@ -186,7 +196,9 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
                     height: 48,
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: selected ? AppPalette.brandBlue.withOpacity(0.1) : const Color(0xFFF3F4F6),
+                      color: selected
+                          ? AppPalette.brandBlue.withOpacity(0.1)
+                          : const Color(0xFFF3F4F6),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Image.asset(iconPath, fit: BoxFit.contain),
@@ -217,14 +229,18 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: selected ? AppPalette.brandBlue : AppPalette.textMuted,
+                          color: selected
+                              ? AppPalette.brandBlue
+                              : AppPalette.textMuted,
                         ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
                         selected ? Icons.check_circle : actionIcon,
                         size: 16,
-                        color: selected ? AppPalette.brandBlue : AppPalette.textMuted,
+                        color: selected
+                            ? AppPalette.brandBlue
+                            : AppPalette.textMuted,
                       ),
                     ],
                   ),
@@ -266,18 +282,31 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
               color: Colors.white.withOpacity(0.6),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.menu_book_rounded, color: AppPalette.brandBlue, size: 32),
+            child: const Icon(
+              Icons.menu_book_rounded,
+              color: AppPalette.brandBlue,
+              size: 32,
+            ),
           ),
           const SizedBox(height: 16),
           const Text(
             'Need help choosing?',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppPalette.textPrimary),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: AppPalette.textPrimary,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
             'Our data shows that listings in Bengali receive 40% more engagement from local customers. Check our best practices for creating high-performing posts.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: AppPalette.textMuted, height: 1.5, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 14,
+              color: AppPalette.textMuted,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 24),
           SizedBox(
@@ -287,7 +316,9 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
               onPressed: () {},
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppPalette.brandBlue,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
                 elevation: 4,
                 shadowColor: AppPalette.brandBlue.withOpacity(0.4),
               ),
@@ -295,9 +326,20 @@ class _CreateAdScreenState extends State<CreateAdScreen> {
               label: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Text('Read Posting Guidelines', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+                  Text(
+                    'Read Posting Guidelines',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
                   SizedBox(width: 8),
-                  Icon(Icons.open_in_new_rounded, color: Colors.white, size: 18),
+                  Icon(
+                    Icons.open_in_new_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                 ],
               ),
             ),

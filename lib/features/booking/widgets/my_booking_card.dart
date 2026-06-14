@@ -64,7 +64,11 @@ class MyBookingCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Icon(Icons.more_vert, color: AppPalette.textMuted, size: 20),
+                  const Icon(
+                    Icons.more_vert,
+                    color: AppPalette.textMuted,
+                    size: 20,
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -96,12 +100,19 @@ class MyBookingCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.person, size: 18, color: AppPalette.textMuted),
+                        const Icon(
+                          Icons.person,
+                          size: 18,
+                          color: AppPalette.textMuted,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             customerName,
-                            style: const TextStyle(fontSize: 13, color: AppPalette.textPrimary),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppPalette.textPrimary,
+                            ),
                           ),
                         ),
                       ],
@@ -109,12 +120,19 @@ class MyBookingCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.badge_outlined, size: 18, color: AppPalette.textMuted),
+                        const Icon(
+                          Icons.badge_outlined,
+                          size: 18,
+                          color: AppPalette.textMuted,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             passportNo,
-                            style: const TextStyle(fontSize: 13, color: AppPalette.textPrimary),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppPalette.textPrimary,
+                            ),
                           ),
                         ),
                       ],
@@ -127,7 +145,9 @@ class MyBookingCard extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(child: _moneyCell(label: 'Package', amount: packagePrice)),
+                  Expanded(
+                    child: _moneyCell(label: 'Package', amount: packagePrice),
+                  ),
                   _moneyCell(label: 'Paid', amount: paidAmount, alignEnd: true),
                 ],
               ),
@@ -136,11 +156,18 @@ class MyBookingCard extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  const Icon(Icons.calendar_today_rounded, size: 15, color: AppPalette.textMuted),
+                  const Icon(
+                    Icons.calendar_today_rounded,
+                    size: 15,
+                    color: AppPalette.textMuted,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     dateText,
-                    style: const TextStyle(fontSize: 12, color: AppPalette.textMuted),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppPalette.textMuted,
+                    ),
                   ),
                 ],
               ),
@@ -151,30 +178,43 @@ class MyBookingCard extends StatelessWidget {
     );
   }
 
-  Widget _moneyCell({required String label, required int amount, bool alignEnd = false}) => Column(
-        crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 12, color: AppPalette.textMuted)),
-          const SizedBox(height: 2),
-          Text(
-            '৳ $amount',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: alignEnd ? AppPalette.brandBlue : AppPalette.textPrimary,
-            ),
-          ),
-        ],
-      );
+  Widget _moneyCell({
+    required String label,
+    required int amount,
+    bool alignEnd = false,
+  }) => Column(
+    crossAxisAlignment: alignEnd
+        ? CrossAxisAlignment.end
+        : CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: const TextStyle(fontSize: 12, color: AppPalette.textMuted),
+      ),
+      const SizedBox(height: 2),
+      Text(
+        '৳ $amount',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          color: alignEnd ? AppPalette.brandBlue : AppPalette.textPrimary,
+        ),
+      ),
+    ],
+  );
 
   Widget _statusChip(String status) {
     final low = status.toLowerCase();
     Color bg = const Color(0xFFEAF1FF);
     Color fg = AppPalette.textStrongBlue;
-    if (low.contains('complete') || low.contains('success') || low.contains('handover')) {
+    if (low.contains('complete') ||
+        low.contains('success') ||
+        low.contains('handover')) {
       bg = const Color(0xFFE7F8EE);
       fg = const Color(0xFF1E7A45);
-    } else if (low.contains('pending') || low.contains('processing') || low.contains('collect')) {
+    } else if (low.contains('pending') ||
+        low.contains('processing') ||
+        low.contains('collect')) {
       bg = const Color(0xFFFFF4DC);
       fg = const Color(0xFF9A6700);
     } else if (low.contains('reject') || low.contains('return request')) {
@@ -183,8 +223,14 @@ class MyBookingCard extends StatelessWidget {
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(status, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: fg),
+      ),
     );
   }
 }

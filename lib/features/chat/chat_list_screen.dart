@@ -79,7 +79,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   List<ChatItem> get _filteredChats {
     final query = _searchQuery.trim().toLowerCase();
     var filtered = _chats;
-    
+
     if (_activeFilter == 'Unread') {
       filtered = filtered.where((c) => c.unreadCount > 0).toList();
     } else if (_activeFilter == 'Online') {
@@ -92,7 +92,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             chat.lastMessage.toLowerCase().contains(query);
       }).toList();
     }
-    
+
     return filtered;
   }
 
@@ -122,7 +122,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFE0F2FE),
                         borderRadius: BorderRadius.circular(20),
@@ -130,13 +133,22 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       child: Row(
                         children: [
                           Container(
-                            width: 8, height: 8,
+                            width: 8,
+                            height: 8,
                             decoration: const BoxDecoration(
-                              color: Color(0xFF10B981), shape: BoxShape.circle
+                              color: Color(0xFF10B981),
+                              shape: BoxShape.circle,
                             ),
                           ),
                           const SizedBox(width: 6),
-                          const Text('3 Online', style: TextStyle(color: Color(0xFF0369A1), fontSize: 12, fontWeight: FontWeight.w700)),
+                          const Text(
+                            '3 Online',
+                            style: TextStyle(
+                              color: Color(0xFF0369A1),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -156,33 +168,45 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 Expanded(
                   child: Stack(
                     children: [
-                      _filteredChats.isEmpty 
-                        ? const Center(child: Text('No conversations found.', style: TextStyle(color: AppPalette.textMuted)))
-                        : ListView.separated(
-                          padding: const EdgeInsets.only(bottom: 80),
-                          itemCount: _filteredChats.length,
-                          separatorBuilder: (_, index) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final item = _filteredChats[index];
-                            return _ChatCard(
-                              item: item,
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ChatConversationScreen(chat: item),
-                                  ),
+                      _filteredChats.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'No conversations found.',
+                                style: TextStyle(color: AppPalette.textMuted),
+                              ),
+                            )
+                          : ListView.separated(
+                              padding: const EdgeInsets.only(bottom: 80),
+                              itemCount: _filteredChats.length,
+                              separatorBuilder: (_, index) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final item = _filteredChats[index];
+                                return _ChatCard(
+                                  item: item,
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            ChatConversationScreen(chat: item),
+                                      ),
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                        ),
+                            ),
                       Positioned(
                         bottom: 16,
                         right: 0,
                         child: FloatingActionButton(
                           backgroundColor: AppPalette.brandBlue,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          child: const Icon(Icons.edit_square, color: Colors.white),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.edit_square,
+                            color: Colors.white,
+                          ),
                           onPressed: () {},
                         ),
                       ),
@@ -238,12 +262,17 @@ class _ChatListScreenState extends State<ChatListScreen> {
               borderRadius: BorderRadius.circular(20),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? AppPalette.brandBlue : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? AppPalette.brandBlue : const Color(0xFFE2E8F0),
+                    color: isSelected
+                        ? AppPalette.brandBlue
+                        : const Color(0xFFE2E8F0),
                   ),
                 ),
                 child: Text(

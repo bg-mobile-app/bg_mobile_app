@@ -174,13 +174,17 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
                         onViewChanged: (value) =>
                             setState(() => _isCardView = value),
                         controller: _searchController,
-                        onQueryChanged: (value) => setState(() => _query = value),
+                        onQueryChanged: (value) =>
+                            setState(() => _query = value),
                       ),
                       const SizedBox(height: AppSpacing.md),
                       if (_error != null)
                         Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                          child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                          child: Text(
+                            _error!,
+                            style: const TextStyle(color: Colors.red),
+                          ),
                         ),
                       Skeletonizer(
                         enabled: _isInitialLoading,
@@ -216,7 +220,48 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
 }
 
 // keep other widgets mostly unchanged
-class _SearchAndActions extends StatelessWidget { const _SearchAndActions({required this.isCardView,required this.onViewChanged,required this.controller,required this.onQueryChanged,}); final bool isCardView; final ValueChanged<bool> onViewChanged; final TextEditingController controller; final ValueChanged<String> onQueryChanged; @override Widget build(BuildContext context){ return Column(children:[Row(children:[ViewToggleButton(isCardView:isCardView,onChanged:onViewChanged),const SizedBox(width: AppSpacing.sm),Expanded(child:SizedBox(height:48,child:ElevatedButton.icon(onPressed:()=>context.go('/dashboard/user/create-user'),icon:const Icon(Icons.person_add),label:const Text('Add Member'))))]),const SizedBox(height: AppSpacing.sm),AppSearchBar(controller:controller,hintText:'Search by user ID, email, phone, role...',onChanged:onQueryChanged,onSearchTap:()=>onQueryChanged(controller.text))]);}}
+class _SearchAndActions extends StatelessWidget {
+  const _SearchAndActions({
+    required this.isCardView,
+    required this.onViewChanged,
+    required this.controller,
+    required this.onQueryChanged,
+  });
+  final bool isCardView;
+  final ValueChanged<bool> onViewChanged;
+  final TextEditingController controller;
+  final ValueChanged<String> onQueryChanged;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            ViewToggleButton(isCardView: isCardView, onChanged: onViewChanged),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: SizedBox(
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.go('/dashboard/user/create-user'),
+                  icon: const Icon(Icons.person_add),
+                  label: const Text('Add Member'),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        AppSearchBar(
+          controller: controller,
+          hintText: 'Search by user ID, email, phone, role...',
+          onChanged: onQueryChanged,
+          onSearchTap: () => onQueryChanged(controller.text),
+        ),
+      ],
+    );
+  }
+}
 
 class _UserTableCard extends StatelessWidget {
   const _UserTableCard({
@@ -312,7 +357,11 @@ class _UserTableCard extends StatelessWidget {
             if (isAdmin)
               DataCell(
                 TextButton(
-                  onPressed: hasPermission ? () => context.go('/dashboard/user/manage-user/activity/${member.userId}') : null,
+                  onPressed: hasPermission
+                      ? () => context.go(
+                          '/dashboard/user/manage-user/activity/${member.userId}',
+                        )
+                      : null,
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFFE9EDFF),
                     elevation: 0,
@@ -345,7 +394,9 @@ class _UserTableCard extends StatelessWidget {
                       isBlocked ? 'Blocked' : 'Active',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isBlocked ? AppPalette.danger : AppPalette.success,
+                        color: isBlocked
+                            ? AppPalette.danger
+                            : AppPalette.success,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -356,7 +407,9 @@ class _UserTableCard extends StatelessWidget {
                         size: 20,
                         color: Color(0xFF434655),
                       ),
-                      onPressed: () => context.go('/dashboard/user/create-user/${member.userId}'),
+                      onPressed: () => context.go(
+                        '/dashboard/user/create-user/${member.userId}',
+                      ),
                       tooltip: 'Edit User',
                     ),
                   ] else ...[
@@ -408,9 +461,9 @@ class _CardGrid extends StatelessWidget {
         final m = members[index];
         final isBlocked = m.isActive == 'False';
         final hasPermission = canManage(m);
-        
-        final initials = m.userCode.length >= 4 
-            ? m.userCode.substring(m.userCode.length - 4) 
+
+        final initials = m.userCode.length >= 4
+            ? m.userCode.substring(m.userCode.length - 4)
             : m.userCode;
 
         return Container(
@@ -481,7 +534,10 @@ class _CardGrid extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppPalette.borderSoftBlue,
                       borderRadius: BorderRadius.circular(8),
@@ -500,7 +556,11 @@ class _CardGrid extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
-                  const Icon(Icons.mail_outline, size: 16, color: AppPalette.textMuted),
+                  const Icon(
+                    Icons.mail_outline,
+                    size: 16,
+                    color: AppPalette.textMuted,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -518,7 +578,11 @@ class _CardGrid extends StatelessWidget {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.phone_outlined, size: 16, color: AppPalette.textMuted),
+                  const Icon(
+                    Icons.phone_outlined,
+                    size: 16,
+                    color: AppPalette.textMuted,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -548,7 +612,9 @@ class _CardGrid extends StatelessWidget {
                           scale: 0.8,
                           child: Switch(
                             value: !isBlocked,
-                            onChanged: hasPermission ? (_) => onToggleBlock(m) : null,
+                            onChanged: hasPermission
+                                ? (_) => onToggleBlock(m)
+                                : null,
                           ),
                         ),
                       ),
@@ -558,7 +624,9 @@ class _CardGrid extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: isBlocked ? AppPalette.danger : AppPalette.success,
+                          color: isBlocked
+                              ? AppPalette.danger
+                              : AppPalette.success,
                         ),
                       ),
                     ],
@@ -567,7 +635,11 @@ class _CardGrid extends StatelessWidget {
                     children: [
                       if (isAdmin) ...[
                         TextButton(
-                          onPressed: hasPermission ? () => context.go('/dashboard/user/manage-user/activity/${m.userId}') : null,
+                          onPressed: hasPermission
+                              ? () => context.go(
+                                  '/dashboard/user/manage-user/activity/${m.userId}',
+                                )
+                              : null,
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
                             minimumSize: const Size(50, 30),
@@ -586,14 +658,24 @@ class _CardGrid extends StatelessWidget {
                       ],
                       if (hasPermission)
                         OutlinedButton.icon(
-                          onPressed: () => context.go('/dashboard/user/create-user/${m.userId}'),
+                          onPressed: () => context.go(
+                            '/dashboard/user/create-user/${m.userId}',
+                          ),
                           icon: const Icon(Icons.edit_outlined, size: 14),
-                          label: const Text('Edit', style: TextStyle(fontSize: 12)),
+                          label: const Text(
+                            'Edit',
+                            style: TextStyle(fontSize: 12),
+                          ),
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            side: const BorderSide(color: AppPalette.borderNeutral),
+                            side: const BorderSide(
+                              color: AppPalette.borderNeutral,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -612,7 +694,34 @@ class _CardGrid extends StatelessWidget {
 }
 
 const _skeletonMembers = [
-  RecruitingAgencyStaffGETProps(id: 0, userId: 'loading', userCode: 'STF-0000', email: 'loading@example.com', phone: '+0 000', userRole: 'Role', designation: 'Designation', isActive: 'True'),
-  RecruitingAgencyStaffGETProps(id: 1, userId: 'loading2', userCode: 'STF-0001', email: 'loading2@example.com', phone: '+0 001', userRole: 'Role', designation: 'Designation', isActive: 'True'),
-  RecruitingAgencyStaffGETProps(id: 2, userId: 'loading3', userCode: 'STF-0002', email: 'loading3@example.com', phone: '+0 002', userRole: 'Role', designation: 'Designation', isActive: 'True'),
+  RecruitingAgencyStaffGETProps(
+    id: 0,
+    userId: 'loading',
+    userCode: 'STF-0000',
+    email: 'loading@example.com',
+    phone: '+0 000',
+    userRole: 'Role',
+    designation: 'Designation',
+    isActive: 'True',
+  ),
+  RecruitingAgencyStaffGETProps(
+    id: 1,
+    userId: 'loading2',
+    userCode: 'STF-0001',
+    email: 'loading2@example.com',
+    phone: '+0 001',
+    userRole: 'Role',
+    designation: 'Designation',
+    isActive: 'True',
+  ),
+  RecruitingAgencyStaffGETProps(
+    id: 2,
+    userId: 'loading3',
+    userCode: 'STF-0002',
+    email: 'loading3@example.com',
+    phone: '+0 002',
+    userRole: 'Role',
+    designation: 'Designation',
+    isActive: 'True',
+  ),
 ];

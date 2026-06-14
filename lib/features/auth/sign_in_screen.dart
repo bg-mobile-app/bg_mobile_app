@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../common/services/agency_access.dart';
@@ -7,6 +8,7 @@ import '../../common/services/api_client.dart';
 import '../../common/services/api_exception.dart';
 import '../../common/services/expiry_reminder_dialog_service.dart';
 import '../../routes/app_routes.dart';
+import '../../common/theme/app_palette.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -107,6 +109,14 @@ class _SignInScreenState extends State<SignInScreen> {
 
         await apiClient.saveCookiesFromResponse(response);
         await ExpiryReminderDialogService().markPendingForLogin();
+        // Set system navigation color for logged-in users
+        SystemChrome.setSystemUIOverlayStyle(
+          const SystemUiOverlayStyle(
+            systemNavigationBarColor: AppPalette.brandBlue,
+            systemNavigationBarDividerColor: AppPalette.brandBlue,
+            systemNavigationBarIconBrightness: Brightness.light,
+          ),
+        );
         if (mounted) {
           context.go(AppRoutes.home);
         }

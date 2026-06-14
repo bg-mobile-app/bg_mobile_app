@@ -12,12 +12,10 @@ class ReceivedPassportScreen extends StatefulWidget {
   const ReceivedPassportScreen({super.key});
 
   @override
-  State<ReceivedPassportScreen> createState() =>
-      _ReceivedPassportScreenState();
+  State<ReceivedPassportScreen> createState() => _ReceivedPassportScreenState();
 }
 
-class _ReceivedPassportScreenState
-    extends State<ReceivedPassportScreen> {
+class _ReceivedPassportScreenState extends State<ReceivedPassportScreen> {
   bool _isCardView = false;
   late final TextEditingController _searchController;
   String _searchQuery = '';
@@ -425,7 +423,6 @@ class _ReceivedPassportScreenState
     );
   }
 
-
   Widget _dateRangeButton() {
     final label = _selectedDateRange == null
         ? 'Select Date Range'
@@ -454,15 +451,32 @@ class _ReceivedPassportScreenState
             },
             child: Row(
               children: [
-                const Icon(Icons.date_range_rounded, size: 18, color: AppPalette.textStrongBlue),
+                const Icon(
+                  Icons.date_range_rounded,
+                  size: 18,
+                  color: AppPalette.textStrongBlue,
+                ),
                 const SizedBox(width: 8),
-                Text(label, style: const TextStyle(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w600)),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: AppPalette.textStrongBlue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
           ),
           const Spacer(),
           if (_selectedDateRange != null)
-            InkWell(onTap: () => setState(() => _selectedDateRange = null), child: const Icon(Icons.close_rounded, size: 18, color: AppPalette.textMuted)),
+            InkWell(
+              onTap: () => setState(() => _selectedDateRange = null),
+              child: const Icon(
+                Icons.close_rounded,
+                size: 18,
+                color: AppPalette.textMuted,
+              ),
+            ),
         ],
       ),
     );
@@ -563,9 +577,15 @@ class _ReceivedPassportScreenState
           createdAtText: _displayDate(item.createdAt),
           fromCountry: item.fromCountry,
           toCountry: item.toCountry,
-          medicalText: item.medicalExpiryDate == null ? '22/08/2026' : _displayDate(item.medicalExpiryDate!),
-          visaText: item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
-          policeClearText: item.policeClearanceExpiryDate == null ? '22/08/2026' : _displayDate(item.policeClearanceExpiryDate!),
+          medicalText: item.medicalExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.medicalExpiryDate!),
+          visaText: item.visaExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.visaExpiryDate!),
+          policeClearText: item.policeClearanceExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.policeClearanceExpiryDate!),
           totalCostText: '৳ ${_money(item.agencyTotalCost)}',
           hasAdvancePayout: item.hasAdvancePayout,
           hasAfterVisaPayout: item.hasAfterVisaPayout,
@@ -865,10 +885,9 @@ void _openActionsSheet(BuildContext context, BookingItem row) {
     ),
   );
 }
-  String _formatDate(DateTime date) {
-    final m = date.month.toString().padLeft(2, '0');
-    final d = date.day.toString().padLeft(2, '0');
-    return '${date.year}-$m-$d';
-  }
 
-
+String _formatDate(DateTime date) {
+  final m = date.month.toString().padLeft(2, '0');
+  final d = date.day.toString().padLeft(2, '0');
+  return '${date.year}-$m-$d';
+}

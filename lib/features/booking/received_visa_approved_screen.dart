@@ -17,7 +17,8 @@ class ReceivedVisaApprovedScreen extends StatefulWidget {
       _ReceivedVisaApprovedScreenState();
 }
 
-class _ReceivedVisaApprovedScreenState extends State<ReceivedVisaApprovedScreen> {
+class _ReceivedVisaApprovedScreenState
+    extends State<ReceivedVisaApprovedScreen> {
   bool _isCardView = false;
   late final TextEditingController _searchController;
   String _searchQuery = '';
@@ -73,8 +74,9 @@ class _ReceivedVisaApprovedScreenState extends State<ReceivedVisaApprovedScreen>
   }
 
   List<BookingItem> get _filteredBookings {
-    final visaApprovedBookings =
-        _bookings.where((item) => item.status == 'VISA_APPROVED').toList();
+    final visaApprovedBookings = _bookings
+        .where((item) => item.status == 'VISA_APPROVED')
+        .toList();
     final query = _searchQuery.trim().toLowerCase();
     return visaApprovedBookings.where((item) {
       final matchesQuery =
@@ -122,8 +124,10 @@ class _ReceivedVisaApprovedScreenState extends State<ReceivedVisaApprovedScreen>
                     const SizedBox(height: 14),
                     AppSearchBar(
                       controller: _searchController,
-                      hintText: 'Search by booking ID, name, passport or status',
-                      onSearchTap: () => setState(() => _searchQuery = _searchController.text),
+                      hintText:
+                          'Search by booking ID, name, passport or status',
+                      onSearchTap: () =>
+                          setState(() => _searchQuery = _searchController.text),
                     ),
                     const SizedBox(height: 14),
                     Row(
@@ -349,9 +353,15 @@ class _ReceivedVisaApprovedScreenState extends State<ReceivedVisaApprovedScreen>
           hasBeforeFlightPayout: item.hasBeforeFlightPayout,
           createdAtText: _displayDate(item.createdAt),
           passportNo: item.passportNo,
-          medicalText: item.medicalExpiryDate == null ? '22/08/2026' : _displayDate(item.medicalExpiryDate!),
-          visaText: item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
-          policeClearText: item.policeClearanceExpiryDate == null ? '22/08/2026' : _displayDate(item.policeClearanceExpiryDate!),
+          medicalText: item.medicalExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.medicalExpiryDate!),
+          visaText: item.visaExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.visaExpiryDate!),
+          policeClearText: item.policeClearanceExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.policeClearanceExpiryDate!),
           style: style,
           onMoreTap: () => _openActionsSheet(context, item),
         );
@@ -428,7 +438,10 @@ class _ReceivedVisaApprovedScreenState extends State<ReceivedVisaApprovedScreen>
             children: [
               Text(
                 'Actions • ${row.statusLabel}',
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 12),
               if (actions.isEmpty)

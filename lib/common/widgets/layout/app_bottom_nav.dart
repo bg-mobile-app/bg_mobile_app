@@ -33,9 +33,7 @@ class AppBottomNav extends StatelessWidget {
         child: DecoratedBox(
           decoration: const BoxDecoration(
             color: AppPalette.surface,
-            border: Border(
-              top: BorderSide(color: AppPalette.borderNeutral),
-            ),
+            border: Border(top: BorderSide(color: AppPalette.borderNeutral)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -201,7 +199,6 @@ class AppBottomNav extends StatelessWidget {
                   ),
                 ),
               ),
-
             ],
           ),
         ),

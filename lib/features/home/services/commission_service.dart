@@ -49,13 +49,17 @@ class WPMyBookingGETProps {
 
   factory WPMyBookingGETProps.fromJson(Map<String, dynamic> json) {
     return WPMyBookingGETProps(
-      id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse('${json['id']}') ?? 0,
       workPermitId: json['workPermitId']?.toString() ?? '',
       workPermitSlug: json['workPermitSlug']?.toString() ?? '',
       fromCountry: json['fromCountry']?.toString() ?? '',
       toCountry: json['toCountry']?.toString() ?? '',
       serviceType: json['serviceType']?.toString() ?? '',
-      createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+          DateTime.now(),
       statusLabel: json['statusLabel']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
       passportNo: json['passportNo']?.toString() ?? '',
@@ -67,14 +71,15 @@ class WPMyBookingGETProps {
 
   static int _toInt(dynamic val) {
     if (val is num) return val.toInt();
-    if (val is String) return double.tryParse(val)?.toInt() ?? int.tryParse(val) ?? 0;
+    if (val is String)
+      return double.tryParse(val)?.toInt() ?? int.tryParse(val) ?? 0;
     return 0;
   }
 }
 
 class CommissionService {
   CommissionService({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
+    : _apiClient = apiClient ?? ApiClient();
 
   final ApiClient _apiClient;
 
@@ -84,7 +89,8 @@ class CommissionService {
     String? toDate,
   }) async {
     final queryParams = <String, dynamic>{
-      'status': '', // In this specific component, status is always an empty string
+      'status':
+          '', // In this specific component, status is always an empty string
     };
     if (search != null && search.isNotEmpty) {
       queryParams['search'] = search;
@@ -109,14 +115,20 @@ class CommissionService {
     final rawResults = map['results'] as List? ?? const [];
 
     return TypesHandler<WPMyBookingGETProps>(
-      count: map['count'] is int ? map['count'] as int : int.tryParse('${map['count']}') ?? 0,
+      count: map['count'] is int
+          ? map['count'] as int
+          : int.tryParse('${map['count']}') ?? 0,
       next: map['next']?.toString(),
       previous: map['previous']?.toString(),
       results: rawResults
           .whereType<Map>()
-          .map((e) => WPMyBookingGETProps.fromJson(Map<String, dynamic>.from(e)))
+          .map(
+            (e) => WPMyBookingGETProps.fromJson(Map<String, dynamic>.from(e)),
+          )
           .toList(),
-      pageSize: map['pageSize'] is int ? map['pageSize'] as int : int.tryParse('${map['pageSize']}') ?? 10,
+      pageSize: map['pageSize'] is int
+          ? map['pageSize'] as int
+          : int.tryParse('${map['pageSize']}') ?? 10,
     );
   }
 }

@@ -12,7 +12,8 @@ class CustomerProfileEditScreen extends StatefulWidget {
   const CustomerProfileEditScreen({super.key});
 
   @override
-  State<CustomerProfileEditScreen> createState() => _CustomerProfileEditScreenState();
+  State<CustomerProfileEditScreen> createState() =>
+      _CustomerProfileEditScreenState();
 }
 
 class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
@@ -82,7 +83,9 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
         return;
       }
 
-      final bank = profile.bankInformation.isNotEmpty ? profile.bankInformation.first : null;
+      final bank = profile.bankInformation.isNotEmpty
+          ? profile.bankInformation.first
+          : null;
       final doc = profile.documents.isNotEmpty ? profile.documents.first : null;
 
       setState(() {
@@ -93,10 +96,12 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
         _existingCivilAviationLicenseUrl = doc?.civilAviationLicenseImage;
 
         _agencyNameController.text = profile.agencyName ?? '';
-        _agencyPhoneController.text = profile.agencyPhone ?? profile.owner?.phone ?? '';
+        _agencyPhoneController.text =
+            profile.agencyPhone ?? profile.owner?.phone ?? '';
         _agencyAddressController.text = profile.agencyAddress ?? '';
         _ownerFullNameController.text = profile.owner?.fullName ?? '';
-        _ownerPhoneController.text = profile.owner?.phone ?? profile.agencyPhone ?? '';
+        _ownerPhoneController.text =
+            profile.owner?.phone ?? profile.agencyPhone ?? '';
         _ownerEmailController.text = profile.owner?.email ?? '';
         _bankNameController.text = bank?.bankName ?? '';
         _branchNameController.text = bank?.branchName ?? '';
@@ -107,20 +112,35 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
       });
 
       if (profile.district != null) {
-        final matchedDistrict = districts.where((d) =>
-          (profile.district!.id != null && d.id == int.tryParse(profile.district!.id.toString())) ||
-          (d.name.toLowerCase() == profile.district!.name.toLowerCase())
-        ).toList();
+        final matchedDistrict = districts
+            .where(
+              (d) =>
+                  (profile.district!.id != null &&
+                      d.id == int.tryParse(profile.district!.id.toString())) ||
+                  (d.name.toLowerCase() ==
+                      profile.district!.name.toLowerCase()),
+            )
+            .toList();
 
         if (matchedDistrict.isNotEmpty) {
           _selectedDistrictId = matchedDistrict.first.id;
-          _policeStations = await _locationService.getPoliceStations(_selectedDistrictId!);
+          _policeStations = await _locationService.getPoliceStations(
+            _selectedDistrictId!,
+          );
 
           if (profile.policeStation != null) {
-            final matchedPs = _policeStations.where((p) =>
-              (profile.policeStation!.id != null && p.id == int.tryParse(profile.policeStation!.id.toString())) ||
-              (p.name.toLowerCase() == profile.policeStation!.name.toLowerCase())
-            ).toList();
+            final matchedPs = _policeStations
+                .where(
+                  (p) =>
+                      (profile.policeStation!.id != null &&
+                          p.id ==
+                              int.tryParse(
+                                profile.policeStation!.id.toString(),
+                              )) ||
+                      (p.name.toLowerCase() ==
+                          profile.policeStation!.name.toLowerCase()),
+                )
+                .toList();
             if (matchedPs.isNotEmpty) {
               _selectedPoliceStationId = matchedPs.first.id;
             }
@@ -152,7 +172,10 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
   }
 
   Future<void> _pickImage(ValueChanged<XFile?> onPicked) async {
-    final file = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    final file = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
     if (!mounted || file == null) return;
     onPicked(file);
   }
@@ -167,7 +190,8 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
         'agencyPhone': _agencyPhoneController.text.trim(),
         'agencyAddress': _agencyAddressController.text.trim(),
         if (_selectedDistrictId != null) 'district': _selectedDistrictId,
-        if (_selectedPoliceStationId != null) 'policeStation': _selectedPoliceStationId,
+        if (_selectedPoliceStationId != null)
+          'policeStation': _selectedPoliceStationId,
         'owner.fullName': _ownerFullNameController.text.trim(),
         'owner.phone': _ownerPhoneController.text.trim(),
         'owner.email': _ownerEmailController.text.trim(),
@@ -179,26 +203,46 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
         'documents.rlNo': _rlNoController.text.trim(),
       };
 
-      if (_profileImage != null) map['image'] = await MultipartFile.fromFile(_profileImage!.path);
-      if (_nidImage != null) map['documents.nidImage'] = await MultipartFile.fromFile(_nidImage!.path);
-      if (_tradeLicenseImage != null) map['documents.tradeLicenseImage'] = await MultipartFile.fromFile(_tradeLicenseImage!.path);
-      if (_rlLicenseImage != null) map['documents.rlLicenseImage'] = await MultipartFile.fromFile(_rlLicenseImage!.path);
-      if (_civilAviationLicenseImage != null) map['documents.civilAviationLicenseImage'] = await MultipartFile.fromFile(_civilAviationLicenseImage!.path);
+      if (_profileImage != null)
+        map['image'] = await MultipartFile.fromFile(_profileImage!.path);
+      if (_nidImage != null)
+        map['documents.nidImage'] = await MultipartFile.fromFile(
+          _nidImage!.path,
+        );
+      if (_tradeLicenseImage != null)
+        map['documents.tradeLicenseImage'] = await MultipartFile.fromFile(
+          _tradeLicenseImage!.path,
+        );
+      if (_rlLicenseImage != null)
+        map['documents.rlLicenseImage'] = await MultipartFile.fromFile(
+          _rlLicenseImage!.path,
+        );
+      if (_civilAviationLicenseImage != null)
+        map['documents.civilAviationLicenseImage'] =
+            await MultipartFile.fromFile(_civilAviationLicenseImage!.path);
 
-      final updated = await _profileService.updateAgencyProfile(FormData.fromMap(map));
+      final updated = await _profileService.updateAgencyProfile(
+        FormData.fromMap(map),
+      );
       if (!mounted) return;
       setState(() => _isSaving = false);
 
       if (updated != null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated successfully')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully')),
+        );
         Navigator.of(context).pop(true);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to update profile')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update profile')),
+        );
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -243,15 +287,22 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                     children: [
                       Text(
                         _error!,
-                        style: const TextStyle(color: AppPalette.danger, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: AppPalette.danger,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _loadData,
-                        style: ElevatedButton.styleFrom(backgroundColor: AppPalette.brandBlue, foregroundColor: Colors.white),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppPalette.brandBlue,
+                          foregroundColor: Colors.white,
+                        ),
                         child: const Text('Retry'),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -261,12 +312,15 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                 child: Form(
                   key: _formKey,
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildProfilePhotoHeader(),
-                        
+
                         // Card 1: Agency Details
                         _buildSectionCard(
                           title: 'Agency Details',
@@ -325,15 +379,33 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                               label: 'District',
                               value: _selectedDistrictId,
                               icon: Icons.my_location,
-                              items: _districts.map((d) => DropdownMenuItem<int>(value: d.id, child: Text(d.name))).toList(),
+                              items: _districts
+                                  .map(
+                                    (d) => DropdownMenuItem<int>(
+                                      value: d.id,
+                                      child: Text(d.name),
+                                    ),
+                                  )
+                                  .toList(),
                               onChanged: _isLoading ? null : _onDistrictChanged,
                             ),
                             _buildCustomDropdown<int>(
                               label: 'Police Station',
                               value: _selectedPoliceStationId,
                               icon: Icons.local_police_outlined,
-                              items: _policeStations.map((p) => DropdownMenuItem<int>(value: p.id, child: Text(p.name))).toList(),
-                              onChanged: _isLoading ? null : (v) => setState(() => _selectedPoliceStationId = v),
+                              items: _policeStations
+                                  .map(
+                                    (p) => DropdownMenuItem<int>(
+                                      value: p.id,
+                                      child: Text(p.name),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: _isLoading
+                                  ? null
+                                  : (v) => setState(
+                                      () => _selectedPoliceStationId = v,
+                                    ),
                             ),
                           ],
                         ),
@@ -386,7 +458,11 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                             const SizedBox(height: 4),
                             const Text(
                               'NID Verification',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppPalette.textMuted),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppPalette.textMuted,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Row(
@@ -395,14 +471,20 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                                   label: 'NID Image',
                                   localFile: _nidImage,
                                   existingUrl: _existingNidImageUrl,
-                                  onTap: () => _pickImage((v) => setState(() => _nidImage = v)),
+                                  onTap: () => _pickImage(
+                                    (v) => setState(() => _nidImage = v),
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 20),
                             const Text(
                               'Licenses & Certificates',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppPalette.textMuted),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppPalette.textMuted,
+                              ),
                             ),
                             const SizedBox(height: 10),
                             _buildLicenseGrid(),
@@ -439,9 +521,13 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                     backgroundColor: const Color(0xFFEFF6FF),
                     backgroundImage: _profileImage != null
                         ? FileImage(File(_profileImage!.path))
-                        : (_existingProfileImageUrl != null && _existingProfileImageUrl!.isNotEmpty
-                            ? NetworkImage(_existingProfileImageUrl!)
-                            : const AssetImage('assets/img/sign-in/login.jpg')) as ImageProvider,
+                        : (_existingProfileImageUrl != null &&
+                                      _existingProfileImageUrl!.isNotEmpty
+                                  ? NetworkImage(_existingProfileImageUrl!)
+                                  : const AssetImage(
+                                      'assets/img/sign-in/login.jpg',
+                                    ))
+                              as ImageProvider,
                   ),
                 ),
                 Positioned(
@@ -449,7 +535,8 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                   right: 4,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: () => _pickImage((v) => setState(() => _profileImage = v)),
+                    onTap: () =>
+                        _pickImage((v) => setState(() => _profileImage = v)),
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -475,7 +562,8 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
             ),
             const SizedBox(height: 10),
             TextButton(
-              onPressed: () => _pickImage((v) => setState(() => _profileImage = v)),
+              onPressed: () =>
+                  _pickImage((v) => setState(() => _profileImage = v)),
               child: const Text(
                 'Change Photo',
                 style: TextStyle(
@@ -513,7 +601,11 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
               const SizedBox(width: 10),
               Text(
                 title,
-                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppPalette.textPrimary),
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: AppPalette.textPrimary,
+                ),
               ),
             ],
           ),
@@ -536,17 +628,32 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppPalette.textMuted),
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppPalette.textMuted,
+          ),
         ),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
-          validator: validator ?? (value) => (value == null || value.trim().isEmpty) ? '$label is required' : null,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppPalette.textPrimary),
+          validator:
+              validator ??
+              (value) => (value == null || value.trim().isEmpty)
+                  ? '$label is required'
+                  : null,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: AppPalette.textPrimary,
+          ),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: AppPalette.textMuted, size: 20),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             filled: true,
             fillColor: const Color(0xFFF9FAFB),
             enabledBorder: OutlineInputBorder(
@@ -555,7 +662,10 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppPalette.brandBlue, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppPalette.brandBlue,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -563,7 +673,10 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppPalette.danger, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppPalette.danger,
+                width: 1.5,
+              ),
             ),
           ),
         ),
@@ -585,19 +698,31 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppPalette.textMuted),
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppPalette.textMuted,
+          ),
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<T>(
           value: value,
           items: items,
           onChanged: onChanged,
-          validator: validator ?? (v) => v == null ? '$label is required' : null,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppPalette.textPrimary),
+          validator:
+              validator ?? (v) => v == null ? '$label is required' : null,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: AppPalette.textPrimary,
+          ),
           icon: const Icon(Icons.arrow_drop_down, color: AppPalette.textMuted),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: AppPalette.textMuted, size: 20),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             filled: true,
             fillColor: const Color(0xFFF9FAFB),
             enabledBorder: OutlineInputBorder(
@@ -606,7 +731,10 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppPalette.brandBlue, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppPalette.brandBlue,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -614,7 +742,10 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppPalette.danger, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppPalette.danger,
+                width: 1.5,
+              ),
             ),
           ),
         ),
@@ -629,9 +760,10 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
     required String? existingUrl,
     required VoidCallback onTap,
   }) {
-    final hasFile = localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
-    final fileName = localFile != null 
-        ? localFile.name 
+    final hasFile =
+        localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
+    final fileName = localFile != null
+        ? localFile.name
         : (existingUrl != null ? existingUrl.split('/').last : '');
 
     return Expanded(
@@ -644,7 +776,9 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
             color: hasFile ? const Color(0xFFECFDF5) : const Color(0xFFF9FAFB),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: hasFile ? const Color(0xFF10B981) : AppPalette.borderNeutral,
+              color: hasFile
+                  ? const Color(0xFF10B981)
+                  : AppPalette.borderNeutral,
               width: 1.5,
             ),
           ),
@@ -662,7 +796,9 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: hasFile ? const Color(0xFF065F46) : AppPalette.textPrimary,
+                  color: hasFile
+                      ? const Color(0xFF065F46)
+                      : AppPalette.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
@@ -675,7 +811,9 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 10,
-                    color: hasFile ? const Color(0xFF047857) : AppPalette.textMuted,
+                    color: hasFile
+                        ? const Color(0xFF047857)
+                        : AppPalette.textMuted,
                   ),
                 ),
               ),
@@ -698,7 +836,8 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                 icon: Icons.verified_user,
                 localFile: _tradeLicenseImage,
                 existingUrl: _existingTradeLicenseUrl,
-                onTap: () => _pickImage((v) => setState(() => _tradeLicenseImage = v)),
+                onTap: () =>
+                    _pickImage((v) => setState(() => _tradeLicenseImage = v)),
               ),
               const SizedBox(width: 12),
               _buildLicenseCard(
@@ -706,7 +845,8 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                 icon: Icons.badge,
                 localFile: _rlLicenseImage,
                 existingUrl: _existingRlLicenseUrl,
-                onTap: () => _pickImage((v) => setState(() => _rlLicenseImage = v)),
+                onTap: () =>
+                    _pickImage((v) => setState(() => _rlLicenseImage = v)),
               ),
               const SizedBox(width: 12),
               _buildLicenseCard(
@@ -714,7 +854,9 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                 icon: Icons.flight,
                 localFile: _civilAviationLicenseImage,
                 existingUrl: _existingCivilAviationLicenseUrl,
-                onTap: () => _pickImage((v) => setState(() => _civilAviationLicenseImage = v)),
+                onTap: () => _pickImage(
+                  (v) => setState(() => _civilAviationLicenseImage = v),
+                ),
               ),
             ],
           );
@@ -726,7 +868,8 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                 icon: Icons.verified_user,
                 localFile: _tradeLicenseImage,
                 existingUrl: _existingTradeLicenseUrl,
-                onTap: () => _pickImage((v) => setState(() => _tradeLicenseImage = v)),
+                onTap: () =>
+                    _pickImage((v) => setState(() => _tradeLicenseImage = v)),
               ),
               const SizedBox(height: 10),
               _buildLicenseCardWide(
@@ -734,7 +877,8 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                 icon: Icons.badge,
                 localFile: _rlLicenseImage,
                 existingUrl: _existingRlLicenseUrl,
-                onTap: () => _pickImage((v) => setState(() => _rlLicenseImage = v)),
+                onTap: () =>
+                    _pickImage((v) => setState(() => _rlLicenseImage = v)),
               ),
               const SizedBox(height: 10),
               _buildLicenseCardWide(
@@ -742,7 +886,9 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                 icon: Icons.flight,
                 localFile: _civilAviationLicenseImage,
                 existingUrl: _existingCivilAviationLicenseUrl,
-                onTap: () => _pickImage((v) => setState(() => _civilAviationLicenseImage = v)),
+                onTap: () => _pickImage(
+                  (v) => setState(() => _civilAviationLicenseImage = v),
+                ),
               ),
             ],
           );
@@ -758,9 +904,10 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
     required String? existingUrl,
     required VoidCallback onTap,
   }) {
-    final hasFile = localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
-    final fileName = localFile != null 
-        ? localFile.name 
+    final hasFile =
+        localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
+    final fileName = localFile != null
+        ? localFile.name
         : (existingUrl != null ? existingUrl.split('/').last : 'Not Uploaded');
 
     return Expanded(
@@ -774,7 +921,9 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: hasFile ? const Color(0xFF3B82F6).withOpacity(0.3) : AppPalette.borderNeutral,
+              color: hasFile
+                  ? const Color(0xFF3B82F6).withOpacity(0.3)
+                  : AppPalette.borderNeutral,
               width: 1.2,
             ),
             boxShadow: AppPalette.softShadow,
@@ -829,9 +978,10 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
     required String? existingUrl,
     required VoidCallback onTap,
   }) {
-    final hasFile = localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
-    final fileName = localFile != null 
-        ? localFile.name 
+    final hasFile =
+        localFile != null || (existingUrl != null && existingUrl.isNotEmpty);
+    final fileName = localFile != null
+        ? localFile.name
         : (existingUrl != null ? existingUrl.split('/').last : 'Not Uploaded');
 
     return GestureDetector(
@@ -843,7 +993,9 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: hasFile ? const Color(0xFF3B82F6).withOpacity(0.3) : AppPalette.borderNeutral,
+            color: hasFile
+                ? const Color(0xFF3B82F6).withOpacity(0.3)
+                : AppPalette.borderNeutral,
             width: 1.2,
           ),
           boxShadow: AppPalette.softShadow,

@@ -46,7 +46,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     if (!mounted) return;
     setState(() {
       if (success) {
-        _notifications = _notifications.map((n) => n.id == id ? n.copyWith(isRead: true) : n).toList();
+        _notifications = _notifications
+            .map((n) => n.id == id ? n.copyWith(isRead: true) : n)
+            .toList();
       }
       _loading = false;
     });
@@ -63,7 +65,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     final previousNotifications = _notifications;
     setState(() {
-      _notifications = _notifications.map((n) => n.id == notification.id ? n.copyWith(isRead: true) : n).toList();
+      _notifications = _notifications
+          .map((n) => n.id == notification.id ? n.copyWith(isRead: true) : n)
+          .toList();
     });
 
     final success = await _notificationsService.markRead(id: notification.id);
@@ -93,7 +97,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     final uri = Uri.tryParse(sanitizedUrl);
     if (uri == null) return;
-    final shouldOpenExternal = uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+    final shouldOpenExternal =
+        uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
     if (!shouldOpenExternal) return;
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
@@ -105,7 +110,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     if (!mounted) return;
     setState(() {
       if (success) {
-        _notifications = _notifications.map((n) => n.copyWith(isRead: true)).toList();
+        _notifications = _notifications
+            .map((n) => n.copyWith(isRead: true))
+            .toList();
       }
       _loading = false;
     });
@@ -130,16 +137,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         children: [
                           _breadcrumb(),
                           const SizedBox(height: 8),
-                          Text('Notifications', style: AppTextStyles.headline2.copyWith(fontSize: 25, fontWeight: FontWeight.w800)),
+                          Text(
+                            'Notifications',
+                            style: AppTextStyles.headline2.copyWith(
+                              fontSize: 25,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                           const SizedBox(height: 4),
-                          Text('Manage your latest activity and alerts.', style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted)),
+                          Text(
+                            'Manage your latest activity and alerts.',
+                            style: AppTextStyles.body2.copyWith(
+                              color: AppPalette.textMuted,
+                            ),
+                          ),
                           const SizedBox(height: 14),
                           if (_notifications.any((n) => !n.isRead))
                             Align(
                               alignment: Alignment.centerRight,
                               child: OutlinedButton.icon(
                                 onPressed: _loading ? null : _markAllRead,
-                                style: OutlinedButton.styleFrom(side: const BorderSide(color: AppPalette.borderSoftBlue)),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                    color: AppPalette.borderSoftBlue,
+                                  ),
+                                ),
                                 icon: const Icon(Icons.done_all),
                                 label: const Text('Mark all as read'),
                               ),
@@ -149,7 +171,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             decoration: BoxDecoration(
                               color: AppPalette.surface,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppPalette.borderSoftBlue),
+                              border: Border.all(
+                                color: AppPalette.borderSoftBlue,
+                              ),
                               boxShadow: AppPalette.cardShadow,
                             ),
                             child: _notifications.isEmpty
@@ -158,17 +182,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                     child: Center(
                                       child: Column(
                                         children: [
-                                          Icon(Icons.inbox_outlined, size: 48, color: Color(0xFF94A3B8)),
+                                          Icon(
+                                            Icons.inbox_outlined,
+                                            size: 48,
+                                            color: Color(0xFF94A3B8),
+                                          ),
                                           SizedBox(height: 12),
-                                          Text('Your inbox is empty', style: TextStyle(fontWeight: FontWeight.w600, color: AppPalette.textMuted)),
+                                          Text(
+                                            'Your inbox is empty',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: AppPalette.textMuted,
+                                            ),
+                                          ),
                                           SizedBox(height: 6),
-                                          Text("We'll notify you when something happens.", style: TextStyle(color: Color(0xFF94A3B8))),
+                                          Text(
+                                            "We'll notify you when something happens.",
+                                            style: TextStyle(
+                                              color: Color(0xFF94A3B8),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
                                   )
                                 : Column(
-                                    children: _notifications.map((n) => _notificationItem(n)).toList(),
+                                    children: _notifications
+                                        .map((n) => _notificationItem(n))
+                                        .toList(),
                                   ),
                           ),
                         ],
@@ -184,12 +225,27 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _breadcrumb() {
     return BreadCrumb(
       items: <BreadCrumbItem>[
-        BreadCrumbItem(content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
         BreadCrumbItem(
-          content: Text('Notifications', style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700)),
+          content: Text(
+            'Dashboard',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
+        ),
+        BreadCrumbItem(
+          content: Text(
+            'Notifications',
+            style: AppTextStyles.caption.copyWith(
+              color: AppPalette.textStrongBlue,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
       ],
-      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+      divider: const Icon(
+        Icons.chevron_right_rounded,
+        size: 16,
+        color: Color(0xFF94A3B8),
+      ),
     );
   }
 
@@ -210,7 +266,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               color: n.isRead ? const Color(0xFFF1F5F9) : AppPalette.brandBlue,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.notifications, size: 18, color: n.isRead ? const Color(0xFF94A3B8) : Colors.white),
+            child: Icon(
+              Icons.notifications,
+              size: 18,
+              color: n.isRead ? const Color(0xFF94A3B8) : Colors.white,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -226,10 +286,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         children: [
                           Text(
                             n.title,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? AppPalette.textMuted : const Color(0xFF0F172A)),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: n.isRead
+                                  ? AppPalette.textMuted
+                                  : const Color(0xFF0F172A),
+                            ),
                           ),
                           const SizedBox(height: 4),
-                          Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                          Text(
+                            timeAgo(n.createdAt),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF94A3B8),
+                            ),
+                          ),
                         ],
                       );
                     }
@@ -238,16 +310,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         Expanded(
                           child: Text(
                             n.title,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: n.isRead ? AppPalette.textMuted : const Color(0xFF0F172A)),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: n.isRead
+                                  ? AppPalette.textMuted
+                                  : const Color(0xFF0F172A),
+                            ),
                           ),
                         ),
-                        Text(timeAgo(n.createdAt), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                        Text(
+                          timeAgo(n.createdAt),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF94A3B8),
+                          ),
+                        ),
                       ],
                     );
                   },
                 ),
                 const SizedBox(height: 6),
-                Text(n.message, style: const TextStyle(color: AppPalette.textMuted)),
+                Text(
+                  n.message,
+                  style: const TextStyle(color: AppPalette.textMuted),
+                ),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 8,
@@ -256,7 +343,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     if (n.linkUrl != null)
                       OutlinedButton.icon(
                         onPressed: _loading ? null : () => _takeAction(n),
-                        style: OutlinedButton.styleFrom(side: const BorderSide(color: AppPalette.borderSoftBlue)),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(
+                            color: AppPalette.borderSoftBlue,
+                          ),
+                        ),
                         icon: const Icon(Icons.open_in_new, size: 16),
                         label: const Text('Take Action'),
                       ),

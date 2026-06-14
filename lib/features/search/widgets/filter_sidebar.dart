@@ -31,7 +31,12 @@ class _FilterSidebarState extends State<FilterSidebar> {
   String? _selectionType;
 
   static const _countries = ['Malaysia', 'Romania', 'Japan', 'Poland'];
-  static const _workTypes = ['Factory', 'Construction', 'Hospitality', 'Agriculture'];
+  static const _workTypes = [
+    'Factory',
+    'Construction',
+    'Hospitality',
+    'Agriculture',
+  ];
   static const _selectionTypes = ['DIRECT', 'LOTTERY', 'DELEGATE'];
 
   void _clearAll() {
@@ -64,64 +69,82 @@ class _FilterSidebarState extends State<FilterSidebar> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Filters', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            TextButton(onPressed: _clearAll, child: const Text('Clear all')),
-          ],
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _queryController,
-          decoration: const InputDecoration(hintText: 'Search work permits...', border: OutlineInputBorder()),
-        ),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String>(
-          value: _country,
-          dropdownColor: Colors.white,
-          decoration: const InputDecoration(
-            labelText: 'Country',
-            border: OutlineInputBorder(),
-            filled: true,
-            fillColor: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Filters',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              TextButton(onPressed: _clearAll, child: const Text('Clear all')),
+            ],
           ),
-          items: _countries.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-          onChanged: (v) => setState(() => _country = v),
-        ),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String>(
-          value: _workType,
-          dropdownColor: Colors.white,
-          decoration: const InputDecoration(
-            labelText: 'Work type',
-            border: OutlineInputBorder(),
-            filled: true,
-            fillColor: Colors.white,
+          const SizedBox(height: 8),
+          TextField(
+            controller: _queryController,
+            decoration: const InputDecoration(
+              hintText: 'Search work permits...',
+              border: OutlineInputBorder(),
+            ),
           ),
-          items: _workTypes.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-          onChanged: (v) => setState(() => _workType = v),
-        ),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String>(
-          value: _selectionType,
-          dropdownColor: Colors.white,
-          decoration: const InputDecoration(
-            labelText: 'Selection type',
-            border: OutlineInputBorder(),
-            filled: true,
-            fillColor: Colors.white,
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: _country,
+            dropdownColor: Colors.white,
+            decoration: const InputDecoration(
+              labelText: 'Country',
+              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            items: _countries
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) => setState(() => _country = v),
           ),
-          items: _selectionTypes.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-          onChanged: (v) => setState(() => _selectionType = v),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(onPressed: _apply, child: const Text('Apply filters')),
-        ),
-      ]),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: _workType,
+            dropdownColor: Colors.white,
+            decoration: const InputDecoration(
+              labelText: 'Work type',
+              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            items: _workTypes
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) => setState(() => _workType = v),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: _selectionType,
+            dropdownColor: Colors.white,
+            decoration: const InputDecoration(
+              labelText: 'Selection type',
+              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            items: _selectionTypes
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) => setState(() => _selectionType = v),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _apply,
+              child: const Text('Apply filters'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

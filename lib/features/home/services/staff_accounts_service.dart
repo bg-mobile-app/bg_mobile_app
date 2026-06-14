@@ -51,8 +51,11 @@ class RecruitingAgencyStaffGETProps {
 
   factory RecruitingAgencyStaffGETProps.fromJson(Map<String, dynamic> json) =>
       RecruitingAgencyStaffGETProps(
-        id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
-        userId: (json['userId'] ?? json['user_id'] ?? json['id'])?.toString() ?? '',
+        id: json['id'] is int
+            ? json['id'] as int
+            : int.tryParse('${json['id']}') ?? 0,
+        userId:
+            (json['userId'] ?? json['user_id'] ?? json['id'])?.toString() ?? '',
         userCode: json['userCode']?.toString() ?? '',
         email: json['email']?.toString() ?? '',
         phone: json['phone']?.toString() ?? '',
@@ -98,7 +101,10 @@ class StaffAccountsService {
   Future<TypesHandler<RecruitingAgencyStaffGETProps>> getRecruitingAgencyStaff({
     int page = 1,
   }) async {
-    final response = await _apiClient.get('/profile/agency-staff/', queryParameters: {'page': page});
+    final response = await _apiClient.get(
+      '/profile/agency-staff/',
+      queryParameters: {'page': page},
+    );
     final data = response.data;
     final map = data is Map<String, dynamic>
         ? data
@@ -107,14 +113,22 @@ class StaffAccountsService {
     final rawResults = map['results'] as List? ?? const [];
 
     return TypesHandler<RecruitingAgencyStaffGETProps>(
-      count: map['count'] is int ? map['count'] as int : int.tryParse('${map['count']}') ?? 0,
+      count: map['count'] is int
+          ? map['count'] as int
+          : int.tryParse('${map['count']}') ?? 0,
       next: map['next']?.toString(),
       previous: map['previous']?.toString(),
       results: rawResults
           .whereType<Map>()
-          .map((e) => RecruitingAgencyStaffGETProps.fromJson(Map<String, dynamic>.from(e)))
+          .map(
+            (e) => RecruitingAgencyStaffGETProps.fromJson(
+              Map<String, dynamic>.from(e),
+            ),
+          )
           .toList(),
-      pageSize: map['pageSize'] is int ? map['pageSize'] as int : int.tryParse('${map['pageSize']}') ?? 10,
+      pageSize: map['pageSize'] is int
+          ? map['pageSize'] as int
+          : int.tryParse('${map['pageSize']}') ?? 10,
     );
   }
 

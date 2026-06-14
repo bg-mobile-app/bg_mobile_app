@@ -219,7 +219,9 @@ class _ReceivedAppliedBookingScreenState
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    _bookings = List<BookingItem>.from(_collectedBookings.where((item) => item.status == 'APPLIED_FILE'));
+    _bookings = List<BookingItem>.from(
+      _collectedBookings.where((item) => item.status == 'APPLIED_FILE'),
+    );
     _fetchAppliedBookings();
   }
 
@@ -230,8 +232,12 @@ class _ReceivedAppliedBookingScreenState
         status: 'APPLIED_FILE',
         page: 1,
         search: _searchQuery,
-        fromDate: _selectedDateRange == null ? null : _formatDate(_selectedDateRange!.start),
-        toDate: _selectedDateRange == null ? null : _formatDate(_selectedDateRange!.end),
+        fromDate: _selectedDateRange == null
+            ? null
+            : _formatDate(_selectedDateRange!.start),
+        toDate: _selectedDateRange == null
+            ? null
+            : _formatDate(_selectedDateRange!.end),
       );
       if (!mounted) return;
       setState(() {
@@ -253,7 +259,9 @@ class _ReceivedAppliedBookingScreenState
   }
 
   List<BookingItem> get _filteredBookings {
-    final appliedOnly = _bookings.where((item) => item.status == 'APPLIED_FILE').toList();
+    final appliedOnly = _bookings
+        .where((item) => item.status == 'APPLIED_FILE')
+        .toList();
     final query = _searchQuery.trim().toLowerCase();
     return appliedOnly.where((item) {
       final createdAt = DateTime.parse(item.createdAt);
@@ -301,8 +309,10 @@ class _ReceivedAppliedBookingScreenState
                     const SizedBox(height: 14),
                     AppSearchBar(
                       controller: _searchController,
-                      hintText: 'Search by booking ID, name, passport or status',
-                      onChanged: (value) => setState(() => _searchQuery = value),
+                      hintText:
+                          'Search by booking ID, name, passport or status',
+                      onChanged: (value) =>
+                          setState(() => _searchQuery = value),
                       onSearchTap: () {
                         setState(() => _searchQuery = _searchController.text);
                         _fetchAppliedBookings();
@@ -318,7 +328,12 @@ class _ReceivedAppliedBookingScreenState
                     ),
                     const SizedBox(height: 16),
                     if (_isLoading)
-                      const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
                     else if (_isCardView)
                       _buildCardList()
                     else
@@ -397,9 +412,19 @@ class _ReceivedAppliedBookingScreenState
             },
             child: Row(
               children: [
-                const Icon(Icons.date_range_rounded, size: 18, color: AppPalette.textStrongBlue),
+                const Icon(
+                  Icons.date_range_rounded,
+                  size: 18,
+                  color: AppPalette.textStrongBlue,
+                ),
                 const SizedBox(width: 8),
-                Text(label, style: const TextStyle(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w600)),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: AppPalette.textStrongBlue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
           ),
@@ -410,7 +435,11 @@ class _ReceivedAppliedBookingScreenState
                 setState(() => _selectedDateRange = null);
                 _fetchAppliedBookings();
               },
-              child: const Icon(Icons.close_rounded, size: 18, color: AppPalette.textMuted),
+              child: const Icon(
+                Icons.close_rounded,
+                size: 18,
+                color: AppPalette.textMuted,
+              ),
             ),
         ],
       ),
@@ -436,7 +465,8 @@ class _ReceivedAppliedBookingScreenState
     rows: _filteredBookings.map((item) {
       final style = _styleFor(item.statusLabel);
       return DataRow(
-        onLongPress: () => _openActionsSheet(context, item, onRefresh: _fetchAppliedBookings),
+        onLongPress: () =>
+            _openActionsSheet(context, item, onRefresh: _fetchAppliedBookings),
         cells: [
           DataCell(Text(item.workPermitId)),
           DataCell(Text(item.id.toString())),
@@ -522,15 +552,25 @@ class _ReceivedAppliedBookingScreenState
           hasBeforeFlightPayout: item.hasBeforeFlightPayout,
           createdAtText: _displayDate(item.createdAt),
           passportNo: item.passportNo,
-          medicalText: item.medicalExpiryDate == null ? '22/08/2026' : _displayDate(item.medicalExpiryDate!),
-          visaText: item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
-          policeClearText: item.policeClearanceExpiryDate == null ? '22/08/2026' : _displayDate(item.policeClearanceExpiryDate!),
+          medicalText: item.medicalExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.medicalExpiryDate!),
+          visaText: item.visaExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.visaExpiryDate!),
+          policeClearText: item.policeClearanceExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.policeClearanceExpiryDate!),
           style: ReceivedBookingCardStyle(
             badgeBg: style.badgeBg,
             badgeText: style.badgeText,
             ctaLabel: style.ctaLabel,
           ),
-          onMoreTap: () => _openActionsSheet(context, item, onRefresh: _fetchAppliedBookings),
+          onMoreTap: () => _openActionsSheet(
+            context,
+            item,
+            onRefresh: _fetchAppliedBookings,
+          ),
         );
       }),
     ],
@@ -769,14 +809,16 @@ class BookingItem {
     this.hasBeforeFlightPayout = false,
   });
 
-
-
   factory BookingItem.fromDto(ReceivedBookingItemDto dto) {
     return BookingItem(
-      workPermitId: dto.workPermitSlug.isNotEmpty ? dto.workPermitSlug : dto.workPermitId.toString(),
+      workPermitId: dto.workPermitSlug.isNotEmpty
+          ? dto.workPermitSlug
+          : dto.workPermitId.toString(),
       id: dto.id,
       serviceType: dto.serviceType.isNotEmpty ? dto.serviceType : 'Work Permit',
-      createdAt: dto.createdAt.isNotEmpty ? dto.createdAt : DateTime.now().toIso8601String().split('T').first,
+      createdAt: dto.createdAt.isNotEmpty
+          ? dto.createdAt
+          : DateTime.now().toIso8601String().split('T').first,
       name: dto.name,
       passportNo: dto.passportNo ?? '-',
       fromCountry: dto.fromCountry ?? 'Bangladesh',
@@ -891,7 +933,11 @@ List<String> _actionsFor(BookingItem row) {
   }).toList();
 }
 
-void _openActionsSheet(BuildContext context, BookingItem row, {VoidCallback? onRefresh}) {
+void _openActionsSheet(
+  BuildContext context,
+  BookingItem row, {
+  VoidCallback? onRefresh,
+}) {
   final actions = _actionsFor(row);
   showModalBottomSheet<void>(
     context: context,
@@ -926,9 +972,13 @@ void _openActionsSheet(BuildContext context, BookingItem row, {VoidCallback? onR
                                       : 'https://demo.bideshgami.com/dashboard/agency/booking-file/details/${row.id}';
                                   final uri = Uri.parse(urlString);
                                   if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                    await launchUrl(
+                                      uri,
+                                      mode: LaunchMode.externalApplication,
+                                    );
                                   }
-                                } else if (action == 'Reject' || action == 'Reject File') {
+                                } else if (action == 'Reject' ||
+                                    action == 'Reject File') {
                                   final bookingService = BookingService();
                                   await bookingService.updateBookingStatus(
                                     bookingId: row.id,

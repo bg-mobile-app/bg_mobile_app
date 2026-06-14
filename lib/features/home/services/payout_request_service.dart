@@ -54,43 +54,75 @@ class PayoutRequestItem {
     return PayoutRequestItem(
       id: toInt(json['id']),
       postId: json['postId']?.toString() ?? json['post_id']?.toString() ?? '-',
-      bookingId: json['booking']?.toString() ?? json['bookingId']?.toString() ?? json['booking_id']?.toString() ?? '-',
-      customerName: json['customerName']?.toString() ?? json['customer_name']?.toString() ?? '-',
-      passportNo: json['passportNo']?.toString() ?? json['passport_no']?.toString() ?? '-',
-      processingBy: json['processingBy']?.toString() ?? json['processing_by']?.toString() ?? '-',
-      referenceBy: json['referenceBy']?.toString() ?? json['reference_by']?.toString() ?? '-',
+      bookingId:
+          json['booking']?.toString() ??
+          json['bookingId']?.toString() ??
+          json['booking_id']?.toString() ??
+          '-',
+      customerName:
+          json['customerName']?.toString() ??
+          json['customer_name']?.toString() ??
+          '-',
+      passportNo:
+          json['passportNo']?.toString() ??
+          json['passport_no']?.toString() ??
+          '-',
+      processingBy:
+          json['processingBy']?.toString() ??
+          json['processing_by']?.toString() ??
+          '-',
+      referenceBy:
+          json['referenceBy']?.toString() ??
+          json['reference_by']?.toString() ??
+          '-',
       rlNo: json['rlNo']?.toString() ?? json['rl_no']?.toString() ?? '-',
       step: json['step']?.toString() ?? '-',
       status: json['status']?.toString() ?? '-',
       totalAmount: toInt(json['totalAmount'] ?? json['total_amount']),
       paidAmount: toInt(json['paidAmount'] ?? json['paid_amount']),
-      currentRequest: json['currentRequest']?.toString() ?? json['current_request']?.toString() ?? json['status']?.toString() ?? '-',
+      currentRequest:
+          json['currentRequest']?.toString() ??
+          json['current_request']?.toString() ??
+          json['status']?.toString() ??
+          '-',
     );
   }
 }
 
 class PayoutRequestService {
-  PayoutRequestService({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
+  PayoutRequestService({ApiClient? apiClient})
+    : _apiClient = apiClient ?? ApiClient();
 
   final ApiClient _apiClient;
 
-  Future<PayoutRequestPage> getRequests({String? status, String? search, String? branch, int page = 1}) async {
-    final query = <String, dynamic>{
-      'page': page,
-    };
+  Future<PayoutRequestPage> getRequests({
+    String? status,
+    String? search,
+    String? branch,
+    int page = 1,
+  }) async {
+    final query = <String, dynamic>{'page': page};
     if ((status ?? '').isNotEmpty) query['status'] = status;
     if ((search ?? '').isNotEmpty) query['search'] = search;
     if ((branch ?? '').isNotEmpty) query['branch'] = branch;
 
-    final response = await _apiClient.get('/payment/agency/payout-request/', queryParameters: query);
-    final data = response.data is Map<String, dynamic> ? response.data as Map<String, dynamic> : Map<String, dynamic>.from(response.data as Map);
+    final response = await _apiClient.get(
+      '/payment/agency/payout-request/',
+      queryParameters: query,
+    );
+    final data = response.data is Map<String, dynamic>
+        ? response.data as Map<String, dynamic>
+        : Map<String, dynamic>.from(response.data as Map);
     final rawResults = data['results'] as List? ?? const [];
 
     return PayoutRequestPage(
       count: int.tryParse('${data['count'] ?? 0}') ?? 0,
       next: data['next']?.toString(),
       previous: data['previous']?.toString(),
-      results: rawResults.whereType<Map>().map((e) => PayoutRequestItem.fromJson(Map<String, dynamic>.from(e))).toList(),
+      results: rawResults
+          .whereType<Map>()
+          .map((e) => PayoutRequestItem.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
     );
   }
 }

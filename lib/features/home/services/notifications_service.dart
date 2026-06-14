@@ -4,7 +4,8 @@ import '../../../common/models/notification.dart';
 import '../../../common/services/api_client.dart';
 
 class NotificationsService {
-  NotificationsService({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
+  NotificationsService({ApiClient? apiClient})
+    : _apiClient = apiClient ?? ApiClient();
 
   final ApiClient _apiClient;
 
@@ -22,7 +23,10 @@ class NotificationsService {
         rawList = const [];
       }
 
-      return rawList.whereType<Map<String, dynamic>>().map(AppNotificationItem.fromJson).toList();
+      return rawList
+          .whereType<Map<String, dynamic>>()
+          .map(AppNotificationItem.fromJson)
+          .toList();
     } catch (e) {
       debugPrint('Error fetching notifications: $e');
       return [];

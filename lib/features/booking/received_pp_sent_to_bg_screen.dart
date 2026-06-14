@@ -58,9 +58,9 @@ class _ReceivedPpSentToBgScreenState extends State<ReceivedPpSentToBgScreen> {
     final ppSentToBgOnly = _bookings
         .where((item) => item.status == 'PP_SENT_TO_BG')
         .toList();
-        
+
     final query = _searchQuery.trim().toLowerCase();
-    
+
     final seeded = ppSentToBgOnly.isEmpty
         ? const [
             BookingItem(
@@ -79,7 +79,7 @@ class _ReceivedPpSentToBgScreenState extends State<ReceivedPpSentToBgScreen> {
             ),
           ]
         : ppSentToBgOnly;
-        
+
     return seeded.where((item) {
       final matchesQuery =
           query.isEmpty ||
@@ -117,8 +117,10 @@ class _ReceivedPpSentToBgScreenState extends State<ReceivedPpSentToBgScreen> {
                     const SizedBox(height: 14),
                     AppSearchBar(
                       controller: _searchController,
-                      hintText: 'Search by booking ID, name, passport or status',
-                      onChanged: (value) => setState(() => _searchQuery = value),
+                      hintText:
+                          'Search by booking ID, name, passport or status',
+                      onChanged: (value) =>
+                          setState(() => _searchQuery = value),
                       onSearchTap: () =>
                           setState(() => _searchQuery = _searchController.text),
                     ),
@@ -348,9 +350,15 @@ class _ReceivedPpSentToBgScreenState extends State<ReceivedPpSentToBgScreen> {
           createdAtText: _displayDate(item.createdAt),
           fromCountry: item.fromCountry,
           toCountry: item.toCountry,
-          medicalText: item.medicalExpiryDate == null ? '22/08/2026' : _displayDate(item.medicalExpiryDate!),
-          visaText: item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
-          policeClearText: item.policeClearanceExpiryDate == null ? '22/08/2026' : _displayDate(item.policeClearanceExpiryDate!),
+          medicalText: item.medicalExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.medicalExpiryDate!),
+          visaText: item.visaExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.visaExpiryDate!),
+          policeClearText: item.policeClearanceExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.policeClearanceExpiryDate!),
           totalCostText: '৳ ${_money(item.agencyTotalCost)}',
           hasAdvancePayout: item.hasAdvancePayout,
           hasAfterVisaPayout: item.hasAfterVisaPayout,
@@ -432,7 +440,10 @@ class _ReceivedPpSentToBgScreenState extends State<ReceivedPpSentToBgScreen> {
             children: [
               Text(
                 'Actions • ${row.statusLabel}',
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 12),
               if (actions.isEmpty)

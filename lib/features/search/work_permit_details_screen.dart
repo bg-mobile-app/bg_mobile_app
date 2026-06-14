@@ -524,12 +524,12 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 ),
                 _StatCard(
                   icon: const FaIcon(
-                    FontAwesomeIcons.userClock,
+                    FontAwesomeIcons.moneyBillWave,
                     color: _brandBlue,
                     size: 20,
                   ),
-                  label: _tr('Age Range', 'বয়সসীমা'),
-                  value: _ageRangeValue(),
+                  label: _tr('Monthly Salary', 'মাসিক বেতন'),
+                  value: '${displayDetails.salary} ${displayDetails.currency}',
                 ),
               ],
             );
@@ -552,7 +552,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           const SizedBox(height: 16),
           _documentsRequired(),
         ],
-        ],
+      ],
     );
   }
 
@@ -595,9 +595,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
         FontAwesomeIcons.moneyBillWave,
       ),
       _SpecItem(
-        _tr('Monthly Salary', 'মাসিক বেতন'),
-        '${displayDetails.salary} ${displayDetails.currency}',
-        FontAwesomeIcons.moneyBillWave,
+        _tr('Age Range', 'বয়সসীমা'),
+        _ageRangeValue(),
+        FontAwesomeIcons.userClock,
       ),
       _SpecItem(
         _tr('Gender', 'লিঙ্গ'),
@@ -947,32 +947,18 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'BDT ${_formatMoney(displayDetails.customerPrice)}',
-              maxLines: 1,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 40,
-                height: 1.05,
-                fontWeight: FontWeight.w900,
-              ),
+          Text(
+            'BDT ${_formatMoney(displayDetails.customerPrice)}',
+            maxLines: 1,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              height: 1.05,
+              fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 22),
-          Container(height: 1, color: Colors.white24),
-          const SizedBox(height: 18),
-          if (agentSpending != null) ...[
-            _privatePriceRow(
-              title: _tr('Agent Spending', 'এজেন্ট খরচ'),
-              value: 'BDT ${_formatMoney(agentSpending)}',
-            ),
-            const SizedBox(height: 14),
-            Container(height: 1, color: Colors.white24),
-            const SizedBox(height: 18),
-          ],
+          const SizedBox(height: 14),
+          // Timeline-style payment breakdown
           if (displayDetails.paymentSteps.isNotEmpty) ...[
             Text(
               _tr('Payment Breakdown', 'পেমেন্ট বিবরণ'),
@@ -982,22 +968,35 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (var step in displayDetails.paymentSteps) ...[
-                  _privatePriceRow(
-                    title: step.name,
-                    value: 'BDT ${_formatMoney(step.amount.toInt())}',
+                for (var i = 0; i < displayDetails.paymentSteps.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _PriceTimelineStep(
+                      title: displayDetails.paymentSteps[i].name,
+                      amount:
+                          'BDT ${_formatMoney(displayDetails.paymentSteps[i].amount.toInt())}',
+                      active: i == 0,
+                      isLast: i == displayDetails.paymentSteps.length - 1,
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                ],
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             Container(height: 1, color: Colors.white24),
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
+          ],
+          // Agent spending (shown after breakdown)
+          if (agentSpending != null) ...[
+            _privatePriceRow(
+              title: _tr('Agent Spending', 'এজেন্ট খরচ'),
+              value: 'BDT ${_formatMoney(agentSpending)}',
+            ),
+            const SizedBox(height: 12),
+            Container(height: 1, color: Colors.white24),
+            const SizedBox(height: 12),
           ],
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1605,3 +1604,73 @@ class _PackageTag extends StatelessWidget {
   }
 }
 
+class _PriceTimelineStep extends StatelessWidget {
+  const _PriceTimelineStep({
+    required this.title,
+    required this.amount,
+    this.active = false,
+    this.isLast = false,
+  });
+
+  final String title;
+  final String amount;
+  final bool active;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    final dotColor = active ? _brandBlue : const Color(0xFFDBE1FF);
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            children: [
+              Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3),
+                ),
+              ),
+              if (!isLast)
+                Expanded(child: Container(width: 2, color: _outline)),
+            ],
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title.toUpperCase(),
+                  style: TextStyle(
+                    color:
+                        (title.toLowerCase().contains('after visa') ||
+                            title.toLowerCase().contains('before flight'))
+                        ? Colors.white
+                        : (active ? _brandBlue : _mutedText),
+                    fontSize: 11,
+                    letterSpacing: 0.6,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  amount,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

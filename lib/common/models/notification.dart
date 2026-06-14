@@ -23,7 +23,8 @@ class AppNotificationItem {
       id: (json['id'] as num?)?.toInt() ?? 0,
       title: json['title']?.toString() ?? '',
       message: json['message']?.toString() ?? '',
-      createdAt: DateTime.tryParse(createdRaw?.toString() ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(createdRaw?.toString() ?? '') ?? DateTime.now(),
       isRead: json['isRead'] == true || json['is_read'] == true,
       notificationType: json['notification_type']?.toString(),
       linkUrl: json['linkUrl']?.toString() ?? json['link_url']?.toString(),

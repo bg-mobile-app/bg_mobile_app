@@ -16,7 +16,8 @@ class ReceivedUnderProcessingScreen extends StatefulWidget {
       _ReceivedUnderProcessingScreenState();
 }
 
-class _ReceivedUnderProcessingScreenState extends State<ReceivedUnderProcessingScreen> {
+class _ReceivedUnderProcessingScreenState
+    extends State<ReceivedUnderProcessingScreen> {
   bool _isCardView = false;
   late final TextEditingController _searchController;
   String _searchQuery = '';
@@ -303,9 +304,9 @@ class _ReceivedUnderProcessingScreenState extends State<ReceivedUnderProcessingS
     final underProcessingOnly = _bookings
         .where((item) => item.status == 'UNDER_PROCESSING')
         .toList();
-        
+
     final query = _searchQuery.trim().toLowerCase();
-    
+
     final seeded = underProcessingOnly.isEmpty
         ? const [
             BookingItem(
@@ -324,7 +325,7 @@ class _ReceivedUnderProcessingScreenState extends State<ReceivedUnderProcessingS
             ),
           ]
         : underProcessingOnly;
-        
+
     return seeded.where((item) {
       final matchesQuery =
           query.isEmpty ||
@@ -362,8 +363,10 @@ class _ReceivedUnderProcessingScreenState extends State<ReceivedUnderProcessingS
                     const SizedBox(height: 14),
                     AppSearchBar(
                       controller: _searchController,
-                      hintText: 'Search by booking ID, name, passport or status',
-                      onChanged: (value) => setState(() => _searchQuery = value),
+                      hintText:
+                          'Search by booking ID, name, passport or status',
+                      onChanged: (value) =>
+                          setState(() => _searchQuery = value),
                       onSearchTap: () =>
                           setState(() => _searchQuery = _searchController.text),
                     ),
@@ -593,9 +596,15 @@ class _ReceivedUnderProcessingScreenState extends State<ReceivedUnderProcessingS
           createdAtText: _displayDate(item.createdAt),
           fromCountry: item.fromCountry,
           toCountry: item.toCountry,
-          medicalText: item.medicalExpiryDate == null ? '22/08/2026' : _displayDate(item.medicalExpiryDate!),
-          visaText: item.visaExpiryDate == null ? '22/08/2026' : _displayDate(item.visaExpiryDate!),
-          policeClearText: item.policeClearanceExpiryDate == null ? '22/08/2026' : _displayDate(item.policeClearanceExpiryDate!),
+          medicalText: item.medicalExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.medicalExpiryDate!),
+          visaText: item.visaExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.visaExpiryDate!),
+          policeClearText: item.policeClearanceExpiryDate == null
+              ? '22/08/2026'
+              : _displayDate(item.policeClearanceExpiryDate!),
           totalCostText: '৳ ${_money(item.agencyTotalCost)}',
           hasAdvancePayout: item.hasAdvancePayout,
           hasAfterVisaPayout: item.hasAfterVisaPayout,

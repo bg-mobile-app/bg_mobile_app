@@ -257,7 +257,11 @@ class _TopBar extends StatelessWidget {
         ),
         TextButton.icon(
           onPressed: onHelpTap,
-          icon: const Icon(Icons.menu_book_outlined, color: Color(0xFF0F4ECF), size: 18),
+          icon: const Icon(
+            Icons.menu_book_outlined,
+            color: Color(0xFF0F4ECF),
+            size: 18,
+          ),
           label: const Text(
             'Ad Guide',
             style: TextStyle(
@@ -269,7 +273,9 @@ class _TopBar extends StatelessWidget {
           style: TextButton.styleFrom(
             backgroundColor: const Color(0xFFE0E7FF),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         ),
       ],

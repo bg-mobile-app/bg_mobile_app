@@ -25,7 +25,7 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
   bool _isLoading = false;
   final BookingService _bookingService = BookingService();
   List<AppointmentBookingItem> _items = [];
-  
+
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;
@@ -130,14 +130,26 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
           try {
             final dt = DateTime.parse(dto.appointmentDate!).toLocal();
             final months = [
-              'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'May',
+              'Jun',
+              'Jul',
+              'Aug',
+              'Sep',
+              'Oct',
+              'Nov',
+              'Dec',
             ];
             final month = months[dt.month - 1];
             final day = dt.day.toString().padLeft(2, '0');
             dateStr = '$month $day, ${dt.year}';
-            
-            final hour = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
+
+            final hour = dt.hour == 0
+                ? 12
+                : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
             final amPm = dt.hour >= 12 ? 'PM' : 'AM';
             final minute = dt.minute.toString().padLeft(2, '0');
             timeStr = '${hour.toString().padLeft(2, '0')}:$minute $amPm';
@@ -153,7 +165,7 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
             .take(2)
             .join()
             .toUpperCase();
-        
+
         final colors = [
           const Color(0xFF2563EB),
           const Color(0xFF10B981),
@@ -168,8 +180,8 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
           postId: dto.workPermitId > 0
               ? dto.workPermitId.toString()
               : (dto.workPermitSlug.isNotEmpty
-                  ? dto.workPermitSlug.toUpperCase()
-                  : 'N/A'),
+                    ? dto.workPermitSlug.toUpperCase()
+                    : 'N/A'),
           bookingId: dto.id,
           fullName: dto.name,
           country: dto.toCountry,
@@ -266,7 +278,9 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                         : Column(
                             children: [
                               Expanded(
-                                child: _isCardView ? _buildCardView() : _buildListView(),
+                                child: _isCardView
+                                    ? _buildCardView()
+                                    : _buildListView(),
                               ),
                               _buildPagination(),
                             ],
@@ -572,7 +586,9 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                 decoration: const BoxDecoration(
                   color: Color(0xFFF1F3FF),
                   borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -580,44 +596,69 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
                       width: 64,
                       height: 64,
                       decoration: BoxDecoration(
-                          color: item.avatarColor,
-                          borderRadius: BorderRadius.circular(999)),
-                      child: const Icon(Icons.person_outline,
-                          color: Colors.white, size: 36),
+                        color: item.avatarColor,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Icon(
+                        Icons.person_outline,
+                        color: Colors.white,
+                        size: 36,
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(item.fullName,
-                                style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF191B24))),
-                            const SizedBox(height: 4),
-                            Row(children: [
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.fullName,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF191B24),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
                               Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                      color: const Color(0xFFD8E6FF),
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Text(item.postId,
-                                      style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xFF38485D)))),
-                              const SizedBox(width: 8),
-                              const Text('•',
-                                  style: TextStyle(
-                                      color: Color(0xFF737687), fontSize: 12)),
-                              const SizedBox(width: 8),
-                              Text(item.country,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFD8E6FF),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  item.postId,
                                   style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF434655))),
-                            ]),
-                          ]),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF38485D),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                '•',
+                                style: TextStyle(
+                                  color: Color(0xFF737687),
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                item.country,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF434655),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -625,49 +666,74 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
                         Expanded(
-                            child: _detailTile(
-                                'BOOKING ID',
-                                item.bookingId.toString(),
-                                Icons.confirmation_number_outlined)),
+                          child: _detailTile(
+                            'BOOKING ID',
+                            item.bookingId.toString(),
+                            Icons.confirmation_number_outlined,
+                          ),
+                        ),
                         const SizedBox(width: 14),
                         Expanded(
-                            child: _detailTile('VISA CATEGORY',
-                                item.visaCategory, Icons.article_outlined)),
-                      ]),
-                      const SizedBox(height: 18),
-                      Row(children: [
+                          child: _detailTile(
+                            'VISA CATEGORY',
+                            item.visaCategory,
+                            Icons.article_outlined,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
                         Expanded(
-                            child: _detailTile('MEETING', item.meeting,
-                                Icons.groups_outlined)),
+                          child: _detailTile(
+                            'MEETING',
+                            item.meeting,
+                            Icons.groups_outlined,
+                          ),
+                        ),
                         const SizedBox(width: 14),
                         Expanded(
-                            child: _detailTile('DATE & TIME',
-                                '${item.date} ${item.time}', Icons.schedule)),
-                      ]),
-                      const SizedBox(height: 18),
-                      _detailTile('COUNTRY', item.country, Icons.public_outlined),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: () => _openTicket(item),
-                          icon: const Icon(Icons.download, size: 22),
-                          label: const Text('Overview',
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w500)),
-                          style: FilledButton.styleFrom(
-                              backgroundColor: AppPalette.brandBlue,
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size.fromHeight(56),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14))),
+                          child: _detailTile(
+                            'DATE & TIME',
+                            '${item.date} ${item.time}',
+                            Icons.schedule,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    _detailTile('COUNTRY', item.country, Icons.public_outlined),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () => _openTicket(item),
+                        icon: const Icon(Icons.download, size: 22),
+                        label: const Text(
+                          'Overview',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppPalette.brandBlue,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size.fromHeight(56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
                       ),
-                    ]),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -677,23 +743,36 @@ class _AppointmentBookingScreenState extends State<AppointmentBookingScreen> {
   }
 
   Widget _detailTile(String label, String value, IconData icon) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
           style: const TextStyle(
-              fontSize: 12,
-              letterSpacing: 1,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF737687))),
-      const SizedBox(height: 6),
-      Row(children: [
-        Icon(icon, size: 22, color: AppColors.primary),
-        const SizedBox(width: 8),
-        Expanded(
-            child: Text(value,
-                style:
-                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)))
-      ]),
-    ]);
+            fontSize: 12,
+            letterSpacing: 1,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF737687),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Icon(icon, size: 22, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   void _openTicket(AppointmentBookingItem item) {

@@ -4,7 +4,12 @@ import '../../home/models/home_models.dart';
 import '../../home/widgets/work_permit_card.dart';
 
 class FilterResults extends StatefulWidget {
-  const FilterResults({super.key, required this.items, required this.brandBlue, required this.onViewDetails});
+  const FilterResults({
+    super.key,
+    required this.items,
+    required this.brandBlue,
+    required this.onViewDetails,
+  });
 
   final List<WorkPermitItem> items;
   final Color brandBlue;
@@ -35,7 +40,12 @@ class _FilterResultsState extends State<FilterResults> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (visibleItems.isEmpty)
-          const Center(child: Text('No work permits found.', style: TextStyle(color: Colors.grey)))
+          const Center(
+            child: Text(
+              'No work permits found.',
+              style: TextStyle(color: Colors.grey),
+            ),
+          )
         else
           ListView.separated(
             itemCount: visibleItems.length,
@@ -50,7 +60,10 @@ class _FilterResultsState extends State<FilterResults> {
                 builder: (context, value, child) {
                   return Opacity(
                     opacity: value,
-                    child: Transform.translate(offset: Offset(0, (1 - value) * 14), child: child),
+                    child: Transform.translate(
+                      offset: Offset(0, (1 - value) * 14),
+                      child: child,
+                    ),
                   );
                 },
                 child: Center(
@@ -61,15 +74,25 @@ class _FilterResultsState extends State<FilterResults> {
                       decoration: BoxDecoration(
                         color: const Color(0x0D111827),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFD1D5DB), width: 0.5),
-                        boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 20, offset: Offset(0, 8))],
+                        border: Border.all(
+                          color: const Color(0xFFD1D5DB),
+                          width: 0.5,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x12000000),
+                            blurRadius: 20,
+                            offset: Offset(0, 8),
+                          ),
+                        ],
                       ),
                       child: AspectRatio(
                         aspectRatio: 0.66,
                         child: WorkPermitCard(
                           item: visibleItems[i],
                           brandBlue: widget.brandBlue,
-                          onViewDetails: () => widget.onViewDetails(visibleItems[i]),
+                          onViewDetails: () =>
+                              widget.onViewDetails(visibleItems[i]),
                           formatBdt: (v) => v.toString(),
                           timeAgo: (_) => 'recently',
                         ),
@@ -93,7 +116,12 @@ class _FilterResultsState extends State<FilterResults> {
         else if (widget.items.isNotEmpty)
           const Padding(
             padding: EdgeInsets.only(top: 16),
-            child: Center(child: Text('No more results', style: TextStyle(color: Colors.grey))),
+            child: Center(
+              child: Text(
+                'No more results',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
           ),
       ],
     );

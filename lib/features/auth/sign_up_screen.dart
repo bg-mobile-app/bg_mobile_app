@@ -77,7 +77,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
     if (!_agreeTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please agree to Privacy Policy and Terms.')),
+        const SnackBar(
+          content: Text('Please agree to Privacy Policy and Terms.'),
+        ),
       );
       return;
     }
@@ -107,7 +109,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: constraints.maxWidth >= 1024 ? constraints.maxWidth * 0.6 : 860,
+                    maxWidth: constraints.maxWidth >= 1024
+                        ? constraints.maxWidth * 0.6
+                        : 860,
                   ),
                   child: Container(
                     padding: const EdgeInsets.all(24),
@@ -191,7 +195,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ? 'Select District first'
                                     : 'Select Police Station',
                                 onChanged: (value) {
-                                  setState(() => _selectedPoliceStation = value);
+                                  setState(
+                                    () => _selectedPoliceStation = value,
+                                  );
                                 },
                               ),
                               _buildAddressField(),
@@ -240,12 +246,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               child: Column(
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Checkbox(
                                         value: _agreeTerms,
                                         onChanged: (value) {
-                                          setState(() => _agreeTerms = value ?? false);
+                                          setState(
+                                            () => _agreeTerms = value ?? false,
+                                          );
                                         },
                                       ),
                                       const Expanded(
@@ -261,12 +270,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               children: [
                                                 TextSpan(
                                                   text: 'Privacy Policy',
-                                                  style: TextStyle(color: _brandBlue),
+                                                  style: TextStyle(
+                                                    color: _brandBlue,
+                                                  ),
                                                 ),
                                                 TextSpan(text: ' and '),
                                                 TextSpan(
                                                   text: 'Terms & Conditions.',
-                                                  style: TextStyle(color: _brandBlue),
+                                                  style: TextStyle(
+                                                    color: _brandBlue,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -283,12 +296,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: _brandBlue,
                                         foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                       ),
-                                      child: Text(_loading ? 'Creating...' : 'Create Account'),
+                                      child: Text(
+                                        _loading
+                                            ? 'Creating...'
+                                            : 'Create Account',
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -326,7 +347,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         final rows = <Widget>[];
         for (var i = 0; i < children.length; i += 2) {
           final left = children[i];
-          final right = i + 1 < children.length ? children[i + 1] : const SizedBox();
+          final right = i + 1 < children.length
+              ? children[i + 1]
+              : const SizedBox();
           rows.add(
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,9 +394,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             hintText: hint,
             filled: true,
             fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
@@ -408,9 +429,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           },
           decoration: InputDecoration(
             hintText: hintText,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
@@ -418,10 +437,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           items: items
               .map(
-                (item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                ),
+                (item) =>
+                    DropdownMenuItem<String>(value: item, child: Text(item)),
               )
               .toList(),
         ),
@@ -447,9 +464,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: InputDecoration(
             hintText: 'Select birth date',
             suffixIcon: const Icon(Icons.calendar_today_outlined),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
@@ -465,7 +480,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Enter Your Full Address', style: TextStyle(fontWeight: FontWeight.w500)),
+        const Text(
+          'Enter Your Full Address',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: _addressController,
@@ -480,9 +498,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: InputDecoration(
             hintText: 'type agency address here...',
             helperText: 'Max 500 characters',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFCBD5E1)),

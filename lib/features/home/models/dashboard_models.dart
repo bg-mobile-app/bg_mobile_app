@@ -8,8 +8,12 @@ class AgencyDashboardStats {
   factory AgencyDashboardStats.fromJson(Map<String, dynamic> json) {
     return AgencyDashboardStats(
       myBookings: MyBookingStats.fromJson(_asMap(json['myBookings'])),
-      agencyBookings: AgencyBookingStats.fromJson(_asMap(json['agencyBookings'])),
-      expiryReminders: ExpiryReminderStats.fromJson(_asMap(json['expiryReminders'])),
+      agencyBookings: AgencyBookingStats.fromJson(
+        _asMap(json['agencyBookings']),
+      ),
+      expiryReminders: ExpiryReminderStats.fromJson(
+        _asMap(json['expiryReminders']),
+      ),
     );
   }
 
@@ -54,16 +58,16 @@ class MyBookingStats {
   }
 
   factory MyBookingStats.empty() => const MyBookingStats(
-        total: 0,
-        successFlight: 0,
-        rejectFlight: 0,
-        processing: 0,
-        returnProcessing: 0,
-        totalAmount: 0,
-        paidAmount: 0,
-        dueAmount: 0,
-        commissionAmount: 0,
-      );
+    total: 0,
+    successFlight: 0,
+    rejectFlight: 0,
+    processing: 0,
+    returnProcessing: 0,
+    totalAmount: 0,
+    paidAmount: 0,
+    dueAmount: 0,
+    commissionAmount: 0,
+  );
 
   final int total;
   final int successFlight;
@@ -132,30 +136,30 @@ class AgencyBookingStats {
   }
 
   factory AgencyBookingStats.empty() => const AgencyBookingStats(
-        total: 0,
-        appliedCustomer: 0,
-        bgCollectPp: 0,
-        bgSentPp: 0,
-        aRecievePp: 0,
-        underProcessing: 0,
-        visaApproved: 0,
-        bmetDone: 0,
-        ticketDone: 0,
-        ppSentToBg: 0,
-        bgReceivedPp: 0,
-        readyForFlight: 0,
-        successFlight: 0,
-        returnRequest: 0,
-        returnAccepted: 0,
-        returnPpSentToBg: 0,
-        bgCollectReturnPp: 0,
-        bgHandoverPpToCustomer: 0,
-        rejectFlight: 0,
-        totalAmount: 0,
-        paidAmount: 0,
-        dueAmount: 0,
-        commissionAmount: 0,
-      );
+    total: 0,
+    appliedCustomer: 0,
+    bgCollectPp: 0,
+    bgSentPp: 0,
+    aRecievePp: 0,
+    underProcessing: 0,
+    visaApproved: 0,
+    bmetDone: 0,
+    ticketDone: 0,
+    ppSentToBg: 0,
+    bgReceivedPp: 0,
+    readyForFlight: 0,
+    successFlight: 0,
+    returnRequest: 0,
+    returnAccepted: 0,
+    returnPpSentToBg: 0,
+    bgCollectReturnPp: 0,
+    bgHandoverPpToCustomer: 0,
+    rejectFlight: 0,
+    totalAmount: 0,
+    paidAmount: 0,
+    dueAmount: 0,
+    commissionAmount: 0,
+  );
 
   final int total;
   final int appliedCustomer;
@@ -220,12 +224,8 @@ class ExpiryReminderGroup {
     );
   }
 
-  factory ExpiryReminderGroup.empty() => const ExpiryReminderGroup(
-        medical: 0,
-        police: 0,
-        visa: 0,
-        total: 0,
-      );
+  factory ExpiryReminderGroup.empty() =>
+      const ExpiryReminderGroup(medical: 0, police: 0, visa: 0, total: 0);
 
   final int medical;
   final int police;
@@ -274,16 +274,16 @@ class AgentDashboardStats {
   }
 
   factory AgentDashboardStats.empty() => const AgentDashboardStats(
-        total: 0,
-        successFlight: 0,
-        rejectFlight: 0,
-        processing: 0,
-        returnProcessing: 0,
-        totalAmount: 0,
-        paidAmount: 0,
-        dueAmount: 0,
-        commissionAmount: 0,
-      );
+    total: 0,
+    successFlight: 0,
+    rejectFlight: 0,
+    processing: 0,
+    returnProcessing: 0,
+    totalAmount: 0,
+    paidAmount: 0,
+    dueAmount: 0,
+    commissionAmount: 0,
+  );
 
   final int total;
   final int successFlight;

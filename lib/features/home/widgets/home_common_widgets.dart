@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'home_responsive.dart';
 
@@ -37,16 +38,11 @@ class HeaderActionButton extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       ),
     );
   }
 }
-
 
 class AppBrandHeader extends StatelessWidget implements PreferredSizeWidget {
   const AppBrandHeader({
@@ -127,8 +123,9 @@ class AppBrandHeader extends StatelessWidget implements PreferredSizeWidget {
             child: CircleAvatar(
               radius: responsive.size(18, min: 15, max: 18),
               backgroundColor: const Color(0xFFD7E3FF),
-              backgroundImage: (profileImageUrl != null && profileImageUrl!.isNotEmpty)
-                  ? NetworkImage(profileImageUrl!)
+              backgroundImage: (profileImageUrl != null &&
+                      profileImageUrl!.isNotEmpty)
+                  ? CachedNetworkImageProvider(profileImageUrl!)
                   : null,
               child: (profileImageUrl == null || profileImageUrl!.isEmpty)
                   ? Icon(

@@ -93,8 +93,12 @@ class _CommissionScreenState extends State<CommissionScreen> {
         }
         if (_selectedDateRange != null) {
           list = list.where((c) {
-            return c.createdAt.isAfter(_selectedDateRange!.start.subtract(const Duration(days: 1))) &&
-                c.createdAt.isBefore(_selectedDateRange!.end.add(const Duration(days: 1)));
+            return c.createdAt.isAfter(
+                  _selectedDateRange!.start.subtract(const Duration(days: 1)),
+                ) &&
+                c.createdAt.isBefore(
+                  _selectedDateRange!.end.add(const Duration(days: 1)),
+                );
           }).toList();
         }
         setState(() {
@@ -130,8 +134,12 @@ class _CommissionScreenState extends State<CommissionScreen> {
       }
       if (_selectedDateRange != null) {
         list = list.where((c) {
-          return c.createdAt.isAfter(_selectedDateRange!.start.subtract(const Duration(days: 1))) &&
-              c.createdAt.isBefore(_selectedDateRange!.end.add(const Duration(days: 1)));
+          return c.createdAt.isAfter(
+                _selectedDateRange!.start.subtract(const Duration(days: 1)),
+              ) &&
+              c.createdAt.isBefore(
+                _selectedDateRange!.end.add(const Duration(days: 1)),
+              );
         }).toList();
       }
       setState(() {
@@ -179,7 +187,9 @@ class _CommissionScreenState extends State<CommissionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final displayItems = _isInitialLoading ? _skeletonCommissions : _commissions;
+    final displayItems = _isInitialLoading
+        ? _skeletonCommissions
+        : _commissions;
 
     return DashboardPageScaffold(
       currentHref: '/dashboard/commission',
@@ -195,14 +205,20 @@ class _CommissionScreenState extends State<CommissionScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Agency Commissions',
-                  style: AppTextStyles.headline2.copyWith(fontSize: 25, fontWeight: FontWeight.w800, color: AppPalette.textPrimary),
+                  style: AppTextStyles.headline2.copyWith(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                    color: AppPalette.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _isInitialLoading
                       ? 'Loading your commission details...'
                       : 'Track earnings and booking commission statements (${_commissions.length})',
-                  style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted),
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppPalette.textMuted,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 _topControls(),
@@ -214,7 +230,9 @@ class _CommissionScreenState extends State<CommissionScreen> {
                 else
                   Skeletonizer(
                     enabled: _isInitialLoading,
-                    child: _cardView ? _cardContent(displayItems) : _tableContent(displayItems),
+                    child: _cardView
+                        ? _cardContent(displayItems)
+                        : _tableContent(displayItems),
                   ),
                 const SizedBox(height: 16),
                 Skeletonizer(
@@ -233,16 +251,26 @@ class _CommissionScreenState extends State<CommissionScreen> {
     return BreadCrumb(
       items: <BreadCrumbItem>[
         BreadCrumbItem(
-          content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted)),
+          content: Text(
+            'Dashboard',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
         ),
         BreadCrumbItem(
           content: Text(
             'Commission',
-            style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700),
+            style: AppTextStyles.caption.copyWith(
+              color: AppPalette.textStrongBlue,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
-      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+      divider: const Icon(
+        Icons.chevron_right_rounded,
+        size: 16,
+        color: Color(0xFF94A3B8),
+      ),
     );
   }
 
@@ -286,13 +314,19 @@ class _CommissionScreenState extends State<CommissionScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(
               children: [
-                const Icon(Icons.calendar_month_outlined, color: AppPalette.brandBlue, size: 20),
+                const Icon(
+                  Icons.calendar_month_outlined,
+                  color: AppPalette.brandBlue,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     label,
                     style: TextStyle(
-                      color: _selectedDateRange == null ? AppPalette.textMuted : Colors.black,
+                      color: _selectedDateRange == null
+                          ? AppPalette.textMuted
+                          : Colors.black,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -309,11 +343,18 @@ class _CommissionScreenState extends State<CommissionScreen> {
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(4),
-                      child: Icon(Icons.close_rounded, size: 16, color: AppPalette.textMuted),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 16,
+                        color: AppPalette.textMuted,
+                      ),
                     ),
                   )
                 else
-                  const Icon(Icons.arrow_drop_down_rounded, color: AppPalette.textMuted),
+                  const Icon(
+                    Icons.arrow_drop_down_rounded,
+                    color: AppPalette.textMuted,
+                  ),
               ],
             ),
           ),
@@ -360,13 +401,34 @@ class _CommissionScreenState extends State<CommissionScreen> {
           .map(
             (item) => DataRow(
               cells: [
-                DataCell(Text(item.workPermitId, style: const TextStyle(fontWeight: FontWeight.w700))),
+                DataCell(
+                  Text(
+                    item.workPermitId,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
                 DataCell(Text(item.name)),
                 DataCell(Text(item.passportNo)),
                 DataCell(Text(_formatListDate(item.createdAt))),
-                DataCell(Text('${item.fromCountry} ➔ ${item.toCountry}\n(${item.serviceType})')),
-                DataCell(Text('৳ ${_money(item.paidAmount)} / ৳ ${_money(item.customerTotal)}')),
-                DataCell(Text('৳ ${_money(item.commission)}', style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF166534)))),
+                DataCell(
+                  Text(
+                    '${item.fromCountry} ➔ ${item.toCountry}\n(${item.serviceType})',
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    '৳ ${_money(item.paidAmount)} / ৳ ${_money(item.customerTotal)}',
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    '৳ ${_money(item.commission)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF166534),
+                    ),
+                  ),
+                ),
                 DataCell(_statusChip(item.statusLabel)),
               ],
             ),
@@ -380,9 +442,7 @@ class _CommissionScreenState extends State<CommissionScreen> {
       return _emptyState();
     }
 
-    return Column(
-      children: items.map(_commissionCard).toList(),
-    );
+    return Column(children: items.map(_commissionCard).toList());
   }
 
   Widget _commissionCard(WPMyBookingGETProps item) {
@@ -434,7 +494,11 @@ class _CommissionScreenState extends State<CommissionScreen> {
                     children: [
                       Text(
                         item.workPermitId,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF191B24)),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF191B24),
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -442,7 +506,11 @@ class _CommissionScreenState extends State<CommissionScreen> {
                           Expanded(
                             child: Text(
                               '${item.fromCountry} ➔ ${item.toCountry}',
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF434655)),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF434655),
+                              ),
                             ),
                           ),
                         ],
@@ -461,17 +529,41 @@ class _CommissionScreenState extends State<CommissionScreen> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: _detailTile('CANDIDATE NAME', item.name, Icons.person_outline_rounded)),
+                    Expanded(
+                      child: _detailTile(
+                        'CANDIDATE NAME',
+                        item.name,
+                        Icons.person_outline_rounded,
+                      ),
+                    ),
                     const SizedBox(width: 14),
-                    Expanded(child: _detailTile('PASSPORT NO', item.passportNo, Icons.badge_outlined)),
+                    Expanded(
+                      child: _detailTile(
+                        'PASSPORT NO',
+                        item.passportNo,
+                        Icons.badge_outlined,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    Expanded(child: _detailTile('SERVICE TYPE', item.serviceType, Icons.card_membership_outlined)),
+                    Expanded(
+                      child: _detailTile(
+                        'SERVICE TYPE',
+                        item.serviceType,
+                        Icons.card_membership_outlined,
+                      ),
+                    ),
                     const SizedBox(width: 14),
-                    Expanded(child: _detailTile('DATE CREATED', _formatListDate(item.createdAt), Icons.calendar_today_outlined)),
+                    Expanded(
+                      child: _detailTile(
+                        'DATE CREATED',
+                        _formatListDate(item.createdAt),
+                        Icons.calendar_today_outlined,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -483,28 +575,66 @@ class _CommissionScreenState extends State<CommissionScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('CUSTOMER BUDGET', style: TextStyle(fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
+                          const Text(
+                            'CUSTOMER BUDGET',
+                            style: TextStyle(
+                              fontSize: 10,
+                              letterSpacing: 1,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF737687),
+                            ),
+                          ),
                           const SizedBox(height: 4),
-                          Text('৳ ${_money(item.customerTotal)}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppPalette.textPrimary)),
-                          Text('Paid: ৳ ${_money(item.paidAmount)}', style: const TextStyle(fontSize: 12, color: AppPalette.textMuted)),
+                          Text(
+                            '৳ ${_money(item.customerTotal)}',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppPalette.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            'Paid: ৳ ${_money(item.paidAmount)}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppPalette.textMuted,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFD8F3DE),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFF1C7A3B).withOpacity(0.3)),
+                        border: Border.all(
+                          color: const Color(0xFF1C7A3B).withOpacity(0.3),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('COMMISSION', style: TextStyle(fontSize: 9, letterSpacing: 1, fontWeight: FontWeight.w800, color: Color(0xFF1C7A3B))),
+                          const Text(
+                            'COMMISSION',
+                            style: TextStyle(
+                              fontSize: 9,
+                              letterSpacing: 1,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1C7A3B),
+                            ),
+                          ),
                           const SizedBox(height: 2),
                           Text(
                             '৳ ${_money(item.commission)}',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF1C7A3B)),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1C7A3B),
+                            ),
                           ),
                         ],
                       ),
@@ -537,9 +667,24 @@ class _CommissionScreenState extends State<CommissionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('TOTAL EARNED COMMISSION', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
+              const Text(
+                'TOTAL EARNED COMMISSION',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1,
+                ),
+              ),
               const SizedBox(height: 6),
-              Text('৳ ${_money(totalCommission)}', style: const TextStyle(color: Colors.white, fontSize: 38, fontWeight: FontWeight.w800)),
+              Text(
+                '৳ ${_money(totalCommission)}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 38,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ],
           ),
         ),
@@ -558,9 +703,23 @@ class _CommissionScreenState extends State<CommissionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('TOTAL BOOKINGS', style: TextStyle(color: AppPalette.textMuted, fontSize: 10, fontWeight: FontWeight.w700)),
+                    const Text(
+                      'TOTAL BOOKINGS',
+                      style: TextStyle(
+                        color: AppPalette.textMuted,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     const SizedBox(height: 6),
-                    Text('${items.length}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: AppPalette.textPrimary)),
+                    Text(
+                      '${items.length}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: AppPalette.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -578,9 +737,23 @@ class _CommissionScreenState extends State<CommissionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('REVENUE COLLECTED', style: TextStyle(color: AppPalette.textMuted, fontSize: 10, fontWeight: FontWeight.w700)),
+                    const Text(
+                      'REVENUE COLLECTED',
+                      style: TextStyle(
+                        color: AppPalette.textMuted,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     const SizedBox(height: 6),
-                    Text('৳ ${_money(totalPaid)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppPalette.textPrimary)),
+                    Text(
+                      '৳ ${_money(totalPaid)}',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppPalette.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -603,11 +776,18 @@ class _CommissionScreenState extends State<CommissionScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.account_balance_wallet_outlined, size: 60, color: AppPalette.textMuted),
+          const Icon(
+            Icons.account_balance_wallet_outlined,
+            size: 60,
+            color: AppPalette.textMuted,
+          ),
           const SizedBox(height: 16),
           Text(
             'No commissions found',
-            style: AppTextStyles.subtitle1.copyWith(color: AppPalette.textPrimary, fontWeight: FontWeight.bold),
+            style: AppTextStyles.subtitle1.copyWith(
+              color: AppPalette.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -631,12 +811,19 @@ class _CommissionScreenState extends State<CommissionScreen> {
       ),
       child: Column(
         children: [
-          const Icon(Icons.error_outline_rounded, size: 48, color: Colors.redAccent),
+          const Icon(
+            Icons.error_outline_rounded,
+            size: 48,
+            color: Colors.redAccent,
+          ),
           const SizedBox(height: 14),
           Text(
             _error ?? 'Failed to load commissions',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -646,7 +833,9 @@ class _CommissionScreenState extends State<CommissionScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppPalette.brandBlue,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ],
@@ -658,13 +847,30 @@ class _CommissionScreenState extends State<CommissionScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, letterSpacing: 1, fontWeight: FontWeight.w700, color: Color(0xFF737687))),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            letterSpacing: 1,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF737687),
+          ),
+        ),
         const SizedBox(height: 6),
         Row(
           children: [
             Icon(icon, size: 20, color: AppPalette.brandBlue),
             const SizedBox(width: 8),
-            Expanded(child: Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis)),
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
       ],
@@ -685,13 +891,32 @@ class _CommissionScreenState extends State<CommissionScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
-      child: Text(status, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: fg),
+      ),
     );
   }
 
   String _formatListDate(DateTime date) {
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day.toString().padLeft(2, '0')} ${monthNames[date.month - 1]}, ${date.year}';
   }
 

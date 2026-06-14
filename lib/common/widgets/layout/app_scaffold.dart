@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/services.dart';
 
 import '../../../common/services/auth_service.dart';
 import '../../../features/booking/appointment_booking_screen.dart';
@@ -35,6 +36,7 @@ import '../../../features/reminder/medical_expiry_screen.dart';
 import '../../../features/search/work_permit_list_screen.dart';
 import '../../../common/services/api_client.dart';
 import 'app_bottom_nav.dart';
+import '../../../common/theme/app_palette.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({super.key, required this.tabIndex, this.dashboardPath});
@@ -335,6 +337,14 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final authService = AuthService();
       await authService.getSingOut();
+      // Reset system navigation color to default for unauthenticated state
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          systemNavigationBarColor: AppPalette.pageBackground,
+          systemNavigationBarDividerColor: AppPalette.pageBackground,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+      );
       if (context.mounted) {
         context.go('/login');
       }

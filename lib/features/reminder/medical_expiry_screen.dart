@@ -164,9 +164,22 @@ class _ReminderExpiryScreenState extends State<ReminderExpiryScreen> {
               children: [
                 _breadcrumb(),
                 const SizedBox(height: 8),
-                Text(_title, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w800, color: AppPalette.textPrimary)),
+                Text(
+                  _title,
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                    color: AppPalette.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 14),
-                Row(children: [_viewToggle(), const SizedBox(width: 10), Expanded(child: _filterDropdown())]),
+                Row(
+                  children: [
+                    _viewToggle(),
+                    const SizedBox(width: 10),
+                    Expanded(child: _filterDropdown()),
+                  ],
+                ),
                 const SizedBox(height: 16),
                 _buildBody(),
               ],
@@ -178,8 +191,12 @@ class _ReminderExpiryScreenState extends State<ReminderExpiryScreen> {
   }
 
   Widget _buildBody() {
-    if (_error != null) return Center(child: Text(_error!, style: const TextStyle(color: AppPalette.danger)));
-    if (!_loading && _items.isEmpty) return const Center(child: Text('No reminders found.'));
+    if (_error != null)
+      return Center(
+        child: Text(_error!, style: const TextStyle(color: AppPalette.danger)),
+      );
+    if (!_loading && _items.isEmpty)
+      return const Center(child: Text('No reminders found.'));
 
     final data = _loading ? _skeletonItems : _items;
     return Skeletonizer(
@@ -190,11 +207,34 @@ class _ReminderExpiryScreenState extends State<ReminderExpiryScreen> {
 
   Widget _breadcrumb() => BreadCrumb(
     items: <BreadCrumbItem>[
-      BreadCrumbItem(content: Text('Dashboard', style: TextStyle(color: AppPalette.textMuted, fontSize: 12))),
-      BreadCrumbItem(content: Text('Reminder List', style: TextStyle(color: AppPalette.textMuted, fontSize: 12))),
-      BreadCrumbItem(content: Text(_crumbLabel, style: TextStyle(color: AppPalette.textStrongBlue, fontSize: 12, fontWeight: FontWeight.w700))),
+      BreadCrumbItem(
+        content: Text(
+          'Dashboard',
+          style: TextStyle(color: AppPalette.textMuted, fontSize: 12),
+        ),
+      ),
+      BreadCrumbItem(
+        content: Text(
+          'Reminder List',
+          style: TextStyle(color: AppPalette.textMuted, fontSize: 12),
+        ),
+      ),
+      BreadCrumbItem(
+        content: Text(
+          _crumbLabel,
+          style: TextStyle(
+            color: AppPalette.textStrongBlue,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
     ],
-    divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+    divider: const Icon(
+      Icons.chevron_right_rounded,
+      size: 16,
+      color: Color(0xFF94A3B8),
+    ),
   );
 
   Widget _viewToggle() => ViewToggleButton(
@@ -205,15 +245,25 @@ class _ReminderExpiryScreenState extends State<ReminderExpiryScreen> {
   Widget _filterDropdown() => Container(
     height: 48,
     padding: const EdgeInsets.symmetric(horizontal: 16),
-    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFD8E3FA))),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: const Color(0xFFD8E3FA)),
+    ),
     child: DropdownButtonHideUnderline(
       child: DropdownButton<String>(
         value: _selectedFilter,
         isExpanded: true,
-        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppPalette.textMuted),
+        icon: const Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: AppPalette.textMuted,
+        ),
         items: const [
           DropdownMenuItem(value: '3_Days', child: Text('Expiring in: 3 days')),
-          DropdownMenuItem(value: '10_Days', child: Text('Expiring in: 10 days')),
+          DropdownMenuItem(
+            value: '10_Days',
+            child: Text('Expiring in: 10 days'),
+          ),
         ],
         onChanged: (val) {
           if (val == null) return;
@@ -224,63 +274,157 @@ class _ReminderExpiryScreenState extends State<ReminderExpiryScreen> {
     ),
   );
 
-  Widget _buildTableList(List<ReminderBookingItem> items) => StyledDataTableCard(
-    columns: [
-      const DataColumn(label: Text('#')),
-      const DataColumn(label: Text('Name')),
-      const DataColumn(label: Text('Passport No')),
-      const DataColumn(label: Text('From & To Country')),
-      const DataColumn(label: Text('Branch')),
-      const DataColumn(label: Text('Status')),
-      DataColumn(label: Text(_expiryColumnTitle)),
-    ],
-    rows: items.asMap().entries.map((entry) {
-      final index = entry.key + 1;
-      final item = entry.value;
-      return DataRow(cells: [
-        DataCell(Text('$index')),
-        DataCell(Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600))),
-        DataCell(Text(item.passportNo ?? '—')),
-        DataCell(Text('${item.fromCountry ?? '—'} → ${item.toCountry ?? '—'}')),
-        DataCell(Text(item.branch ?? '—')),
-        DataCell(Text(item.statusLabel ?? item.status ?? '—')),
-        DataCell(Text(_expiryLabel(item), style: const TextStyle(color: AppPalette.danger, fontWeight: FontWeight.w700))),
-      ]);
-    }).toList(),
-  );
+  Widget _buildTableList(List<ReminderBookingItem> items) =>
+      StyledDataTableCard(
+        columns: [
+          const DataColumn(label: Text('#')),
+          const DataColumn(label: Text('Name')),
+          const DataColumn(label: Text('Passport No')),
+          const DataColumn(label: Text('From & To Country')),
+          const DataColumn(label: Text('Branch')),
+          const DataColumn(label: Text('Status')),
+          DataColumn(label: Text(_expiryColumnTitle)),
+        ],
+        rows: items.asMap().entries.map((entry) {
+          final index = entry.key + 1;
+          final item = entry.value;
+          return DataRow(
+            cells: [
+              DataCell(Text('$index')),
+              DataCell(
+                Text(
+                  item.name,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+              DataCell(Text(item.passportNo ?? '—')),
+              DataCell(
+                Text('${item.fromCountry ?? '—'} → ${item.toCountry ?? '—'}'),
+              ),
+              DataCell(Text(item.branch ?? '—')),
+              DataCell(Text(item.statusLabel ?? item.status ?? '—')),
+              DataCell(
+                Text(
+                  _expiryLabel(item),
+                  style: const TextStyle(
+                    color: AppPalette.danger,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          );
+        }).toList(),
+      );
 
   Widget _buildCardList(List<ReminderBookingItem> items) => Column(
-    children: items.map((item) => Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Colors.white, Color(0xFFF6FAFF)]),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppPalette.borderSoftBlue),
-        boxShadow: AppPalette.cardShadow,
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Row(children: [const Icon(Icons.person_pin_circle_rounded, color: AppPalette.brandBlue), const SizedBox(width: 8), Text(item.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700))]),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: AppPalette.brandBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(8)), child: Text(item.statusLabel ?? item.status ?? '—', style: const TextStyle(fontSize: 12, color: AppPalette.brandBlue, fontWeight: FontWeight.w700))),
-        ]),
-        const SizedBox(height: 12),
-        _cardRow(Icons.badge_rounded, 'Passport', item.passportNo ?? '—'),
-        _cardRow(Icons.route_rounded, 'Route', '${item.fromCountry ?? '—'} → ${item.toCountry ?? '—'}'),
-        _cardRow(Icons.apartment_rounded, 'Branch', item.branch ?? '—'),
-        _cardRow(Icons.warning_amber_rounded, _expiryColumnTitle, _expiryLabel(item), isAlert: true),
-      ]),
-    )).toList(),
+    children: items
+        .map(
+          (item) => Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Colors.white, Color(0xFFF6FAFF)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppPalette.borderSoftBlue),
+              boxShadow: AppPalette.cardShadow,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.person_pin_circle_rounded,
+                          color: AppPalette.brandBlue,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          item.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppPalette.brandBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        item.statusLabel ?? item.status ?? '—',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppPalette.brandBlue,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _cardRow(
+                  Icons.badge_rounded,
+                  'Passport',
+                  item.passportNo ?? '—',
+                ),
+                _cardRow(
+                  Icons.route_rounded,
+                  'Route',
+                  '${item.fromCountry ?? '—'} → ${item.toCountry ?? '—'}',
+                ),
+                _cardRow(Icons.apartment_rounded, 'Branch', item.branch ?? '—'),
+                _cardRow(
+                  Icons.warning_amber_rounded,
+                  _expiryColumnTitle,
+                  _expiryLabel(item),
+                  isAlert: true,
+                ),
+              ],
+            ),
+          ),
+        )
+        .toList(),
   );
 
-  Widget _cardRow(IconData icon, String label, String value, {bool isAlert = false}) => Padding(
+  Widget _cardRow(
+    IconData icon,
+    String label,
+    String value, {
+    bool isAlert = false,
+  }) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
-    child: Row(children: [
-      Icon(icon, size: 18, color: isAlert ? AppPalette.danger : AppPalette.textMuted),
-      const SizedBox(width: 8),
-      Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w700)),
-      Expanded(child: Text(value, style: TextStyle(color: isAlert ? AppPalette.danger : AppPalette.textPrimary, fontWeight: isAlert ? FontWeight.w700 : FontWeight.w500))),
-    ]),
+    child: Row(
+      children: [
+        Icon(
+          icon,
+          size: 18,
+          color: isAlert ? AppPalette.danger : AppPalette.textMuted,
+        ),
+        const SizedBox(width: 8),
+        Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w700)),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              color: isAlert ? AppPalette.danger : AppPalette.textPrimary,
+              fontWeight: isAlert ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    ),
   );
 
   List<ReminderBookingItem> get _skeletonItems => List.generate(
@@ -301,33 +445,61 @@ class _ReminderExpiryScreenState extends State<ReminderExpiryScreen> {
 }
 
 class ReminderService {
-  ReminderService({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
+  ReminderService({ApiClient? apiClient})
+    : _apiClient = apiClient ?? ApiClient();
 
   final ApiClient _apiClient;
 
-  Future<List<ReminderBookingItem>> fetchReminderBookings(String status, String? date) async {
-    final response = await _apiClient.get('/booking/wp/reminders/list/', queryParameters: {'status': status, if (date != null) 'date': date});
+  Future<List<ReminderBookingItem>> fetchReminderBookings(
+    String status,
+    String? date,
+  ) async {
+    final response = await _apiClient.get(
+      '/booking/wp/reminders/list/',
+      queryParameters: {'status': status, if (date != null) 'date': date},
+    );
     final data = response.data;
-    final results = (data is Map<String, dynamic> ? data['results'] : null) as List<dynamic>? ?? const [];
-    return results.map((e) => ReminderBookingItem.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+    final results =
+        (data is Map<String, dynamic> ? data['results'] : null)
+            as List<dynamic>? ??
+        const [];
+    return results
+        .map(
+          (e) =>
+              ReminderBookingItem.fromJson(Map<String, dynamic>.from(e as Map)),
+        )
+        .toList();
   }
 }
 
 class ReminderBookingItem {
-  const ReminderBookingItem({required this.name, this.passportNo, this.fromCountry, this.toCountry, this.branch, this.status, this.statusLabel, this.medicalExpiryDate, this.policeClearanceExpiryDate, this.visaExpiryDate});
+  const ReminderBookingItem({
+    required this.name,
+    this.passportNo,
+    this.fromCountry,
+    this.toCountry,
+    this.branch,
+    this.status,
+    this.statusLabel,
+    this.medicalExpiryDate,
+    this.policeClearanceExpiryDate,
+    this.visaExpiryDate,
+  });
 
-  factory ReminderBookingItem.fromJson(Map<String, dynamic> json) => ReminderBookingItem(
-    name: json['name']?.toString() ?? '—',
-    passportNo: json['passportNo']?.toString(),
-    fromCountry: json['fromCountry']?.toString(),
-    toCountry: json['toCountry']?.toString(),
-    branch: json['branch']?.toString(),
-    status: json['status']?.toString(),
-    statusLabel: json['statusLabel']?.toString(),
-    medicalExpiryDate: json['medicalExpiryDate']?.toString(),
-    policeClearanceExpiryDate: json['policeClearanceExpiryDate']?.toString(),
-    visaExpiryDate: json['visaExpiryDate']?.toString(),
-  );
+  factory ReminderBookingItem.fromJson(Map<String, dynamic> json) =>
+      ReminderBookingItem(
+        name: json['name']?.toString() ?? '—',
+        passportNo: json['passportNo']?.toString(),
+        fromCountry: json['fromCountry']?.toString(),
+        toCountry: json['toCountry']?.toString(),
+        branch: json['branch']?.toString(),
+        status: json['status']?.toString(),
+        statusLabel: json['statusLabel']?.toString(),
+        medicalExpiryDate: json['medicalExpiryDate']?.toString(),
+        policeClearanceExpiryDate: json['policeClearanceExpiryDate']
+            ?.toString(),
+        visaExpiryDate: json['visaExpiryDate']?.toString(),
+      );
 
   final String name;
   final String? passportNo;

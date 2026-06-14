@@ -16,7 +16,8 @@ class PassportReturnRequestScreen extends StatefulWidget {
       _PassportReturnRequestScreenState();
 }
 
-class _PassportReturnRequestScreenState extends State<PassportReturnRequestScreen> {
+class _PassportReturnRequestScreenState
+    extends State<PassportReturnRequestScreen> {
   bool _isCardView = false;
   bool _isMyReturn = false; // false = Customer Return, true = My Return
   late final TextEditingController _searchController;
@@ -63,17 +64,21 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
   }
 
   List<ReturnRequestItem> get _filteredItems {
-    final filteredByType = _items.where((item) => item.isMyReturn == _isMyReturn).toList();
+    final filteredByType = _items
+        .where((item) => item.isMyReturn == _isMyReturn)
+        .toList();
     final query = _searchQuery.trim().toLowerCase();
-    
+
     return filteredByType.where((item) {
-      final matchesQuery = query.isEmpty ||
+      final matchesQuery =
+          query.isEmpty ||
           item.workPermitId.toLowerCase().contains(query) ||
           item.id.toString().contains(query) ||
           item.name.toLowerCase().contains(query) ||
           item.passportNo.toLowerCase().contains(query);
       final createdAt = DateTime.parse(item.createdAt);
-      final matchesDate = _selectedDateRange == null ||
+      final matchesDate =
+          _selectedDateRange == null ||
           (!createdAt.isBefore(_selectedDateRange!.start) &&
               !createdAt.isAfter(_selectedDateRange!.end));
       return matchesQuery && matchesDate;
@@ -99,8 +104,10 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
                     const SizedBox(height: 14),
                     AppSearchBar(
                       controller: _searchController,
-                      hintText: 'Search by post ID, booking ID, name or passport',
-                      onChanged: (value) => setState(() => _searchQuery = value),
+                      hintText:
+                          'Search by post ID, booking ID, name or passport',
+                      onChanged: (value) =>
+                          setState(() => _searchQuery = value),
                       onSearchTap: () =>
                           setState(() => _searchQuery = _searchController.text),
                     ),
@@ -133,20 +140,35 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
           content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.assignment_return_outlined, size: 14, color: AppPalette.textMuted),
+              const Icon(
+                Icons.assignment_return_outlined,
+                size: 14,
+                color: AppPalette.textMuted,
+              ),
               const SizedBox(width: 4),
-              const Text('Passport Return List', style: TextStyle(color: AppPalette.textMuted, fontSize: 12)),
+              const Text(
+                'Passport Return List',
+                style: TextStyle(color: AppPalette.textMuted, fontSize: 12),
+              ),
             ],
           ),
         ),
         BreadCrumbItem(
           content: const Text(
             'Return Request/Review',
-            style: TextStyle(color: AppPalette.textStrongBlue, fontSize: 12, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              color: AppPalette.textStrongBlue,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
-      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+      divider: const Icon(
+        Icons.chevron_right_rounded,
+        size: 16,
+        color: Color(0xFF94A3B8),
+      ),
     );
   }
 
@@ -162,20 +184,31 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
       width: 110,
       height: 48,
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: const Color(0xFFE9EDFF), borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE9EDFF),
+        borderRadius: BorderRadius.circular(14),
+      ),
       child: Stack(
         children: [
           AnimatedAlign(
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeInOut,
-            alignment: !_isMyReturn ? Alignment.centerLeft : Alignment.centerRight,
+            alignment: !_isMyReturn
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
             child: Container(
               width: 50,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
             ),
           ),
@@ -191,7 +224,9 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
                       child: Icon(
                         Icons.groups_outlined,
                         size: 22,
-                        color: !_isMyReturn ? const Color(0xFF004AC6) : const Color(0xFF434655),
+                        color: !_isMyReturn
+                            ? const Color(0xFF004AC6)
+                            : const Color(0xFF434655),
                       ),
                     ),
                   ),
@@ -207,7 +242,9 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
                       child: Icon(
                         Icons.person_outline,
                         size: 22,
-                        color: _isMyReturn ? const Color(0xFF004AC6) : const Color(0xFF434655),
+                        color: _isMyReturn
+                            ? const Color(0xFF004AC6)
+                            : const Color(0xFF434655),
                       ),
                     ),
                   ),
@@ -248,13 +285,20 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
               },
               child: Row(
                 children: [
-                  const Icon(Icons.date_range_rounded, size: 18, color: AppPalette.textStrongBlue),
+                  const Icon(
+                    Icons.date_range_rounded,
+                    size: 18,
+                    color: AppPalette.textStrongBlue,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       label,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: AppPalette.textStrongBlue,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -267,7 +311,11 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
               borderRadius: BorderRadius.circular(999),
               child: const Padding(
                 padding: EdgeInsets.all(4),
-                child: Icon(Icons.close_rounded, size: 18, color: AppPalette.textMuted),
+                child: Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: AppPalette.textMuted,
+                ),
               ),
             ),
         ],
@@ -304,7 +352,10 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
           DataCell(Text('৳ ${_money(item.paidAmount)}')),
           DataCell(
             IconButton(
-              icon: const Icon(Icons.more_vert_rounded, color: AppPalette.textMuted),
+              icon: const Icon(
+                Icons.more_vert_rounded,
+                color: AppPalette.textMuted,
+              ),
               onPressed: () => _openActionsSheet(context, item),
             ),
           ),
@@ -320,7 +371,9 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
         return ReturnRequestCard(
           bookingId: item.id.toString(),
           postId: item.workPermitId,
-          customerInitials: item.name.length > 1 ? item.name.substring(0, 2).toUpperCase() : item.name.toUpperCase(),
+          customerInitials: item.name.length > 1
+              ? item.name.substring(0, 2).toUpperCase()
+              : item.name.toUpperCase(),
           customerName: item.name,
           passportNo: item.passportNo,
           applyDate: _displayDate(item.createdAt),
@@ -346,7 +399,20 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
   String _displayDate(String iso) {
     final parts = iso.split('-');
     if (parts.length != 3) return iso;
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[int.parse(parts[1]) - 1]} ${parts[2]}, ${parts[0]}';
   }
 
@@ -357,7 +423,11 @@ class _PassportReturnRequestScreenState extends State<PassportReturnRequestScree
     for (var i = 0; i < chars.length; i += 3) {
       chunks.add(chars.skip(i).take(3).join());
     }
-    return chunks.map((c) => c.split('').reversed.join()).toList().reversed.join(',');
+    return chunks
+        .map((c) => c.split('').reversed.join())
+        .toList()
+        .reversed
+        .join(',');
   }
 
   String _formatDate(DateTime date) {

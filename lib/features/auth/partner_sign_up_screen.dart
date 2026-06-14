@@ -106,9 +106,7 @@ class _AccountTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTapRoute == null
-          ? null
-          : () => context.push(onTapRoute!),
+      onTap: onTapRoute == null ? null : () => context.push(onTapRoute!),
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.all(16),

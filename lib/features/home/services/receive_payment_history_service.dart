@@ -41,7 +41,9 @@ class ReceivePaymentHistoryItem {
         : double.tryParse(rawAmount?.toString() ?? '') ?? 0;
 
     return ReceivePaymentHistoryItem(
-      id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse('${json['id']}') ?? 0,
       paymentReference: json['paymentReference']?.toString() ?? '',
       totalAmount: amount,
       status: json['status']?.toString() ?? '',
@@ -51,7 +53,8 @@ class ReceivePaymentHistoryItem {
 }
 
 class ReceivePaymentHistoryService {
-  ReceivePaymentHistoryService({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
+  ReceivePaymentHistoryService({ApiClient? apiClient})
+    : _apiClient = apiClient ?? ApiClient();
 
   final ApiClient _apiClient;
 
@@ -64,16 +67,30 @@ class ReceivePaymentHistoryService {
     if (status.isNotEmpty) query['status'] = status;
     if (search.isNotEmpty) query['search'] = search;
 
-    final response = await _apiClient.get('/payment/history-agency/', queryParameters: query);
+    final response = await _apiClient.get(
+      '/payment/history-agency/',
+      queryParameters: query,
+    );
     final data = response.data;
-    final map = data is Map<String, dynamic> ? data : Map<String, dynamic>.from(data as Map);
+    final map = data is Map<String, dynamic>
+        ? data
+        : Map<String, dynamic>.from(data as Map);
     final rawResults = map['results'] as List? ?? const [];
 
     return ReceivePaymentHistoryPage(
-      count: map['count'] is int ? map['count'] as int : int.tryParse('${map['count']}') ?? 0,
+      count: map['count'] is int
+          ? map['count'] as int
+          : int.tryParse('${map['count']}') ?? 0,
       next: map['next']?.toString(),
       previous: map['previous']?.toString(),
-      results: rawResults.whereType<Map>().map((e) => ReceivePaymentHistoryItem.fromJson(Map<String, dynamic>.from(e))).toList(),
+      results: rawResults
+          .whereType<Map>()
+          .map(
+            (e) => ReceivePaymentHistoryItem.fromJson(
+              Map<String, dynamic>.from(e),
+            ),
+          )
+          .toList(),
     );
   }
 }

@@ -262,8 +262,9 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
         'trade_license_image': await _toMultipart(_tradeLicenseImage!),
         'rl_license_image': await _toMultipart(_rlLicenseImage!),
         if (_civilAviationLicenseImage != null)
-          'civil_aviation_license_image':
-              await _toMultipart(_civilAviationLicenseImage!),
+          'civil_aviation_license_image': await _toMultipart(
+            _civilAviationLicenseImage!,
+          ),
       });
 
       await _authService.registerRecruitingAgency(formData);
@@ -385,14 +386,16 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                 height: 32,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isActive ? const Color(0xFF2563EB) : Colors.grey.shade300,
+                  color: isActive
+                      ? const Color(0xFF2563EB)
+                      : Colors.grey.shade300,
                   boxShadow: isActive
                       ? [
                           BoxShadow(
                             color: const Color(0xFF2563EB).withOpacity(0.4),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
-                          )
+                          ),
                         ]
                       : [],
                 ),
@@ -432,7 +435,11 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
       children: [
         const Text(
           'Agency Information',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF1E293B),
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -469,14 +476,22 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
               children: [
                 const Text(
                   'Select Agency District *',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF334155),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<DistrictOption>(
                   initialValue: _selectedDistrict,
                   isExpanded: true,
                   items: _districts
-                      .map((d) => DropdownMenuItem<DistrictOption>(value: d, child: Text(d.name)))
+                      .map(
+                        (d) => DropdownMenuItem<DistrictOption>(
+                          value: d,
+                          child: Text(d.name),
+                        ),
+                      )
                       .toList(),
                   onChanged: _locationsLoading
                       ? null
@@ -486,10 +501,16 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                           _loadPoliceStations(d.id);
                         },
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                     filled: true,
                     fillColor: const Color(0xFFF1F5F9),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                 ),
               ],
@@ -499,24 +520,40 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
               children: [
                 const Text(
                   'Select Agency Police Station *',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF334155),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<PoliceStationOption>(
                   initialValue: _selectedPoliceStation,
                   isExpanded: true,
                   items: _policeStations
-                      .map((p) => DropdownMenuItem<PoliceStationOption>(value: p, child: Text(p.name)))
+                      .map(
+                        (p) => DropdownMenuItem<PoliceStationOption>(
+                          value: p,
+                          child: Text(p.name),
+                        ),
+                      )
                       .toList(),
                   onChanged: (_selectedDistrict == null || _locationsLoading)
                       ? null
                       : (p) => setState(() => _selectedPoliceStation = p),
                   decoration: InputDecoration(
-                    hintText: _selectedDistrict == null ? 'Select district first' : 'Select police station',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    hintText: _selectedDistrict == null
+                        ? 'Select district first'
+                        : 'Select police station',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                     filled: true,
                     fillColor: const Color(0xFFF1F5F9),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                 ),
               ],
@@ -540,7 +577,11 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
       children: [
         const Text(
           'Contact Information',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF1E293B),
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -579,7 +620,11 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
       children: [
         const Text(
           'Login Credentials',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF1E293B),
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -625,7 +670,11 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
       children: [
         const Text(
           'Documents & Verification',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF1E293B),
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -677,7 +726,11 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
             activeColor: const Color(0xFF2563EB),
             title: const Text(
               'I agree to the Privacy Policy and Terms & Conditions.',
-              style: TextStyle(fontSize: 14, color: Color(0xFF475569), fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF475569),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
@@ -691,7 +744,11 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
       children: [
         const Text(
           'OTP Verification',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF1E293B),
+          ),
         ),
         const SizedBox(height: 8),
         Text(
@@ -714,7 +771,13 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
           alignment: Alignment.centerRight,
           child: TextButton(
             onPressed: _loading ? null : _resendOtp,
-            child: const Text('Resend OTP', style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF2563EB))),
+            child: const Text(
+              'Resend OTP',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2563EB),
+              ),
+            ),
           ),
         ),
       ],
@@ -746,7 +809,10 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('$_agencyTitle Sign Up', style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(
+          '$_agencyTitle Sign Up',
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -761,7 +827,10 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
               _buildStepIndicator(),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 800),
@@ -780,18 +849,19 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                         ),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 400),
-                          transitionBuilder: (Widget child, Animation<double> animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SlideTransition(
-                                position: Tween<Offset>(
-                                  begin: const Offset(0.05, 0.0),
-                                  end: Offset.zero,
-                                ).animate(animation),
-                                child: child,
-                              ),
-                            );
-                          },
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: const Offset(0.05, 0.0),
+                                      end: Offset.zero,
+                                    ).animate(animation),
+                                    child: child,
+                                  ),
+                                );
+                              },
                           child: KeyedSubtree(
                             key: ValueKey<int>(_currentStep),
                             child: currentStepContent,
@@ -811,7 +881,7 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, -5),
-                    )
+                    ),
                   ],
                 ),
                 child: Center(
@@ -824,35 +894,61 @@ class _RecruitingSignUpScreenState extends State<RecruitingSignUpScreen> {
                           OutlinedButton(
                             onPressed: _previousStep,
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                               side: const BorderSide(color: Color(0xFFCBD5E1)),
                             ),
                             child: const Text(
                               'Back',
-                              style: TextStyle(color: Color(0xFF475569), fontWeight: FontWeight.w600, fontSize: 16),
+                              style: TextStyle(
+                                color: Color(0xFF475569),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
                             ),
                           )
                         else
                           const SizedBox.shrink(),
                         ElevatedButton(
-                          onPressed: (_loading || _locationsLoading) ? null : _nextStep,
+                          onPressed: (_loading || _locationsLoading)
+                              ? null
+                              : _nextStep,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF2563EB),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             elevation: 0,
                           ),
                           child: _loading
                               ? const SizedBox(
                                   width: 24,
                                   height: 24,
-                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : Text(
-                                  _currentStep >= 3 ? (_currentStep == 4 ? 'Verify OTP' : 'Create Account') : 'Next Step',
-                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                                  _currentStep >= 3
+                                      ? (_currentStep == 4
+                                            ? 'Verify OTP'
+                                            : 'Create Account')
+                                      : 'Next Step',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
                                 ),
                         ),
                       ],
@@ -884,7 +980,13 @@ class _PremiumUploadField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF334155),
+          ),
+        ),
         const SizedBox(height: 8),
         InkWell(
           onTap: onPick,
@@ -893,18 +995,26 @@ class _PremiumUploadField extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: file == null ? const Color(0xFFF8FAFC) : const Color(0xFFEFF6FF),
+              color: file == null
+                  ? const Color(0xFFF8FAFC)
+                  : const Color(0xFFEFF6FF),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: file == null ? const Color(0xFFCBD5E1) : const Color(0xFFBFDBFE),
+                color: file == null
+                    ? const Color(0xFFCBD5E1)
+                    : const Color(0xFFBFDBFE),
                 width: 2,
               ),
             ),
             child: Column(
               children: [
                 Icon(
-                  file == null ? Icons.cloud_upload_outlined : Icons.check_circle,
-                  color: file == null ? const Color(0xFF94A3B8) : const Color(0xFF3B82F6),
+                  file == null
+                      ? Icons.cloud_upload_outlined
+                      : Icons.check_circle,
+                  color: file == null
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF3B82F6),
                   size: 32,
                 ),
                 const SizedBox(height: 12),
@@ -914,8 +1024,12 @@ class _PremiumUploadField extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: file == null ? const Color(0xFF64748B) : const Color(0xFF1D4ED8),
-                    fontWeight: file == null ? FontWeight.normal : FontWeight.w600,
+                    color: file == null
+                        ? const Color(0xFF64748B)
+                        : const Color(0xFF1D4ED8),
+                    fontWeight: file == null
+                        ? FontWeight.normal
+                        : FontWeight.w600,
                   ),
                 ),
               ],
@@ -960,11 +1074,8 @@ class _PremiumSelectedImagePreview extends StatelessWidget {
             height: 140,
             decoration: BoxDecoration(
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                )
-              ]
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+              ],
             ),
             child: Image.memory(bytes, fit: BoxFit.cover),
           ),

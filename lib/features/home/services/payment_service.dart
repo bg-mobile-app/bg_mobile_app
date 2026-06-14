@@ -49,11 +49,14 @@ class PaymentsHistory {
     if (rawAmount is num) {
       parsedAmount = rawAmount.toInt();
     } else if (rawAmount is String) {
-      parsedAmount = double.tryParse(rawAmount)?.toInt() ?? int.tryParse(rawAmount) ?? 0;
+      parsedAmount =
+          double.tryParse(rawAmount)?.toInt() ?? int.tryParse(rawAmount) ?? 0;
     }
 
     return PaymentsHistory(
-      id: json['id'] is int ? json['id'] as int : int.tryParse('${json['id']}') ?? 0,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse('${json['id']}') ?? 0,
       postId: json['postId']?.toString() ?? '',
       bookingId: json['bookingId']?.toString() ?? '',
       terminal: json['terminal']?.toString() ?? '',
@@ -63,7 +66,9 @@ class PaymentsHistory {
       transactionType: json['transactionType']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
       amount: parsedAmount,
-      collectedAt: DateTime.tryParse(json['collectedAt']?.toString() ?? '') ?? DateTime.now(),
+      collectedAt:
+          DateTime.tryParse(json['collectedAt']?.toString() ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -98,7 +103,7 @@ class PaymentsHistory {
 
 class PaymentService {
   PaymentService({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
+    : _apiClient = apiClient ?? ApiClient();
 
   final ApiClient _apiClient;
 
@@ -129,14 +134,18 @@ class PaymentService {
     final rawResults = map['results'] as List? ?? const [];
 
     return TypesHandler<PaymentsHistory>(
-      count: map['count'] is int ? map['count'] as int : int.tryParse('${map['count']}') ?? 0,
+      count: map['count'] is int
+          ? map['count'] as int
+          : int.tryParse('${map['count']}') ?? 0,
       next: map['next']?.toString(),
       previous: map['previous']?.toString(),
       results: rawResults
           .whereType<Map>()
           .map((e) => PaymentsHistory.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
-      pageSize: map['pageSize'] is int ? map['pageSize'] as int : int.tryParse('${map['pageSize']}') ?? 10,
+      pageSize: map['pageSize'] is int
+          ? map['pageSize'] as int
+          : int.tryParse('${map['pageSize']}') ?? 10,
     );
   }
 }

@@ -48,17 +48,23 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password changed successfully')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password changed successfully')),
+      );
       _formKey.currentState!.reset();
       _oldPasswordController.clear();
       _newPasswordController.clear();
       _confirmPasswordController.clear();
     } on DioException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_extractApiError(e))));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_extractApiError(e))));
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to change password')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to change password')),
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -104,9 +110,20 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               children: [
                 _breadcrumb(),
                 const SizedBox(height: 8),
-                Text('Change Password', style: AppTextStyles.headline2.copyWith(fontSize: 25, fontWeight: FontWeight.w800)),
+                Text(
+                  'Change Password',
+                  style: AppTextStyles.headline2.copyWith(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('Keep your account secure by setting a strong password.', style: AppTextStyles.body2.copyWith(color: AppPalette.textMuted)),
+                Text(
+                  'Keep your account secure by setting a strong password.',
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppPalette.textMuted,
+                  ),
+                ),
                 const SizedBox(height: 14),
                 Container(
                   width: double.infinity,
@@ -128,14 +145,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               label: 'Old Password',
                               controller: _oldPasswordController,
                               visible: _showOldPassword,
-                              onVisibility: () => setState(() => _showOldPassword = !_showOldPassword),
+                              onVisibility: () => setState(
+                                () => _showOldPassword = !_showOldPassword,
+                              ),
                             ),
                             const SizedBox(height: 14),
                             _passwordField(
                               label: 'New Password',
                               controller: _newPasswordController,
                               visible: _showNewPassword,
-                              onVisibility: () => setState(() => _showNewPassword = !_showNewPassword),
+                              onVisibility: () => setState(
+                                () => _showNewPassword = !_showNewPassword,
+                              ),
                               minLength: 8,
                             ),
                             const SizedBox(height: 14),
@@ -143,7 +164,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               label: 'Confirm Password',
                               controller: _confirmPasswordController,
                               visible: _showConfirmPassword,
-                              onVisibility: () => setState(() => _showConfirmPassword = !_showConfirmPassword),
+                              onVisibility: () => setState(
+                                () => _showConfirmPassword =
+                                    !_showConfirmPassword,
+                              ),
                               minLength: 8,
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
@@ -163,15 +187,27 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 OutlinedButton(
-                                  onPressed: _isLoading ? null : () => Navigator.maybePop(context),
-                                  style: OutlinedButton.styleFrom(side: const BorderSide(color: AppPalette.borderSoftBlue)),
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () => Navigator.maybePop(context),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                      color: AppPalette.borderSoftBlue,
+                                    ),
+                                  ),
                                   child: const Text('Cancel'),
                                 ),
                                 const SizedBox(width: 12),
                                 FilledButton(
                                   onPressed: _isLoading ? null : _submit,
-                                  style: FilledButton.styleFrom(backgroundColor: AppPalette.brandBlue),
-                                  child: Text(_isLoading ? 'Changing...' : 'Change Password'),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: AppPalette.brandBlue,
+                                  ),
+                                  child: Text(
+                                    _isLoading
+                                        ? 'Changing...'
+                                        : 'Change Password',
+                                  ),
                                 ),
                               ],
                             ),
@@ -192,12 +228,27 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget _breadcrumb() {
     return BreadCrumb(
       items: <BreadCrumbItem>[
-        BreadCrumbItem(content: Text('Dashboard', style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted))),
         BreadCrumbItem(
-          content: Text('Change Password', style: AppTextStyles.caption.copyWith(color: AppPalette.textStrongBlue, fontWeight: FontWeight.w700)),
+          content: Text(
+            'Dashboard',
+            style: AppTextStyles.caption.copyWith(color: AppPalette.textMuted),
+          ),
+        ),
+        BreadCrumbItem(
+          content: Text(
+            'Change Password',
+            style: AppTextStyles.caption.copyWith(
+              color: AppPalette.textStrongBlue,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
       ],
-      divider: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF94A3B8)),
+      divider: const Icon(
+        Icons.chevron_right_rounded,
+        size: 16,
+        color: Color(0xFF94A3B8),
+      ),
     );
   }
 
@@ -217,14 +268,23 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         labelText: label,
         filled: true,
         fillColor: AppPalette.surface,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppPalette.borderSoftBlue)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppPalette.borderSoftBlue)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppPalette.borderSoftBlue),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppPalette.borderSoftBlue),
+        ),
         suffixIcon: IconButton(
           onPressed: onVisibility,
-          icon: Icon(visible ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+          icon: Icon(
+            visible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+          ),
         ),
       ),
-      validator: validator ??
+      validator:
+          validator ??
           (value) {
             if (value == null || value.trim().isEmpty) {
               return 'All fields are required';

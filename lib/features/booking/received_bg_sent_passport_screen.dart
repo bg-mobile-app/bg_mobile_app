@@ -299,8 +299,9 @@ class _ReceivedBgSentPassportScreenState
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    _collectedBookings =
-        _bookings.where((item) => item.status == 'BG_SENT_PP').toList();
+    _collectedBookings = _bookings
+        .where((item) => item.status == 'BG_SENT_PP')
+        .toList();
     _loadBookings();
   }
 
@@ -334,8 +335,6 @@ class _ReceivedBgSentPassportScreenState
     }).toList();
   }
 
-
-
   Future<void> _loadBookings() async {
     setState(() => _isLoading = true);
     try {
@@ -344,8 +343,12 @@ class _ReceivedBgSentPassportScreenState
         queryParameters: {
           'status': 'BG_SENT_PP',
           'search': _searchQuery.trim(),
-          'from_date': _selectedDateRange != null ? _formatApiDate(_selectedDateRange!.start) : '',
-          'to_date': _selectedDateRange != null ? _formatApiDate(_selectedDateRange!.end) : '',
+          'from_date': _selectedDateRange != null
+              ? _formatApiDate(_selectedDateRange!.start)
+              : '',
+          'to_date': _selectedDateRange != null
+              ? _formatApiDate(_selectedDateRange!.end)
+              : '',
           'page': 1,
         },
       );
@@ -364,8 +367,9 @@ class _ReceivedBgSentPassportScreenState
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _collectedBookings =
-            _bookings.where((item) => item.status == 'BG_SENT_PP').toList();
+        _collectedBookings = _bookings
+            .where((item) => item.status == 'BG_SENT_PP')
+            .toList();
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -377,37 +381,48 @@ class _ReceivedBgSentPassportScreenState
 
   BookingItem _fromApi(Map<String, dynamic> json) {
     return BookingItem(
-      workPermitId: json['workPermitId']?.toString() ??
+      workPermitId:
+          json['workPermitId']?.toString() ??
           json['work_permit_id']?.toString() ??
           '-',
       id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
-      serviceType: json['serviceType']?.toString() ??
+      serviceType:
+          json['serviceType']?.toString() ??
           json['service_type']?.toString() ??
           'Work Permit',
-      createdAt: json['createdAt']?.toString() ??
+      createdAt:
+          json['createdAt']?.toString() ??
           json['created_at']?.toString() ??
           DateTime.now().toIso8601String().split('T').first,
-      name: json['name']?.toString() ??
+      name:
+          json['name']?.toString() ??
           json['customer_name']?.toString() ??
           'Unknown',
-      passportNo: json['passportNo']?.toString() ??
+      passportNo:
+          json['passportNo']?.toString() ??
           json['passport_no']?.toString() ??
           '-',
-      fromCountry: json['fromCountry']?.toString() ??
+      fromCountry:
+          json['fromCountry']?.toString() ??
           json['from_country']?.toString() ??
           'Bangladesh',
-      toCountry: json['toCountry']?.toString() ??
+      toCountry:
+          json['toCountry']?.toString() ??
           json['to_country']?.toString() ??
           '-',
-      agencyTotalCost: int.tryParse(
-              json['agencyTotalCost']?.toString() ??
-                  json['agency_total_cost']?.toString() ??
-                  '') ??
+      agencyTotalCost:
+          int.tryParse(
+            json['agencyTotalCost']?.toString() ??
+                json['agency_total_cost']?.toString() ??
+                '',
+          ) ??
           0,
-      paidAmount: int.tryParse(
-              json['paidAmount']?.toString() ??
-                  json['paid_amount']?.toString() ??
-                  '') ??
+      paidAmount:
+          int.tryParse(
+            json['paidAmount']?.toString() ??
+                json['paid_amount']?.toString() ??
+                '',
+          ) ??
           0,
       status: 'BG_SENT_PP',
       statusLabel: 'BG Sent Passport',
@@ -443,8 +458,10 @@ class _ReceivedBgSentPassportScreenState
                   onChanged: (value) {
                     setState(() => _searchQuery = value);
                     _searchDebounce?.cancel();
-                    _searchDebounce =
-                        Timer(const Duration(milliseconds: 400), _loadBookings);
+                    _searchDebounce = Timer(
+                      const Duration(milliseconds: 400),
+                      _loadBookings,
+                    );
                   },
                   onSearchTap: () {
                     setState(() => _searchQuery = _searchController.text);
@@ -461,7 +478,8 @@ class _ReceivedBgSentPassportScreenState
                 ),
 
                 const SizedBox(height: 16),
-                if (_isLoading) const Center(child: CircularProgressIndicator()),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator()),
                 if (!_isLoading)
                   (_isCardView ? _buildCardList() : _buildTableList()),
               ],
@@ -947,11 +965,7 @@ class _CardStyle extends ReceivedBookingCardStyle {
     required this.progressLabel,
     required String ctaLabel,
     required this.ctaIcon,
-  }) : super(
-          badgeBg: badgeBg,
-          badgeText: badgeText,
-          ctaLabel: ctaLabel,
-        );
+  }) : super(badgeBg: badgeBg, badgeText: badgeText, ctaLabel: ctaLabel);
 
   final IconData icon;
   final Color iconBg;

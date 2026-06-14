@@ -18,18 +18,10 @@ class AppPalette {
   static const Color danger = Color(0xFFB91C1C);
 
   static const List<BoxShadow> softShadow = [
-    BoxShadow(
-      color: Color(0x0D2563EB),
-      blurRadius: 20,
-      offset: Offset(0, 8),
-    ),
+    BoxShadow(color: Color(0x0D2563EB), blurRadius: 20, offset: Offset(0, 8)),
   ];
 
   static const List<BoxShadow> cardShadow = [
-    BoxShadow(
-      color: Color(0x12051B44),
-      blurRadius: 16,
-      offset: Offset(0, 6),
-    ),
+    BoxShadow(color: Color(0x12051B44), blurRadius: 16, offset: Offset(0, 6)),
   ];
 }
