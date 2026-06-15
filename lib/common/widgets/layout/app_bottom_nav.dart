@@ -17,6 +17,20 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isSmallDevice = screenWidth < 360;
+    final navHorizontalPadding = isSmallDevice ? 8.0 : 12.0;
+    final navVerticalPadding = isSmallDevice ? 6.0 : 10.0;
+    final itemHorizontalPadding = isSmallDevice ? 2.0 : 4.0;
+    final selectedHorizontalPadding = isSmallDevice ? 8.0 : 12.0;
+    final selectedVerticalPadding = isSmallDevice ? 5.0 : 7.0;
+    final unselectedVerticalPadding = isSmallDevice ? 7.0 : 10.0;
+    final iconSize = isSmallDevice ? 24.0 : 28.0;
+    final selectedIconSize = isSmallDevice ? 20.0 : 23.0;
+    final labelFontSize = isSmallDevice ? 9.0 : 10.0;
+    final prominentButtonSize = isSmallDevice ? 44.0 : 52.0;
+    final prominentIconSize = isSmallDevice ? 28.0 : 34.0;
+
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -42,9 +56,9 @@ class AppBottomNav extends StatelessWidget {
                 bottom: false,
                 minimum: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: navHorizontalPadding,
+                    vertical: navVerticalPadding,
                   ),
                   child: Row(
                     children: List.generate(_items.length, (index) {
@@ -60,8 +74,8 @@ class AppBottomNav extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Container(
-                                  width: 52,
-                                  height: 52,
+                                  width: prominentButtonSize,
+                                  height: prominentButtonSize,
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [
@@ -88,10 +102,10 @@ class AppBottomNav extends StatelessWidget {
                                       width: 1.5,
                                     ),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.add_rounded,
                                     color: Colors.white,
-                                    size: 34,
+                                    size: prominentIconSize,
                                   ),
                                 ),
                               ],
@@ -102,7 +116,9 @@ class AppBottomNav extends StatelessWidget {
 
                       return Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: itemHorizontalPadding,
+                          ),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -112,8 +128,12 @@ class AppBottomNav extends StatelessWidget {
                                 duration: const Duration(milliseconds: 180),
                                 curve: Curves.easeOut,
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: isSelected ? 12 : 0,
-                                  vertical: isSelected ? 7 : 10,
+                                  horizontal: isSelected
+                                      ? selectedHorizontalPadding
+                                      : 0,
+                                  vertical: isSelected
+                                      ? selectedVerticalPadding
+                                      : unselectedVerticalPadding,
                                 ),
                                 decoration: BoxDecoration(
                                   color: isSelected
@@ -137,8 +157,12 @@ class AppBottomNav extends StatelessWidget {
                                             isSelected
                                                 ? item.selectedIcon
                                                 : item.icon,
-                                            width: isSelected ? 23 : 28,
-                                            height: isSelected ? 23 : 28,
+                                            width: isSelected
+                                                ? selectedIconSize
+                                                : iconSize,
+                                            height: isSelected
+                                                ? selectedIconSize
+                                                : iconSize,
                                             color: isSelected
                                                 ? primaryColor
                                                 : const Color(0xFF98A1AF),
@@ -175,7 +199,7 @@ class AppBottomNav extends StatelessWidget {
                                                         TextOverflow.ellipsis,
                                                     style: TextStyle(
                                                       color: primaryColor,
-                                                      fontSize: 10,
+                                                      fontSize: labelFontSize,
                                                       fontWeight:
                                                           FontWeight.w700,
                                                       height: 1.0,
