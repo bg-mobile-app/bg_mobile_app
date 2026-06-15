@@ -18,7 +18,7 @@ class ReceivedReadyForFlightScreen extends StatefulWidget {
 
 class _ReceivedReadyForFlightScreenState
     extends State<ReceivedReadyForFlightScreen> {
-  bool _isCardView = false;
+  bool _isCardView = true;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;

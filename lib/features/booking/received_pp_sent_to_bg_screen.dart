@@ -17,7 +17,7 @@ class ReceivedPpSentToBgScreen extends StatefulWidget {
 }
 
 class _ReceivedPpSentToBgScreenState extends State<ReceivedPpSentToBgScreen> {
-  bool _isCardView = false;
+  bool _isCardView = true;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;

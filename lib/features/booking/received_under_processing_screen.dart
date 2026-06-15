@@ -18,7 +18,7 @@ class ReceivedUnderProcessingScreen extends StatefulWidget {
 
 class _ReceivedUnderProcessingScreenState
     extends State<ReceivedUnderProcessingScreen> {
-  bool _isCardView = false;
+  bool _isCardView = true;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;

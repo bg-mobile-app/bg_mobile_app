@@ -16,7 +16,7 @@ class ReceivedPassportScreen extends StatefulWidget {
 }
 
 class _ReceivedPassportScreenState extends State<ReceivedPassportScreen> {
-  bool _isCardView = false;
+  bool _isCardView = true;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;

@@ -20,7 +20,7 @@ class ReceivedAppliedBookingScreen extends StatefulWidget {
 
 class _ReceivedAppliedBookingScreenState
     extends State<ReceivedAppliedBookingScreen> {
-  bool _isCardView = false;
+  bool _isCardView = true;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;

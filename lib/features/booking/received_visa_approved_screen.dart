@@ -19,7 +19,7 @@ class ReceivedVisaApprovedScreen extends StatefulWidget {
 
 class _ReceivedVisaApprovedScreenState
     extends State<ReceivedVisaApprovedScreen> {
-  bool _isCardView = false;
+  bool _isCardView = true;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;

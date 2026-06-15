@@ -146,6 +146,8 @@ class _MyAdsScreenState extends State<MyAdsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _BreadcrumbHeader(),
+                    const SizedBox(height: 8),
                     _TopBar(
                       onHelpTap: () => _showInfo('Ads guide is coming soon'),
                     ),
@@ -251,7 +253,7 @@ class _TopBar extends StatelessWidget {
         Text(
           'My Ads (বিজ্ঞাপন)',
           style: AppTextStyles.headline2.copyWith(
-            color: const Color(0xFF0F4ECF),
+            color: Colors.black,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -283,46 +285,74 @@ class _TopBar extends StatelessWidget {
   }
 }
 
+class _BreadcrumbHeader extends StatelessWidget {
+  const _BreadcrumbHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.view_list_rounded, size: 14, color: AppPalette.textMuted),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text('Dashboard', style: TextStyle(color: AppPalette.textMuted, fontSize: 12)),
+            SizedBox(height: 2),
+            Text('My Ads', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w800)),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class _CreateButton extends StatelessWidget {
   const _CreateButton({required this.onTap});
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0D4CC7),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x2A0D4CC7),
-              blurRadius: 14,
-              offset: Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.add_circle_outline, color: Colors.white, size: 24),
-            const SizedBox(width: 10),
-            Text(
-              'CREATE NEW ADS',
-              style: AppTextStyles.button.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1,
+    return LayoutBuilder(builder: (context, constraints) {
+      final isSmall = constraints.maxWidth <= 380;
+      final vertical = isSmall ? 12.0 : 18.0;
+      final iconSize = isSmall ? 20.0 : 24.0;
+      final gap = isSmall ? 8.0 : 10.0;
+      final font = AppTextStyles.button.copyWith(
+        color: Colors.white,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1,
+        fontSize: isSmall ? 13 : null,
+      );
+
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: vertical),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0D4CC7),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x2A0D4CC7),
+                blurRadius: 14,
+                offset: Offset(0, 6),
               ),
-            ),
-          ],
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_circle_outline, color: Colors.white, size: iconSize),
+              SizedBox(width: gap),
+              Text('CREATE NEW ADS', style: font),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -546,17 +576,21 @@ class _AdCard extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        _ActionButton(
-                          label: 'Edit',
-                          icon: Icons.edit_outlined,
-                          onTap: onEdit,
-                        ),
-                        const SizedBox(width: 8),
-                        _ActionButton(
-                          label: 'Boost',
-                          icon: Icons.trending_up,
-                          onTap: onPromote,
-                        ),
+                        Builder(builder: (ctx) {
+                          final w = MediaQuery.of(ctx).size.width;
+                          final isSmall = w <= 380;
+                          return Row(
+                            children: [
+                              _ActionButton(
+                                label: 'Edit',
+                                icon: Icons.edit_outlined,
+                                onTap: onEdit,
+                              ),
+                              SizedBox(width: isSmall ? 4 : 8),
+                              // Boost removed as requested
+                            ],
+                          );
+                        }),
                       ],
                     ),
                   ],

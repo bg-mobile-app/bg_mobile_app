@@ -21,7 +21,7 @@ class ReceivedBgCollectPassportScreen extends StatefulWidget {
 
 class _ReceivedBgCollectPassportScreenState
     extends State<ReceivedBgCollectPassportScreen> {
-  bool _isCardView = false;
+  bool _isCardView = true;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;

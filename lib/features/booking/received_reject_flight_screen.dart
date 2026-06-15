@@ -18,7 +18,7 @@ class ReceivedRejectFlightScreen extends StatefulWidget {
 
 class _ReceivedRejectFlightScreenState
     extends State<ReceivedRejectFlightScreen> {
-  bool _isCardView = false;
+  bool _isCardView = true;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;
