@@ -317,8 +317,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     setState(() => _isLoadingUser = true);
     try {
       final data = await _staffAccountsService.getStaffDetails(widget.userId!);
-      _fullNameController.text = (data['fullName'] ?? '').toString();
-      _contactNoController.text = (data['contactNo'] ?? '').toString();
+      _fullNameController.text = (data['fullName'] ?? data['full_name'] ?? '')
+          .toString();
+      _contactNoController.text =
+          (data['contactNo'] ?? data['contact_number'] ?? data['phone'] ?? '')
+              .toString();
       _designationController.text = (data['designation'] ?? '').toString();
       _usernameController.text = (data['username'] ?? '').toString();
       _emailController.text = (data['email'] ?? '').toString();
