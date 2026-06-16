@@ -82,9 +82,13 @@ class StaffAccountsService {
     String? password,
     String? confirmPassword,
   }) async {
+    final trimmedContactNo = contactNo.trim();
     final payload = <String, dynamic>{
       'fullName': fullName,
-      'contactNo': contactNo,
+      'full_name': fullName,
+      'contactNo': trimmedContactNo,
+      'contact_number': trimmedContactNo,
+      'phone': trimmedContactNo,
       'gender': gender,
       'designation': designation,
       'permissions': permissions,
@@ -150,9 +154,13 @@ class StaffAccountsService {
     String? username,
     String? password,
   }) async {
+    final trimmedContactNo = contactNo.trim();
     final payload = <String, dynamic>{
       'fullName': fullName,
-      'contactNo': contactNo,
+      'full_name': fullName,
+      'contactNo': trimmedContactNo,
+      'contact_number': trimmedContactNo,
+      'phone': trimmedContactNo,
       'gender': gender,
       'designation': designation,
       'permissions': permissions,
