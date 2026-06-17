@@ -157,6 +157,8 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
         elevation: 1,
         shadowColor: Colors.black12,
         leading: IconButton(
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
           icon: const Icon(Icons.arrow_back, color: _brandBlue),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
@@ -217,6 +219,8 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             ),
           ),
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
             onPressed: () => _showMessage(
               context,
               _tr('Share option coming soon', 'শেয়ার অপশন শীঘ্রই আসছে'),
@@ -635,13 +639,13 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
       ),
       if (displayDetails.startDate != null)
         _SpecItem(
-          _tr('Start Date', 'শুরুর তারিখ'),
+          _tr('Application Starting Date', 'আবেদন শুরুর তারিখ'),
           _formatDate(displayDetails.startDate),
           FontAwesomeIcons.calendarPlus,
         ),
       if (displayDetails.endDate != null)
         _SpecItem(
-          _tr('End Date', 'শেষের তারিখ'),
+          _tr('Application End Date', 'আবেদন শেষের তারিখ'),
           _formatDate(displayDetails.endDate),
           FontAwesomeIcons.calendarMinus,
         ),
@@ -865,7 +869,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           title: Text(
             _tr(
               'Safety guidelines: Things you should never do before going abroad.',
-              'সতর্কতামূলক নিদর্শন: বিদেশ যাওয়ার আগে যা কখনো করবেন না।',
+              'সতর্কতামূলক নির্দেশনা: বিদেশ যাওয়ার আগে যা কখনো করবেন না।',
             ),
             style: TextStyle(
               color: const Color(0xFF93000A),
@@ -966,12 +970,23 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             maxLines: 1,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 16,
-              height: 1.05,
+              fontSize: 40,
+              height: 1.0,
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 14),
+          if (agentSpending != null) ...[
+            const SizedBox(height: 14),
+            _privatePriceRow(
+              title: _tr('Agent Spending', 'এজেন্ট খরচ'),
+              value: 'BDT ${_formatMoney(agentSpending)}',
+              valueFontSize: 36,
+              valueOnSecondLine: true,
+            ),
+            const SizedBox(height: 14),
+            Container(height: 1, color: Colors.white24),
+            const SizedBox(height: 14),
+          ],
           // Timeline-style payment breakdown
           if (displayDetails.paymentSteps.isNotEmpty) ...[
             Text(
@@ -1002,52 +1017,45 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
             Container(height: 1, color: Colors.white24),
             const SizedBox(height: 12),
           ],
-          // Agent spending (shown after breakdown)
-          if (agentSpending != null) ...[
-            _privatePriceRow(
-              title: _tr('Agent Spending', 'এজেন্ট খরচ'),
-              value: 'BDT ${_formatMoney(agentSpending)}',
-            ),
-            const SizedBox(height: 12),
-            Container(height: 1, color: Colors.white24),
-            const SizedBox(height: 12),
-          ],
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white12,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                const FaIcon(
-                  FontAwesomeIcons.moneyBillWave,
-                  size: 16,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _tr(
-                      'Standard Overseas Benefits Apply',
-                      'স্ট্যান্ডার্ড বিদেশি সুবিধা প্রযোজ্য',
-                    ),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _privatePriceRow({required String title, required String value}) {
+  Widget _privatePriceRow({
+    required String title,
+    required String value,
+    double valueFontSize = 14,
+    bool valueOnSecondLine = false,
+  }) {
+    if (valueOnSecondLine) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xCCFFFFFF),
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: valueFontSize,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      );
+    }
+
     return Row(
       children: [
         Expanded(
@@ -1064,13 +1072,13 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
         Flexible(
           child: Text(
             value,
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.right,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
+              fontSize: valueFontSize,
+              fontWeight: FontWeight.w900,
             ),
           ),
         ),
@@ -1102,6 +1110,16 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
   String _formatEnum(String value) {
     final trimmed = value.trim();
     if (trimmed.isEmpty) return _tr('N/A', 'প্রযোজ্য নয়');
+
+    final normalized = trimmed.toLowerCase();
+    if (normalized == 'self') {
+      return _tr('Self', 'নিজ');
+    }
+    if (normalized == 'company' ||
+        normalized == 'provided by company' ||
+        normalized == 'company provided') {
+      return _tr('Provided by company', 'কোম্পানি বহন করবে');
+    }
 
     return trimmed
         .split(RegExp(r'[_\s-]+'))
@@ -1479,57 +1497,31 @@ class _SpecRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compact = constraints.maxWidth < 360;
-
-        return Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: compact ? 12 : 16,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: _outline)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Text(
+              item.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: _mutedText,
+                fontSize: 14,
+                height: 1.35,
+              ),
+            ),
           ),
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: _outline)),
-          ),
-          child: compact
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.label,
-                      style: const TextStyle(
-                        color: _mutedText,
-                        fontSize: 13,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    _SpecValue(item: item, alignRight: false),
-                  ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: Text(
-                        item.label,
-                        style: const TextStyle(
-                          color: _mutedText,
-                          fontSize: 14,
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 6,
-                      child: _SpecValue(item: item, alignRight: true),
-                    ),
-                  ],
-                ),
-        );
-      },
+          const SizedBox(width: 12),
+          Expanded(flex: 6, child: _SpecValue(item: item, alignRight: true)),
+        ],
+      ),
     );
   }
 }
@@ -1558,6 +1550,8 @@ class _SpecValue extends StatelessWidget {
         Flexible(
           child: Text(
             item.value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             textAlign: alignRight ? TextAlign.right : TextAlign.left,
             style: const TextStyle(
               color: _text,
@@ -1661,7 +1655,8 @@ class _PriceTimelineStep extends StatelessWidget {
                 Text(
                   title.toUpperCase(),
                   style: TextStyle(
-                    color: (title.toLowerCase().contains('advance') ||
+                    color:
+                        (title.toLowerCase().contains('advance') ||
                             title.toLowerCase().contains('after visa') ||
                             title.toLowerCase().contains('before flight'))
                         ? Colors.white

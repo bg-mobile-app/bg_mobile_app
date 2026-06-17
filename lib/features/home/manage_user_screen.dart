@@ -407,8 +407,10 @@ class _UserTableCard extends StatelessWidget {
                         size: 20,
                         color: Color(0xFF434655),
                       ),
+                      // Use numeric `id` for edit route which the detail endpoint
+                      // commonly expects. The list provides both `id` and `userId`.
                       onPressed: () => context.go(
-                        '/dashboard/user/create-user/${member.userId}',
+                        '/dashboard/user/create-user/${member.id}',
                       ),
                       tooltip: 'Edit User',
                     ),
@@ -658,8 +660,8 @@ class _CardGrid extends StatelessWidget {
                       ],
                       if (hasPermission)
                         OutlinedButton.icon(
-                          onPressed: () => context.go(
-                            '/dashboard/user/create-user/${m.userId}',
+                            onPressed: () => context.go(
+                            '/dashboard/user/create-user/${m.id}',
                           ),
                           icon: const Icon(Icons.edit_outlined, size: 14),
                           label: const Text(

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../../../common/services/api_client.dart';
 
 class TypesHandler<T> {
@@ -137,10 +138,44 @@ class StaffAccountsService {
   }
 
   Future<Map<String, dynamic>> getStaffDetails(String userId) async {
-    final response = await _apiClient.get('/profile/user/$userId/');
-    final data = response.data;
-    if (data is Map<String, dynamic>) return data;
-    throw Exception('Invalid staff details response');
+    // Try the most likely endpoints and log responses to help debugging.
+    final triedEndpoints = <String>[];
+
+    // Preferred: agency-staff detail endpoint (numeric id)
+    final primary = '/profile/agency-staff/$userId/';
+    triedEndpoints.add(primary);
+    try {
+      final resp = await _apiClient.get(
+        primary,
+        useCache: false,
+        forceRefresh: true,
+      );
+      debugPrint('[StaffAccountsService] GET $primary -> ${resp.statusCode}');
+      final data = resp.data;
+      if (data is Map<String, dynamic>) return data;
+    } catch (e) {
+      debugPrint('[StaffAccountsService] GET $primary failed: $e');
+    }
+
+    // Fallback: user-detail endpoint (may accept UUID)
+    final fallback = '/profile/user/$userId/';
+    triedEndpoints.add(fallback);
+    try {
+      final resp = await _apiClient.get(
+        fallback,
+        useCache: false,
+        forceRefresh: true,
+      );
+      debugPrint('[StaffAccountsService] GET $fallback -> ${resp.statusCode}');
+      final data = resp.data;
+      if (data is Map<String, dynamic>) return data;
+    } catch (e) {
+      debugPrint('[StaffAccountsService] GET $fallback failed: $e');
+    }
+
+    // If both fail, throw a helpful ApiException-like message
+    final tried = triedEndpoints.join(', ');
+    throw Exception('Failed to load staff details. Tried endpoints: $tried');
   }
 
   Future<void> updateRecruitingAgencyStaff({
@@ -169,7 +204,11 @@ class StaffAccountsService {
       if (password != null && password.isNotEmpty) 'password': password,
     };
 
-    await _apiClient.patch('/profile/user/$userId/', data: payload);
+    // Use the agency-staff update endpoint to match web behaviour.
+    await _apiClient.put(
+      '/profile/agency-staff/$userId/update/',
+      data: payload,
+    );
   }
 
   Future<void> updateStaffVerifiedStatus({

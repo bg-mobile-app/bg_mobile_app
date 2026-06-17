@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
@@ -315,7 +316,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             ? 'Staff account updated successfully.'
             : 'Staff account created successfully.',
       );
-      if (mounted) Navigator.of(context).maybePop();
+      if (mounted) {
+        // Navigate to Manage User screen after successful create/update
+        context.go('/dashboard/user/manage-user');
+      }
     } catch (e, st) {
       final errorMessage = e.toString();
       final errorType = e.runtimeType.toString();
@@ -411,12 +415,28 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   }
 
   void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red.shade700 : Colors.green.shade700,
-      ),
-    );
+    if (isError) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green.shade700,
+        ),
+      );
+    }
   }
 
   Widget _formCard({

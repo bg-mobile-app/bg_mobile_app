@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:go_router/go_router.dart';
+import '../../routes/app_router.dart';
+import '../../routes/app_routes.dart';
 
 import '../../common/theme/app_palette.dart';
 import '../../common/services/profile_service.dart';
@@ -747,21 +749,90 @@ class _DocumentPreview extends StatelessWidget {
       );
     }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.network(
-        imageUrl!,
-        width: 88,
-        height: 60,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Container(
+    return GestureDetector(
+      onTap: () {
+        showDialog<void>(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 24,
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Container(
+                      color: Colors.black,
+                      padding: const EdgeInsets.all(12),
+                      child: InteractiveViewer(
+                        panEnabled: true,
+                        minScale: 1.0,
+                        maxScale: 5.0,
+                        child: Image.network(
+                          imageUrl!,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) return child;
+                            return SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.6,
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.6,
+                                color: const Color(0xFF0F172A),
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  Icons.broken_image_outlined,
+                                  color: Colors.white70,
+                                  size: 48,
+                                ),
+                              ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Material(
+                      color: Colors.black54,
+                      shape: const CircleBorder(),
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          imageUrl!,
           width: 88,
           height: 60,
-          color: const Color(0xFFE2E8F0),
-          alignment: Alignment.center,
-          child: const Icon(
-            Icons.broken_image_outlined,
-            color: AppPalette.textMuted,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            width: 88,
+            height: 60,
+            color: const Color(0xFFE2E8F0),
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.broken_image_outlined,
+              color: AppPalette.textMuted,
+            ),
           ),
         ),
       ),
@@ -826,7 +897,12 @@ class _LogoutButton extends StatelessWidget {
 
           if (confirm == true) {
             await ApiClient().tokenStorage.clearCookies();
-            router.go('/login');
+            final rootCtx = rootNavigatorKey.currentContext;
+            if (rootCtx != null) {
+              GoRouter.of(rootCtx).go(AppRoutes.login);
+            } else {
+              router.go(AppRoutes.login);
+            }
           }
         },
         icon: const Icon(Icons.logout, color: AppPalette.danger),

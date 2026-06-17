@@ -771,7 +771,7 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
-          height: 120,
+          height: 148,
           decoration: BoxDecoration(
             color: hasFile ? const Color(0xFFECFDF5) : const Color(0xFFF9FAFB),
             borderRadius: BorderRadius.circular(14),
@@ -782,15 +782,20 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
               width: 1.5,
             ),
           ),
+          padding: const EdgeInsets.all(12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                hasFile ? Icons.check_circle : Icons.upload_file,
-                color: hasFile ? const Color(0xFF10B981) : AppPalette.textMuted,
-                size: 30,
-              ),
-              const SizedBox(height: 8),
+              if (hasFile)
+                _buildDocumentPreviewThumbnail(
+                  localFile: localFile,
+                  existingUrl: existingUrl,
+                  height: 80,
+                  width: 80,
+                )
+              else
+                Icon(Icons.upload_file, color: AppPalette.textMuted, size: 30),
+              const SizedBox(height: 10),
               Text(
                 label,
                 style: TextStyle(
@@ -801,7 +806,7 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                       : AppPalette.textPrimary,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
@@ -915,7 +920,7 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
-          height: 95,
+          height: 115,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -939,6 +944,13 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
                   const Icon(Icons.edit, color: AppPalette.textMuted, size: 13),
                 ],
               ),
+              if (hasFile)
+                _buildDocumentPreviewThumbnail(
+                  localFile: localFile,
+                  existingUrl: existingUrl,
+                  width: double.infinity,
+                  height: 52,
+                ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1004,6 +1016,16 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
           children: [
             Icon(icon, color: AppPalette.brandBlue, size: 20),
             const SizedBox(width: 12),
+            if (hasFile)
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: _buildDocumentPreviewThumbnail(
+                  localFile: localFile,
+                  existingUrl: existingUrl,
+                  width: 52,
+                  height: 52,
+                ),
+              ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1034,6 +1056,57 @@ class _CustomerProfileEditScreenState extends State<CustomerProfileEditScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildDocumentPreviewThumbnail({
+    required XFile? localFile,
+    required String? existingUrl,
+    required double width,
+    required double height,
+  }) {
+    if (localFile != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.file(
+          File(localFile.path),
+          width: width,
+          height: height,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            width: width,
+            height: height,
+            color: const Color(0xFFE2E8F0),
+            child: const Icon(
+              Icons.broken_image_outlined,
+              color: AppPalette.textMuted,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (existingUrl != null && existingUrl.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          existingUrl,
+          width: width,
+          height: height,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            width: width,
+            height: height,
+            color: const Color(0xFFE2E8F0),
+            child: const Icon(
+              Icons.broken_image_outlined,
+              color: AppPalette.textMuted,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(width: width, height: height);
   }
 
   Widget _buildSaveButton() {

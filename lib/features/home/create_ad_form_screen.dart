@@ -60,10 +60,10 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   String _paymentSystem = 'AFTER_VISA_BEFORE_FLIGHT';
 
   static const List<String> _selectionTypes = [
-    'Direct',
-    'Delegate',
+    'Delegate Interview',
+    'Pushing',
+    'CV Selection',
     'Zoom Interview',
-    'Lottery',
   ];
 
   bool get _isEditMode => widget.adId != null;
@@ -460,7 +460,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   }
 
   bool get _requiresInterviewDates {
-    return _selectionType == 'Delegate' || _selectionType == 'Zoom Interview';
+    return _selectionType == 'Delegate Interview' ||
+        _selectionType == 'Zoom Interview';
   }
 
   String? _formatDate(DateTime? date) {
@@ -481,9 +482,11 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     switch (value.trim().toUpperCase()) {
       case 'PUSHING':
       case 'DIRECT':
-        return 'Direct';
+        return 'Pushing';
       case 'DELEGATE':
-        return 'Delegate';
+        return 'Delegate Interview';
+      case 'CV_SELECTION':
+        return 'CV Selection';
       case 'ZOOM_INTERVIEW':
         return 'Zoom Interview';
       case 'LOTTERY':
@@ -492,12 +495,28 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     return value;
   }
 
+  String _selectionTypeLabel(String value) {
+    switch (value) {
+      case 'Delegate Interview':
+        return _tr('Delegate Interview', 'ডেলিগেট ইন্টারভিউ');
+      case 'Pushing':
+        return _tr('Pushing', 'পুশিং');
+      case 'CV Selection':
+        return _tr('CV Selection', 'সিভি সিলেকশন');
+      case 'Zoom Interview':
+        return _tr('Zoom Interview', 'জুম ইন্টারভিউ');
+    }
+    return value;
+  }
+
   String _apiSelectionTypeValue(String value) {
     switch (value) {
-      case 'Direct':
+      case 'Pushing':
         return 'PUSHING';
-      case 'Delegate':
+      case 'Delegate Interview':
         return 'DELEGATE';
+      case 'CV Selection':
+        return 'CV_SELECTION';
       case 'Zoom Interview':
         return 'ZOOM_INTERVIEW';
       case 'Lottery':
@@ -996,8 +1015,11 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
           ),
           const SizedBox(height: 32),
           _buildField(
-            label: _tr('Job Title', 'পদের নাম'),
-            hint: _tr('e.g. Electrician', 'উদাঃ ইলেকট্রিশিয়ান'),
+            label: _tr('Job Title', 'চাকরির শিরোনাম'),
+            hint: _tr(
+              'Restaurant Job in Iceland',
+              'আইসল্যান্ডে রেস্টুরেন্ট জব',
+            ),
             controller: _jobTitleController,
           ),
           const SizedBox(height: 24),
@@ -1083,7 +1105,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             value: _selectionType,
             hint: _tr('Select Selection Type', 'নির্বাচন পদ্ধতি নির্বাচন করুন'),
             items: _selectionTypes,
-            itemLabel: (item) => item,
+            itemLabel: _selectionTypeLabel,
             onChanged: (value) {
               setState(() {
                 _selectionType = value;

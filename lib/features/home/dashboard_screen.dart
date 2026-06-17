@@ -9,6 +9,7 @@ import '../../common/services/api_client.dart';
 import '../../common/services/auth_service.dart';
 import '../../common/services/profile_service.dart';
 import '../../routes/app_routes.dart';
+import '../../routes/app_router.dart';
 import 'models/agency_profile.dart';
 import 'models/dashboard_models.dart';
 import 'services/dashboard_service.dart';
@@ -1114,7 +1115,6 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
                   ),
                 ),
                 onTap: () async {
-                  final router = GoRouter.of(context);
                   Navigator.pop(context);
                   try {
                     await _authService.getSingOut();
@@ -1123,7 +1123,13 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
                   }
                   await ApiClient().tokenStorage.clearCookies();
                   if (!mounted) return;
-                  router.go(AppRoutes.login);
+                  // Use the root navigator to ensure we navigate the app-level router.
+                  final rootContext = rootNavigatorKey.currentContext;
+                  if (rootContext != null) {
+                    GoRouter.of(rootContext).go(AppRoutes.login);
+                  } else {
+                    GoRouter.of(context).go(AppRoutes.login);
+                  }
                 },
               ),
             ],
