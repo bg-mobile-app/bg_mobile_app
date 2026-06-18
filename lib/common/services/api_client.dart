@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:go_router/go_router.dart';
+import '../../routes/app_router.dart';
 import 'api_exception.dart';
 
 // Abstract class for cookie storage, to be implemented with your preferred storage
@@ -75,8 +77,11 @@ class ApiClient {
   static final ApiClient _instance = ApiClient._internal();
   late Dio _dio;
   late TokenStorage tokenStorage;
-  final String baseUrl =
-      'https://demoapi.bideshgami.com/api/r'; // Replace with your base URL
+  final String baseUrl = const String.fromEnvironment(
+    'NEXT_PUBLIC_API_URL',
+    defaultValue: 'https://demoapi.bideshgami.com/api/r',
+  );
+  late final Uri baseUri = Uri.parse(baseUrl);
   final Map<String, _ResponseCacheEntry> _responseCache = {};
   final Duration defaultCacheDuration = const Duration(minutes: 2);
 
@@ -95,8 +100,8 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Origin': 'https://demoapi.bideshgami.com',
-        'Referer': 'https://demoapi.bideshgami.com/',
+        'Origin': baseUri.origin,
+        'Referer': '${baseUri.origin}/',
         'User-Agent':
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       },
@@ -181,7 +186,10 @@ class ApiClient {
             } else {
               debugPrint("Token refresh failed. User needs to login again.");
               await tokenStorage.clearCookies();
-              // Here you might want to dispatch an event or use a global key to navigate to login screen
+              final rootCtx = rootNavigatorKey.currentContext;
+              if (rootCtx != null) {
+                GoRouter.of(rootCtx).go('/login');
+              }
             }
           }
           return handler.next(e);

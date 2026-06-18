@@ -39,6 +39,73 @@ class AgencyAccess {
     return permissionsFrom(authPayload).contains(normalizedPermission);
   }
 
+  static bool isRouteAllowed(String route, Object? authPayload) {
+    // If not staff, allow everything
+    if (!isAgencyStaffAccount(authPayload)) {
+      return true;
+    }
+
+    // General routes allowed for everyone
+    if (route == '/profile' ||
+        route == '/dashboard/customer/profile' ||
+        route == '/dashboard/customer/profile/edit' ||
+        route == '/dashboard/customer/change-password' ||
+        route == '/dashboard/notifications' ||
+        route == '/dashboard/terms-and-conditions' ||
+        route == '/logout') {
+      return true;
+    }
+
+    // Dashboard overview itself - staff doesn't see general Dashboard overview
+    if (route == '/dashboard/agency' || route == '/dashboard/agent' || route == '/dashboard/customer') {
+      return false;
+    }
+
+    final permissions = permissionsFrom(authPayload);
+
+    if (route.startsWith('/dashboard/ads/create') || route.startsWith('/dashboard/ads/edit/')) {
+      return permissions.contains('ADS_CREATE');
+    }
+    if (route == '/dashboard/ads/my') {
+      return permissions.contains('ADS_LIST');
+    }
+    if (route.startsWith('/dashboard/receive-booking/')) {
+      return permissions.contains('BOOKING_LIST');
+    }
+    if (route.startsWith('/dashboard/passport-return/')) {
+      return permissions.contains('RETURN_LIST');
+    }
+    if (route.startsWith('/dashboard/booking/my')) {
+      return permissions.contains('OUR_BOOKING');
+    }
+    if (route == '/dashboard/booking/appointment') {
+      return permissions.contains('APPOINTMENT_LIST');
+    }
+    if (route.startsWith('/dashboard/user/')) {
+      return permissions.contains('USER');
+    }
+    if (route.startsWith('/dashboard/reminder/')) {
+      return permissions.contains('REMINDER_LIST');
+    }
+    if (route == '/dashboard/customer/check-status') {
+      return permissions.contains('CHECK_STATUS');
+    }
+    if (route == '/dashboard/commission') {
+      return permissions.contains('COMMISSION');
+    }
+    if (route == '/dashboard/my-payments') {
+      return permissions.contains('PAYMENT_LIST');
+    }
+    if (route.startsWith('/dashboard/receive-payment/')) {
+      return permissions.contains('RECEIVE_PAYMENT_LIST');
+    }
+    if (route.startsWith('/dashboard/refund-payment/')) {
+      return permissions.contains('REFUND_PAYMENT');
+    }
+
+    return false;
+  }
+
   static Set<String> permissionsFrom(Object? authPayload) {
     if (authPayload is! Map) return const {};
 

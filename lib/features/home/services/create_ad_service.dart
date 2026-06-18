@@ -139,8 +139,8 @@ class CreateAdService {
     }
   }
 
-  Future<WorkPermitDetails> getAdDetails(int adId) async {
-    final response = await _apiClient.get('/work-permits/$adId/');
+  Future<WorkPermitDetails> getAdDetails(String adSlug) async {
+    final response = await _apiClient.get('/work-permits/$adSlug/');
     return WorkPermitDetails.fromJson(response.data as Map<String, dynamic>);
   }
 
@@ -222,7 +222,7 @@ class CreateAdService {
   }
 
   Future<void> updateAd({
-    required int adId,
+    required String adSlug,
     required String country,
     required int workTypeId,
     required String title,
@@ -280,8 +280,8 @@ class CreateAdService {
 
     try {
       final requestData = await _buildMultipartPayload(payload, imagePath);
-      final response = await _apiClient.patch(
-        '/work-permits/$adId/',
+      final response = await _apiClient.put(
+        '/work-permits/$adSlug/',
         data: requestData,
         options: Options(contentType: 'multipart/form-data'),
       );

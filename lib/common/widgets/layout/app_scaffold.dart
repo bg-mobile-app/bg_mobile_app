@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 
 import '../../../common/services/auth_service.dart';
+import '../../../common/services/agency_access.dart';
 import '../../../features/booking/appointment_booking_screen.dart';
 import '../../../features/booking/received_all_booking_screen.dart';
 import '../../../features/booking/my_booking_screen.dart';
@@ -35,6 +36,7 @@ import '../../../features/home/user_activity_screen.dart';
 import '../../../features/reminder/medical_expiry_screen.dart';
 import '../../../features/search/work_permit_list_screen.dart';
 import '../../../common/services/api_client.dart';
+import '../../../routes/app_router.dart';
 import 'app_bottom_nav.dart';
 import '../../../common/theme/app_palette.dart';
 
@@ -49,7 +51,11 @@ class AppScaffold extends StatelessWidget {
     final screens = [
       const HomeScreen(),
       const WorkPermitListScreen(),
-      const _DashboardHostScreen(route: '/dashboard/ads/create'),
+      _DashboardHostScreen(
+        route: tabIndex == 2
+            ? (dashboardPath ?? '/dashboard/ads/create')
+            : '/dashboard/ads/create',
+      ),
       const ChatListScreen(),
       tabIndex == 4
           ? _DashboardHostScreen(route: dashboardPath ?? '/profile')
@@ -91,25 +97,37 @@ class _DashboardHostScreen extends StatefulWidget {
 
 class _DashboardHostScreenState extends State<_DashboardHostScreen> {
   bool? _isLoggedIn;
+  Map<String, dynamic>? _userData;
+  bool _isLoadingUser = true;
 
   @override
   void initState() {
     super.initState();
-    _checkLogin();
+    _checkLoginAndPermissions();
   }
 
-  Future<void> _checkLogin() async {
+  Future<void> _checkLoginAndPermissions() async {
     final cookies = await ApiClient().tokenStorage.getCookies();
+    final isLoggedIn = cookies != null && cookies.isNotEmpty;
+    if (isLoggedIn) {
+      try {
+        await AuthService().getCurrentUser();
+        _userData = AuthService.currentUserData;
+      } catch (e) {
+        debugPrint('Error fetching current user in scaffold: $e');
+      }
+    }
     if (mounted) {
       setState(() {
-        _isLoggedIn = cookies != null && cookies.isNotEmpty;
+        _isLoggedIn = isLoggedIn;
+        _isLoadingUser = false;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoggedIn == null) {
+    if (_isLoggedIn == null || _isLoadingUser) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
@@ -118,6 +136,81 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) {
           context.go('/login');
+        }
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_isLoggedIn! && !AgencyAccess.isRouteAllowed(widget.route, _userData)) {
+      if (widget.route.startsWith('/dashboard/ads/create') || widget.route.startsWith('/dashboard/ads/edit/')) {
+        return const _PremiumPermissionDeniedScreen(
+          message: 'You are not permitted to create ad.\nFor permission, talk to your admin.',
+        );
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          context.go('/profile');
+          showDialog(
+            context: rootNavigatorKey.currentContext ?? context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              backgroundColor: Colors.white,
+              title: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.gpp_maybe_outlined,
+                    color: Colors.amber,
+                    size: 50,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Access Restricted',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                ],
+              ),
+              content: const Text(
+                'You are not permitted to access this screen. For permission, please talk to your admin.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF64748B),
+                  height: 1.5,
+                ),
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppPalette.brandBlue,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text(
+                      'Understand',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
         }
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -298,20 +391,20 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
             segments[0] == 'dashboard' &&
             segments[1] == 'ads' &&
             segments[2] == 'edit') {
-          final adId = int.tryParse(segments[3]);
-          if (adId != null) {
-            return CreateAdFormScreen(isBangla: false, adId: adId);
+          final adSlug = segments[3];
+          if (adSlug.isNotEmpty) {
+            return CreateAdFormScreen(isBangla: false, adSlug: adSlug);
           }
         }
         if (segments.length == 5 &&
             segments[0] == 'dashboard' &&
             segments[1] == 'ads' &&
             segments[2] == 'edit') {
-          final adId = int.tryParse(segments[4]);
-          if (adId != null) {
+          final adSlug = segments[4];
+          if (adSlug.isNotEmpty) {
             return CreateAdFormScreen(
               isBangla: segments[3].toLowerCase() == 'bn',
-              adId: adId,
+              adSlug: adSlug,
             );
           }
         }
@@ -338,7 +431,8 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
   Widget _buildLogoutScreen(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final authService = AuthService();
-      await authService.getSingOut();
+      // Instantly clear cookies
+      await ApiClient().tokenStorage.clearCookies();
       // Reset system navigation color to default for unauthenticated state
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
@@ -350,7 +444,107 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
       if (context.mounted) {
         context.go('/login');
       }
+      // Fire-and-forget backend logout request in background
+      authService.getSingOut().catchError((_) {});
     });
     return const Scaffold(body: Center(child: CircularProgressIndicator()));
+  }
+}
+
+class _PremiumPermissionDeniedScreen extends StatelessWidget {
+  const _PremiumPermissionDeniedScreen({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Premium Gradient Icon Box
+                Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFEFF6FF), Color(0xFFDBEAFE)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.lock_person_outlined,
+                    color: Color(0xFF2563EB),
+                    size: 44,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                // Premium Headline
+                const Text(
+                  'Access Restricted',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F172A),
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Message Body
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF475569),
+                    height: 1.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 36),
+                // Premium Styled Action Button
+                SizedBox(
+                  width: 200,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () => context.go('/profile'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Go to Profile',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

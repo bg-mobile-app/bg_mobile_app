@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'api_client.dart';
 import 'package:dio/dio.dart';
 
 class AuthService {
   final ApiClient _apiClient = ApiClient();
+
+  static Map<String, dynamic>? _currentUserData;
+  static Map<String, dynamic>? get currentUserData => _currentUserData;
 
   Future<Response> registerAgent(FormData formData) async {
     return _apiClient.post(
@@ -46,12 +50,21 @@ class AuthService {
         forceRefresh: true,
       );
     } finally {
+      _currentUserData = null;
       await _apiClient.tokenStorage.clearCookies();
       _apiClient.clearResponseCache();
     }
   }
 
   Future<Response> getCurrentUser() async {
-    return _apiClient.get('/auth/me/');
+    final response = await _apiClient.get('/auth/me/');
+    if (response.statusCode == 200 && response.data != null) {
+      final raw = response.data;
+      final data = raw is String ? jsonDecode(raw) : raw;
+      if (data is Map<String, dynamic>) {
+        _currentUserData = data;
+      }
+    }
+    return response;
   }
 }

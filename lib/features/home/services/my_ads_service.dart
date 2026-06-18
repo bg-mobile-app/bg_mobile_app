@@ -70,6 +70,7 @@ class MyAdItem {
     required this.image,
     required this.country,
     required this.isBn,
+    required this.slug,
   });
 
   final int id;
@@ -78,6 +79,7 @@ class MyAdItem {
   final String image;
   final String country;
   final bool isBn;
+  final String slug;
 
   factory MyAdItem.fromJson(Map<String, dynamic> json) {
     final countryJson = json['country'];
@@ -94,6 +96,7 @@ class MyAdItem {
       image: json['image']?.toString() ?? '',
       country: country,
       isBn: _parseBool(json['isBn'] ?? json['is_bn']),
+      slug: json['slug']?.toString() ?? '',
     );
   }
 }
