@@ -8,6 +8,8 @@ import '../../routes/app_routes.dart';
 import '../../common/theme/app_palette.dart';
 import '../../common/services/profile_service.dart';
 import '../../common/services/api_client.dart';
+import '../../common/services/auth_service.dart';
+import '../../common/services/agency_access.dart';
 import 'models/agency_profile.dart';
 import 'dashboard_screen.dart';
 
@@ -21,6 +23,8 @@ class CustomerProfileScreen extends StatefulWidget {
 class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   final ProfileService _profileService = ProfileService();
   RecruitingAgencyMeDetailsProps? _agentProfileData;
+  Map<String, dynamic>? _staffProfileData;
+  bool _isStaff = false;
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -36,23 +40,75 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       _errorMessage = null;
     });
     try {
-      final data = await _profileService.getAgencyProfile();
-      if (!mounted) return;
-      if (data != null) {
-        setState(() {
-          _agentProfileData = data;
-          _isLoading = false;
-        });
+      await AuthService().getCurrentUser();
+      final userData = AuthService.currentUserData;
+      final isStaff = AgencyAccess.isAgencyStaffAccount(userData);
+
+      if (isStaff) {
+        final staffListResponse = await _profileService.getAgencyStaffProfile();
+        if (!mounted) return;
+        if (staffListResponse != null && staffListResponse['results'] is List) {
+          final results = staffListResponse['results'] as List;
+          
+          final myEmail = userData?['email']?.toString() ?? userData?['user']?['email']?.toString();
+          final myId = userData?['id']?.toString() ?? userData?['userId']?.toString() ?? userData?['user']?['id']?.toString() ?? userData?['user']?['userId']?.toString();
+          final myUserCode = userData?['userCode']?.toString() ?? userData?['user_code']?.toString() ?? userData?['user']?['userCode']?.toString();
+          
+          Map<String, dynamic>? myRecord;
+          for (var item in results) {
+            if (item is Map<String, dynamic>) {
+              final itemUserId = item['userId']?.toString() ?? item['user_id']?.toString();
+              final itemEmail = item['email']?.toString();
+              final itemUserCode = item['userCode']?.toString() ?? item['user_code']?.toString();
+              
+              if ((myId != null && itemUserId == myId) ||
+                  (myEmail != null && itemEmail?.toLowerCase() == myEmail.toLowerCase()) ||
+                  (myUserCode != null && itemUserCode == myUserCode)) {
+                myRecord = item;
+                break;
+              }
+            }
+          }
+          
+          if (myRecord != null) {
+            setState(() {
+              _isStaff = true;
+              _staffProfileData = myRecord;
+              _isLoading = false;
+            });
+          } else {
+            setState(() {
+              _errorMessage = "Could not find matching staff record for logged-in user.";
+              _isLoading = false;
+            });
+          }
+        } else {
+          setState(() {
+            _errorMessage = "Failed to load staff profile data.";
+            _isLoading = false;
+          });
+        }
       } else {
-        setState(() {
-          _errorMessage = "Failed to load profile data.";
-          _isLoading = false;
-        });
+        final data = await _profileService.getAgencyProfile();
+        if (!mounted) return;
+        if (data != null) {
+          setState(() {
+            _isStaff = false;
+            _agentProfileData = data;
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _errorMessage = "Failed to load profile data.";
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
+      debugPrint('EXCEPTION IN _fetchProfile: $e');
       if (!mounted) return;
       setState(() {
-        _errorMessage = "An error occurred while fetching profile.";
+        _errorMessage = "An error occurred while fetching profile: $e";
         _isLoading = false;
       });
     }
@@ -60,6 +116,77 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isStaff) {
+      final staff = _staffProfileData ?? {
+        'fullName': 'Loading Staff Name',
+        'designation': 'Staff',
+        'email': 'loading@example.com',
+        'phone': 'N/A',
+        'userCode': 'AGS-00000',
+        'userId': 'usr_00000',
+        'userRole': 'agency_staff',
+        'isActive': true,
+        'permissions': const <String>[],
+      };
+
+      return DashboardPageScaffold(
+        currentHref: '/dashboard/customer/profile',
+        child: Container(
+          color: AppPalette.pageBackground,
+          child: SafeArea(
+            child: _errorMessage != null && !_isLoading
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _errorMessage!,
+                          style: const TextStyle(color: Colors.red, fontSize: 16),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: _fetchProfile,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _fetchProfile,
+                    child: Skeletonizer(
+                      enabled: _isLoading,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const _Breadcrumb(),
+                            const SizedBox(height: 8),
+                            const _PageHeading(),
+                            const SizedBox(height: 16),
+                            _StaffProfileHeaderCard(staffData: staff),
+                            const SizedBox(height: 18),
+                            const _SectionTitle(
+                              title: 'Staff Profile Details',
+                              subtitle: 'Personal and system access details',
+                            ),
+                            const SizedBox(height: 12),
+                            _StaffInfoCard(staffData: staff),
+                            const SizedBox(height: 12),
+                            _StaffPermissionsCard(staffData: staff),
+                            const SizedBox(height: 24),
+                            const _LogoutButton(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ),
+      );
+    }
+
     final placeholderAgencyProfile = RecruitingAgencyMeDetailsProps(
       id: '0',
       owner: AgentUser(
@@ -973,5 +1100,172 @@ String _formatDob(String? rawDob) {
     return '$day ${months[parsed.month - 1]} ${parsed.year}';
   } catch (_) {
     return rawDob;
+  }
+}
+
+class _StaffProfileHeaderCard extends StatelessWidget {
+  final Map<String, dynamic> staffData;
+
+  const _StaffProfileHeaderCard({required this.staffData});
+
+  @override
+  Widget build(BuildContext context) {
+    final String fullName = staffData['fullName'] ?? staffData['full_name'] ?? 'N/A';
+    final String designation = staffData['designation'] ?? 'Staff Member';
+    final bool isActive = staffData['isActive'] == true || staffData['is_active'] == true;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(),
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppPalette.borderSoftBlue,
+                width: 3,
+              ),
+            ),
+            child: const CircleAvatar(
+              radius: 50,
+              backgroundColor: Color(0xFFD7E3FF),
+              child: Icon(Icons.person, size: 50, color: Color(0xFF2563EB)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            fullName,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: AppPalette.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            designation,
+            style: const TextStyle(color: AppPalette.textMuted, fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _Pill(
+                label: isActive ? 'Active' : 'Inactive',
+                bg: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                fg: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+              ),
+              const _Pill(
+                label: 'Agency Staff',
+                bg: Color(0xFFEFF6FF),
+                fg: AppPalette.textStrongBlue,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StaffInfoCard extends StatelessWidget {
+  final Map<String, dynamic> staffData;
+
+  const _StaffInfoCard({required this.staffData});
+
+  @override
+  Widget build(BuildContext context) {
+    final String userCode = staffData['userCode'] ?? staffData['user_code'] ?? 'N/A';
+    final String userId = staffData['userId'] ?? staffData['user_id'] ?? 'N/A';
+    final String email = staffData['email'] ?? 'N/A';
+    final String phone = staffData['phone'] ?? 'N/A';
+    final String role = staffData['userRole'] ?? staffData['user_role'] ?? 'agency_staff';
+
+    return _InfoCard(
+      icon: Icons.badge_outlined,
+      title: 'Staff Member Details',
+      rows: [
+        _InfoRow(label: 'STAFF CODE', value: userCode),
+        _InfoRow(label: 'USER ID', value: userId),
+        _InfoRow(label: 'USER ROLE', value: role.replaceAll('_', ' ').toUpperCase()),
+        _InfoRow(label: 'EMAIL', value: email),
+        _InfoRow(label: 'PHONE', value: phone, isLast: true),
+      ],
+    );
+  }
+}
+
+class _StaffPermissionsCard extends StatelessWidget {
+  final Map<String, dynamic> staffData;
+
+  const _StaffPermissionsCard({required this.staffData});
+
+  @override
+  Widget build(BuildContext context) {
+    final permissionsRaw = staffData['permissions'];
+    final List<String> permissions = permissionsRaw is List
+        ? permissionsRaw.map((e) => e.toString()).toList()
+        : [];
+
+    final Map<String, String> permissionLabels = {
+      "ADS_CREATE": "Ads Create",
+      "ADS_LIST": "Ads List",
+      "BOOKING_LIST": "Booking List",
+      "RETURN_LIST": "Return List",
+      "OUR_BOOKING": "Our Booking",
+      "APPOINTMENT_LIST": "Appointment List",
+      "USER": "User",
+      "REMINDER_LIST": "Reminder List",
+      "CHECK_STATUS": "Check Status",
+      "COMMISSION": "Commission",
+      "PAYMENT_LIST": "Payment List",
+      "RECEIVE_PAYMENT_LIST": "Receive Payment List",
+      "REFUND_PAYMENT": "Refund Payment",
+    };
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _CardTitle(icon: Icons.lock_open_outlined, title: 'Assigned Permissions'),
+          const SizedBox(height: 14),
+          permissions.isEmpty
+              ? const Text(
+                  'No specific permissions assigned.',
+                  style: TextStyle(color: AppPalette.textMuted, fontSize: 14),
+                )
+              : Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: permissions.map((perm) {
+                    final label = permissionLabels[perm] ?? perm;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          color: Color(0xFF334155),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+        ],
+      ),
+    );
   }
 }

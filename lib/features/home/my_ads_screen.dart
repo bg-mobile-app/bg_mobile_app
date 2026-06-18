@@ -211,7 +211,7 @@ class _MyAdsScreenState extends State<MyAdsScreen> {
                             onEdit: () {
                               final lang = ad.isBn ? 'bn' : 'en';
                               context.push(
-                                '/dashboard/ads/edit/$lang/${ad.id}',
+                                '/dashboard/ads/edit/$lang/${ad.slug}',
                               );
                             },
                             onPromote: () =>

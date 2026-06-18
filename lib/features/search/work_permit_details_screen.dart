@@ -1006,7 +1006,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           if (agentSpending != null) ...[
             const SizedBox(height: 14),
             _privatePriceRow(
-              title: _tr('Agent Spending', 'এজেন্ট খরচ'),
+              title: _tr('Total Agent Cost', 'এজেন্ট খরচ'),
               value: 'BDT ${_formatMoney(agentSpending)}',
               valueFontSize: 36,
               valueOnSecondLine: true,
@@ -1018,7 +1018,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
           // Timeline-style payment breakdown
           if (displayDetails.paymentSteps.isNotEmpty) ...[
             Text(
-              _tr('Payment Breakdown', 'পেমেন্ট বিবরণ'),
+              _tr('Payment System', 'পেমেন্ট পদ্ধতি'),
               style: const TextStyle(
                 color: Color(0xCCFFFFFF),
                 fontSize: 14,

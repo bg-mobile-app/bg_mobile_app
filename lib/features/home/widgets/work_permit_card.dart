@@ -224,9 +224,18 @@ class WorkPermitCard extends StatelessWidget {
   }
 
   Widget _buildImage(String path, {BoxFit fit = BoxFit.cover}) {
-    if (path.startsWith('http')) {
+    final trimmedPath = path.trim();
+    if (trimmedPath.isEmpty || (!trimmedPath.startsWith('http') && !trimmedPath.startsWith('assets'))) {
+      return Container(
+        color: const Color(0xFFF1F5F9),
+        child: const Center(
+          child: Icon(Icons.image_not_supported, color: Color(0xFF94A3B8)),
+        ),
+      );
+    }
+    if (trimmedPath.startsWith('http')) {
       return Image.network(
-        path,
+        trimmedPath,
         fit: fit,
         errorBuilder: (context, error, stackTrace) => Container(
           color: const Color(0xFFF1F5F9),
@@ -236,7 +245,7 @@ class WorkPermitCard extends StatelessWidget {
         ),
       );
     }
-    return Image.asset(path, fit: fit);
+    return Image.asset(trimmedPath, fit: fit);
   }
 
   Widget _buildImageHeader(HomeResponsive responsive) {

@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../features/home/models/agency_profile.dart';
 import 'api_client.dart';
+import 'agency_access.dart';
+import 'auth_service.dart';
 
 class ProfileService {
   RecruitingAgencyMeDetailsProps? _cachedProfile;
@@ -12,6 +14,10 @@ class ProfileService {
   final ApiClient _apiClient = ApiClient();
 
   Future<RecruitingAgencyMeDetailsProps?> getAgencyProfile() async {
+    if (AgencyAccess.isAgencyStaffAccount(AuthService.currentUserData)) {
+      return null;
+    }
+
     final now = DateTime.now();
     if (_cachedProfile != null &&
         _cachedAt != null &&
@@ -82,5 +88,29 @@ class ProfileService {
     }
 
     return RecruitingAgencyMeDetailsProps.fromJson(data);
+  }
+
+  Future<Map<String, dynamic>?> getAgencyStaffProfile() async {
+    debugPrint('Calling getAgencyStaffProfile API at /profile/agency-staff/');
+    try {
+      final response = await _apiClient.get('/profile/agency-staff/');
+      debugPrint('getAgencyStaffProfile Response Status: ${response.statusCode}');
+      debugPrint('getAgencyStaffProfile Response Data: ${response.data}');
+      if (response.statusCode == 200 && response.data != null) {
+        final raw = response.data;
+        final data = raw is String ? jsonDecode(raw) : raw;
+        if (data is Map<String, dynamic>) {
+          return data;
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Exception in getAgencyStaffProfile: $e');
+      if (e is DioException) {
+        debugPrint('DioException Status: ${e.response?.statusCode}');
+        debugPrint('DioException Data: ${e.response?.data}');
+      }
+      rethrow;
+    }
   }
 }

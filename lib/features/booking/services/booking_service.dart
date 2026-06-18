@@ -387,6 +387,28 @@ class ReceiveBookingItemDto {
 
   factory ReceiveBookingItemDto.fromJson(Map<String, dynamic> json) {
     final status = _pickString(json, ['status'], fallback: 'UNKNOWN');
+    final Map<String, dynamic> returnFile = json['returnFile'] is Map
+        ? Map<String, dynamic>.from(json['returnFile'] as Map)
+        : <String, dynamic>{};
+
+    // try top-level values first, then fall back to values inside `returnFile`
+    final agencyTotalCostValue = _pickInt(json, [
+      'agencyTotalCost',
+      'agency_total_cost',
+      'packagePrice',
+      'package_price',
+      'customerTotal',
+      'customer_total',
+    ]) ?? _pickInt(returnFile, ['packagePrice', 'package_price', 'customerTotal', 'customer_total']);
+
+    final paidAmountValue = _pickInt(json, [
+      'clientPaidAmount',
+      'client_paid_amount',
+      'paidAmount',
+      'paid_amount',
+    ]) ??
+        _pickInt(returnFile, ['receivedAmount', 'received_amount']);
+
     return ReceiveBookingItemDto(
       id: _toInt(json['id']),
       workPermitId: _pickString(json, [
@@ -409,13 +431,8 @@ class ReceiveBookingItemDto {
       ], fallback: '-'),
       toCountry: _pickString(json, ['toCountry', 'to_country'], fallback: '-'),
       passportNo: _pickNullableString(json, ['passportNo', 'passport_no']),
-      agencyTotalCost: _pickInt(json, [
-        'agencyTotalCost',
-        'agency_total_cost',
-        'packagePrice',
-        'package_price',
-      ]),
-      paidAmount: _pickInt(json, ['paidAmount', 'paid_amount']),
+      agencyTotalCost: agencyTotalCostValue,
+      paidAmount: paidAmountValue,
       status: status,
       statusLabel: _pickString(json, [
         'statusLabel',

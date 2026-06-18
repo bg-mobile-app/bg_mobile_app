@@ -8,6 +8,7 @@ import '../../common/theme/app_text_styles.dart';
 import '../../common/services/api_client.dart';
 import '../../common/services/auth_service.dart';
 import '../../common/services/profile_service.dart';
+import '../../common/services/agency_access.dart';
 import '../../routes/app_routes.dart';
 import '../../routes/app_router.dart';
 import 'models/agency_profile.dart';
@@ -930,32 +931,138 @@ class DashboardPageScaffold extends StatefulWidget {
 class _DashboardPageScaffoldState extends State<DashboardPageScaffold> {
   final ProfileService _profileService = ProfileService();
   RecruitingAgencyMeDetailsProps? _profile;
+  Map<String, dynamic>? _userData;
 
   @override
   void initState() {
     super.initState();
-    _loadProfile();
+    _loadProfileAndUser();
   }
 
-  Future<void> _loadProfile() async {
-    final profile = await _profileService.getAgencyProfile();
-    if (mounted) {
-      setState(() => _profile = profile);
+  Future<void> _loadProfileAndUser() async {
+    try {
+      await AuthService().getCurrentUser();
+      _userData = AuthService.currentUserData;
+      
+      final isStaff = AgencyAccess.isAgencyStaffAccount(_userData);
+      if (!isStaff) {
+        final profile = await _profileService.getAgencyProfile();
+        if (mounted) {
+          setState(() {
+            _profile = profile;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _profile = null;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching current user details in scaffold: $e');
     }
+  }
+
+  List<SidebarLink> _getFilteredLinks() {
+    if (!AgencyAccess.isAgencyStaffAccount(_userData)) {
+      return kDashboardSidebarLinks;
+    }
+
+    final permissions = AgencyAccess.permissionsFrom(_userData);
+    final filtered = <SidebarLink>[];
+
+    for (final link in kDashboardSidebarLinks) {
+      bool isVisible = false;
+
+      switch (link.name) {
+        case 'Home':
+        case 'My Profile':
+        case 'Notifications':
+        case 'Change Password':
+        case 'Terms & Conditions':
+          isVisible = true;
+          break;
+        case 'Dashboard':
+          isVisible = false; // Staff doesn't see general dashboard
+          break;
+        case 'Create Ads':
+          isVisible = permissions.contains('ADS_CREATE');
+          break;
+        case 'My Ads':
+          isVisible = permissions.contains('ADS_LIST');
+          break;
+        case 'Receive Booking List':
+          isVisible = permissions.contains('BOOKING_LIST');
+          break;
+        case 'Passport Return List':
+          isVisible = permissions.contains('RETURN_LIST');
+          break;
+        case 'My Booking List':
+          isVisible = permissions.contains('OUR_BOOKING');
+          break;
+        case 'Appointment Booking':
+          isVisible = permissions.contains('APPOINTMENT_LIST');
+          break;
+        case 'User':
+          isVisible = permissions.contains('USER');
+          break;
+        case 'Reminder List':
+          isVisible = permissions.contains('REMINDER_LIST');
+          break;
+        case 'Check Status':
+          isVisible = permissions.contains('CHECK_STATUS');
+          break;
+        case 'My Payments':
+          isVisible = permissions.contains('PAYMENT_LIST');
+          break;
+        case 'Receive Payment':
+          isVisible = permissions.contains('RECEIVE_PAYMENT_LIST');
+          break;
+        case 'Refund Payment':
+          isVisible = permissions.contains('REFUND_PAYMENT');
+          break;
+        case 'Commission':
+          isVisible = permissions.contains('COMMISSION');
+          break;
+        default:
+          isVisible = true;
+      }
+
+      if (isVisible) {
+        filtered.add(link);
+      }
+    }
+
+    return filtered;
   }
 
   @override
   Widget build(BuildContext context) {
     final owner = _profile?.owner;
+    final isStaff = AgencyAccess.isAgencyStaffAccount(_userData);
+    final displayName = isStaff
+        ? (_userData?['fullName'] ?? _userData?['full_name'] ?? owner?.fullName ?? _profile?.agencyName ?? 'Staff')
+        : (owner?.fullName ?? _profile?.agencyName ?? 'User');
+    final designation = isStaff ? (_userData?['designation'] ?? '') : '';
+    final formattedName = designation.isNotEmpty ? '$displayName ($designation)' : displayName;
+
+    final displayEmail = isStaff
+        ? (_userData?['email'] ?? owner?.email ?? 'N/A')
+        : (owner?.email ?? 'N/A');
+    final displayPhone = isStaff
+        ? (_userData?['phone'] ?? owner?.phone ?? _profile?.agencyPhone ?? 'N/A')
+        : (owner?.phone ?? _profile?.agencyPhone ?? 'N/A');
+
     return Scaffold(
       backgroundColor: Colors.white,
       endDrawer: CustomerSidebarDrawer(
         currentHref: widget.currentHref,
-        fullName: owner?.fullName ?? _profile?.agencyName ?? 'User',
-        email: owner?.email ?? 'N/A',
-        phone: owner?.phone ?? _profile?.agencyPhone ?? 'N/A',
+        fullName: formattedName,
+        email: displayEmail,
+        phone: displayPhone,
         profileImage: _profile?.image,
-        links: kDashboardSidebarLinks,
+        links: _getFilteredLinks(),
       ),
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -1116,20 +1223,17 @@ class _CustomerSidebarDrawerState extends State<CustomerSidebarDrawer> {
                 ),
                 onTap: () async {
                   Navigator.pop(context);
-                  try {
-                    await _authService.getSingOut();
-                  } catch (_) {
-                    // Continue local logout even if backend logout request fails.
-                  }
+                  // Instantly clear cookies and redirect to sign-in screen
                   await ApiClient().tokenStorage.clearCookies();
-                  if (!mounted) return;
-                  // Use the root navigator to ensure we navigate the app-level router.
                   final rootContext = rootNavigatorKey.currentContext;
                   if (rootContext != null) {
                     GoRouter.of(rootContext).go(AppRoutes.login);
                   } else {
                     GoRouter.of(context).go(AppRoutes.login);
                   }
+                  
+                  // Fire-and-forget backend logout request in background
+                  _authService.getSingOut().catchError((_) {});
                 },
               ),
             ],
