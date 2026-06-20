@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -46,6 +45,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   bool _isLoadingMeta = false;
   bool _isLoadingExistingAd = false;
   bool _isPublishing = false;
+  bool _showNewWorkTypeInput = false;
+  bool _isSuggestingWorkType = false;
   List<CountryOption> _countries = [];
   List<WorkTypeOption> _workTypes = [];
   Object? _selectedCountryValue;
@@ -57,8 +58,6 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   XFile? _selectedImage;
   String _existingImageUrl = '';
   String _paymentSystem = 'AFTER_VISA_BEFORE_FLIGHT';
-  Object? _detailsLoadError;
-  StackTrace? _detailsLoadStackTrace;
 
   static const List<String> _selectionTypes = [
     'Delegate Interview',
@@ -299,16 +298,12 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   }
 
   Future<void> _loadInitialData() async {
-    debugPrint('CreateAdFormScreen._loadInitialData started. Edit mode: $_isEditMode, Slug: ${widget.adSlug}');
     setState(() {
       _isLoadingMeta = true;
       _isLoadingExistingAd = _isEditMode;
-      _detailsLoadError = null;
-      _detailsLoadStackTrace = null;
     });
 
     try {
-      debugPrint('Fetching metadata countries and worktypes...');
       final results = await Future.wait<dynamic>([
         _createAdService.getCountries(),
         _createAdService.getWorkTypes(),
@@ -319,34 +314,24 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         _workTypes = results[1] as List<WorkTypeOption>;
         _isLoadingMeta = false;
       });
-      debugPrint('Fetched metadata successfully: ${_countries.length} countries, ${_workTypes.length} work types.');
 
       final adSlug = widget.adSlug;
       if (adSlug != null) {
-        debugPrint('Edit mode active. Fetching details for adSlug: $adSlug...');
         final details = await _createAdService.getAdDetails(adSlug);
-        debugPrint('Successfully fetched ad details: title="${details.title}", slug="${details.slug}", id=${details.id}');
         if (!mounted) return;
         _prefillForm(details);
-        debugPrint('Prefilled edit form successfully.');
       }
-    } catch (e, stack) {
-      debugPrint('ERROR in CreateAdFormScreen._loadInitialData: $e');
-      debugPrintStack(stackTrace: stack);
+    } catch (e) {
       if (!mounted) return;
-      setState(() {
-        _detailsLoadError = e;
-        _detailsLoadStackTrace = stack;
-      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             _isEditMode
                 ? _tr(
-                    'Failed to load ad data: $e',
-                    'বিজ্ঞাপনের তথ্য লোড করা যায়নি: $e',
+                    'Failed to load ad data',
+                    'বিজ্ঞাপনের তথ্য লোড করা যায়নি',
                   )
-                : _tr('Failed to load form data: $e', 'ফর্মের তথ্য লোড করা যায়নি: $e'),
+                : _tr('Failed to load form data', 'ফর্মের তথ্য লোড করা যায়নি'),
           ),
         ),
       );
@@ -469,12 +454,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
       return;
     }
     setState(() => _isPublishing = true);
-    debugPrint('CreateAdFormScreen: Starting ad submission. EditMode: $_isEditMode');
-    debugPrint('Payload params: country="${_apiCountryValue()}", workTypeId=$_selectedWorkTypeId, title="$title", quota=$quota, deadline="$applicationDeadline", packagePrice=$_packagePrice, paymentSystem="$_paymentSystem", steps=$_paymentSteps, imagePath="${_selectedImage?.path}"');
-    
     try {
       if (_isEditMode) {
-        debugPrint('Invoking updateAd for slug: ${widget.adSlug}');
         await _createAdService.updateAd(
           adSlug: widget.adSlug!,
           country: _apiCountryValue(),
@@ -491,7 +472,6 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
           imagePath: _selectedImage?.path,
         );
       } else {
-        debugPrint('Invoking createAd...');
         await _createAdService.createAd(
           country: _apiCountryValue(),
           workTypeId: _selectedWorkTypeId!,
@@ -507,7 +487,6 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
           imagePath: _selectedImage!.path,
         );
       }
-      debugPrint('Ad saved/updated successfully on server.');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -525,33 +504,27 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         ),
       );
       _exitForm();
-    } on ApiException catch (e, stack) {
-      debugPrint('ApiException in CreateAdFormScreen submit: statusCode=${e.statusCode}, message=${e.message}, data=${e.data}');
-      debugPrintStack(stackTrace: stack);
+    } on ApiException catch (e) {
       if (!mounted) return;
       final message = e.message.trim().isNotEmpty
-          ? '${e.message} (Status: ${e.statusCode})'
+          ? e.message
           : _isEditMode
-          ? _tr('Failed to update ad: ${e.statusCode}', 'বিজ্ঞাপন আপডেট করা যায়নি: ${e.statusCode}')
-          : _tr('Failed to publish ad: ${e.statusCode}', 'বিজ্ঞাপন প্রকাশ করা যায়নি: ${e.statusCode}');
+          ? _tr('Failed to update ad', 'বিজ্ঞাপন আপডেট করা যায়নি')
+          : _tr('Failed to publish ad', 'বিজ্ঞাপন প্রকাশ করা যায়নি');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
-      _showDebugErrorDialog(e, stack, context);
-    } catch (e, stack) {
-      debugPrint('Unexpected error in CreateAdFormScreen submit: $e');
-      debugPrintStack(stackTrace: stack);
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             _isEditMode
-                ? _tr('Failed to update ad: $e', 'বিজ্ঞাপন আপডেট করা যায়নি: $e')
-                : _tr('Failed to publish ad: $e', 'বিজ্ঞাপন প্রকাশ করা যায়নি: $e'),
+                ? _tr('Failed to update ad', 'বিজ্ঞাপন আপডেট করা যায়নি')
+                : _tr('Failed to publish ad', 'বিজ্ঞাপন প্রকাশ করা যায়নি'),
           ),
         ),
       );
-      _showDebugErrorDialog(e, stack, context);
     } finally {
       if (mounted) {
         setState(() => _isPublishing = false);
@@ -746,563 +719,44 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     return null;
   }
 
-  Future<void> _openAddWorkTypeModal() async {
-    _newWorkTypeController.clear();
-    final suggested = await showModalBottomSheet<WorkTypeOption?>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        var isSubmitting = false;
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            final mediaQuery = MediaQuery.of(context);
-            final inputText = _newWorkTypeController.text.trim();
-            return AnimatedPadding(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOut,
-              padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
-              child: SafeArea(
-                top: false,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(24, 22, 24, 24),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(24),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 42,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFCBD5E1),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        _tr(
-                          'Add your own work type',
-                          'নিজের কাজের ধরন যোগ করুন',
-                        ),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: AppPalette.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        _tr(
-                          'Enter the work type name to suggest a new option.',
-                          'নতুন অপশন প্রস্তাব করতে কাজের ধরন লিখুন।',
-                        ),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF64748B),
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 22),
-                      TextField(
-                        controller: _newWorkTypeController,
-                        autofocus: true,
-                        textInputAction: TextInputAction.done,
-                        onChanged: (_) => setSheetState(() {}),
-                        onSubmitted: (_) async {
-                          FocusScope.of(context).unfocus();
-                          if (inputText.isEmpty || isSubmitting) return;
-                          setSheetState(() => isSubmitting = true);
-                          try {
-                            final suggestion = await _createAdService
-                                .suggestWorkType(inputText);
-                            if (suggestion != null) {
-                              Navigator.pop(context, suggestion);
-                            } else {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    _tr(
-                                      'Failed to suggest work type',
-                                      'কাজের ধরন প্রস্তাব করতে ব্যর্থ হয়েছে',
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                          } catch (_) {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  _tr(
-                                    'Failed to suggest work type',
-                                    'কাজের ধরন প্রস্তাব করতে ব্যর্থ হয়েছে',
-                                  ),
-                                ),
-                              ),
-                            );
-                          } finally {
-                            setSheetState(() => isSubmitting = false);
-                          }
-                        },
-                        decoration: InputDecoration(
-                          hintText: _tr(
-                            'Enter work type',
-                            'কাজের ধরন লিখুন',
-                          ),
-                          filled: true,
-                          fillColor: const Color(0xFFF8FAFC),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: AppPalette.brandBlue,
-                              width: 1.5,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: inputText.isEmpty || isSubmitting
-                              ? null
-                              : () async {
-                                  setSheetState(() => isSubmitting = true);
-                                  try {
-                                    final suggestion = await _createAdService
-                                        .suggestWorkType(inputText);
-                                    if (suggestion != null) {
-                                      Navigator.pop(context, suggestion);
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            _tr(
-                                              'Failed to suggest work type',
-                                              'কাজের ধরন প্রস্তাব করতে ব্যর্থ হয়েছে',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  } catch (_) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          _tr(
-                                            'Failed to suggest work type',
-                                            'কাজের ধরন প্রস্তাব করতে ব্যর্থ হয়েছে',
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  } finally {
-                                    setSheetState(() => isSubmitting = false);
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppPalette.brandBlue,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: isSubmitting
-                              ? const SizedBox(
-                                  height: 18,
-                                  width: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  _tr('Suggest Work Type', 'কাজের ধরন প্রস্তাব করুন'),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          _tr('Cancel', 'বাতিল করুন'),
-                          style: const TextStyle(
-                            color: Color(0xFF64748B),
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
+  Future<void> _suggestWorkType() async {
+    final name = _newWorkTypeController.text.trim();
+    if (name.isEmpty) return;
 
-    if (suggested != null) {
+    setState(() => _isSuggestingWorkType = true);
+    try {
+      final suggested = await _createAdService.suggestWorkType(name);
+      if (!mounted) return;
       setState(() {
-        if (!_workTypes.any((item) => item.id == suggested.id)) {
+        if (suggested != null &&
+            !_workTypes.any((item) => item.id == suggested.id)) {
           _workTypes = [..._workTypes, suggested];
         }
-        _selectedWorkTypeId = suggested.id;
+        if (suggested != null) {
+          _selectedWorkTypeId = suggested.id;
+        }
+        _showNewWorkTypeInput = false;
+        _newWorkTypeController.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_tr(
-            'Work type added successfully',
-            'কাজের ধরন সফলভাবে যোগ করা হয়েছে',
-          )),
+          content: Text(_tr('Work type submitted', 'কাজের ধরন জমা হয়েছে')),
         ),
       );
-    }
-  }
-
-  Widget _buildErrorDebugScreen() {
-    final error = _detailsLoadError;
-    final stack = _detailsLoadStackTrace;
-    String errorMsg = error?.toString() ?? 'Unknown error';
-    String apiResponse = '';
-    int? statusCode;
-
-    if (error is ApiException) {
-      statusCode = error.statusCode;
-      errorMsg = error.message;
-      try {
-        apiResponse = jsonEncode(error.data);
-      } catch (_) {
-        apiResponse = error.data?.toString() ?? '';
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _tr('Failed to submit work type', 'কাজের ধরন জমা দেওয়া যায়নি'),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSuggestingWorkType = false);
       }
     }
-
-    final debugTextBuffer = StringBuffer()
-      ..writeln('--- DATA LOAD ERROR LOG ---')
-      ..writeln('Ad Slug: ${widget.adSlug}')
-      ..writeln('Endpoint: /work-permits/${widget.adSlug}/')
-      ..writeln('Status Code: ${statusCode ?? "N/A"}')
-      ..writeln('Message: $errorMsg');
-    if (apiResponse.isNotEmpty) {
-      debugTextBuffer.writeln('API Response: $apiResponse');
-    }
-    if (stack != null) {
-      debugTextBuffer.writeln('\n--- STACK TRACE ---');
-      debugTextBuffer.writeln(stack.toString());
-    }
-
-    return Container(
-      key: const ValueKey('error_screen'),
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 20,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline_rounded,
-            color: Colors.redAccent,
-            size: 64,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            _tr('Failed to Load Ad Details', 'বিজ্ঞাপনের তথ্য লোড করতে ব্যর্থ'),
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: AppPalette.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _tr(
-              'The server returned an error while fetching the details for this ad. Please check your internet connection or inspect the debug log below.',
-              'বিজ্ঞাপনের বিবরণ লোড করার সময় সার্ভার একটি ত্রুটি ফিরিয়ে দিয়েছে। ইন্টারনেটে সংযুক্ত আছেন কি না পরীক্ষা করুন অথবা নিচের ডিবাগ লগ দেখুন।',
-            ),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF64748B),
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 24),
-          // Scrollable Debug Console
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              _tr('Debug Terminal Log', 'ডিবাগ টার্মিনাল লগ'),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-                color: AppPalette.textPrimary,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            constraints: const BoxConstraints(maxHeight: 250),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF0F172A),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: SingleChildScrollView(
-              child: Text(
-                debugTextBuffer.toString(),
-                style: const TextStyle(
-                  color: Color(0xFF38BDF8),
-                  fontFamily: 'monospace',
-                  fontSize: 11,
-                  height: 1.4,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton.icon(
-                icon: const Icon(Icons.copy, size: 16, color: AppPalette.brandBlue),
-                label: Text(
-                  _tr('Copy Error Log', 'লগ কপি করুন'),
-                  style: const TextStyle(color: AppPalette.brandBlue, fontWeight: FontWeight.bold),
-                ),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: debugTextBuffer.toString()));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(_tr('Logs copied to clipboard', 'লগ ক্লিপবোর্ডে কপি করা হয়েছে'))),
-                  );
-                },
-              ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppPalette.brandBlue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                icon: const Icon(Icons.refresh, size: 18),
-                label: Text(_tr('Retry', 'পুনরায় চেষ্টা করুন')),
-                onPressed: _loadInitialData,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Divider(),
-          TextButton(
-            onPressed: _exitForm,
-            child: Text(
-              _tr('Go Back to My Ads', 'আমার বিজ্ঞাপনে ফিরে যান'),
-              style: const TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDebugErrorDialog(dynamic error, StackTrace? stack, BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final titleText = _isEditMode ? 'Edit Ad Submission Error' : 'Create Ad Submission Error';
-        String errorMsg = error.toString();
-        String apiResponse = '';
-        int? statusCode;
-
-        if (error is ApiException) {
-          statusCode = error.statusCode;
-          errorMsg = error.message;
-          try {
-            apiResponse = jsonEncode(error.data);
-          } catch (_) {
-            apiResponse = error.data?.toString() ?? '';
-          }
-        }
-
-        final payloadMap = <String, dynamic>{
-          'title': _jobTitleController.text.trim(),
-          'country': _apiCountryValue(),
-          'workType': _selectedWorkTypeId,
-          'selectionType': _selectionType != null ? _apiSelectionTypeValue(_selectionType!) : null,
-          'quota': int.tryParse(_quotaController.text.trim()),
-          'applicationDeadline': _formatDate(_applicationDeadline),
-          'packagePrice': _packagePrice,
-          'paymentSystem': _paymentSystem,
-          'paymentSteps': _paymentSteps,
-          'imagePath': _selectedImage?.path,
-        };
-
-        final debugInfo = StringBuffer()
-          ..writeln('--- DEBUG INFO ---')
-          ..writeln('URL: /work-permits/${_isEditMode ? "${widget.adSlug}/" : ""}')
-          ..writeln('Method: ${_isEditMode ? "PUT" : "POST"}')
-          ..writeln('Status Code: ${statusCode ?? "N/A"}')
-          ..writeln('Error Message: $errorMsg')
-          ..writeln('API Response: $apiResponse')
-          ..writeln('\n--- Request Payload ---')
-          ..writeln(const JsonEncoder.withIndent('  ').convert(payloadMap))
-          ..writeln('\n--- Stack Trace ---')
-          ..writeln(stack?.toString() ?? 'No stack trace');
-
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Row(
-            children: [
-              const Icon(Icons.bug_report, color: Colors.redAccent),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  titleText,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _tr(
-                    'An error occurred during submission. See debug details below:',
-                    'সাবমিট করার সময় একটি ত্রুটি ঘটেছে। বিস্তারিত নিচে দেখুন:',
-                  ),
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFCBD5E1)),
-                  ),
-                  child: Text(
-                    errorMsg,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontFamily: 'monospace',
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                if (apiResponse.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  const Text(
-                    'API Server Response:',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      apiResponse,
-                      style: const TextStyle(
-                        color: Color(0xFF38BDF8),
-                        fontFamily: 'monospace',
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 12),
-                const Text(
-                  'Submitted Payload Data:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0F172A),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    const JsonEncoder.withIndent('  ').convert(payloadMap),
-                    style: const TextStyle(
-                      color: Color(0xFF34D399),
-                      fontFamily: 'monospace',
-                      fontSize: 11,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton.icon(
-              icon: const Icon(Icons.copy, size: 16),
-              label: const Text('Copy Logs'),
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: debugInfo.toString()));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Debug logs copied to clipboard')),
-                );
-              },
-            ),
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -1322,35 +776,25 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
               _topBar(),
               _progressBar(),
               Expanded(
-                child: Stack(
-                  children: [
-                    SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                        16,
-                        24,
-                        16,
-                        _currentStep == 1 ? 140 : 40,
-                      ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: const Offset(0.05, 0),
-                                    end: Offset.zero,
-                                  ).animate(animation),
-                                  child: child,
-                                ),
-                              );
-                            },
-                        child: _buildCurrentStep(),
-                      ),
-                    ),
-                    
-                  ],
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0.05, 0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                    child: _buildCurrentStep(),
+                  ),
                 ),
               ),
               _footerButtons(),
@@ -1367,10 +811,6 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         padding: EdgeInsets.symmetric(vertical: 80),
         child: Center(child: CircularProgressIndicator()),
       );
-    }
-
-    if (_detailsLoadError != null) {
-      return _buildErrorDebugScreen();
     }
 
     switch (_currentStep) {
@@ -1704,16 +1144,60 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             items: _workTypes,
             itemLabel: (item) => item.name,
             extraActionLabel: _tr(
-              'Add your own',
-              'নিজের যোগ করুন',
+              'Add new work type',
+              'নতুন কাজের ধরন যোগ করুন',
             ),
-            onExtraAction: _openAddWorkTypeModal,
+            onExtraAction: () => setState(() => _showNewWorkTypeInput = true),
             onChanged: (value) {
               setState(() {
                 _selectedWorkTypeId = value?.id;
+                _showNewWorkTypeInput = false;
               });
             },
           ),
+          if (_showNewWorkTypeInput) ...[
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: _buildField(
+                    label: _tr('New Work Type', 'নতুন কাজের ধরন'),
+                    hint: _tr('Enter work type', 'কাজের ধরন লিখুন'),
+                    controller: _newWorkTypeController,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _isSuggestingWorkType ? null : _suggestWorkType,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppPalette.brandBlue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: _isSuggestingWorkType
+                        ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            _tr('Add', 'যোগ করুন'),
+                            style: const TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 24),
           _buildOptionDropdown<String>(
             label: _tr('Selection Type', 'নির্বাচন পদ্ধতি'),
@@ -1873,7 +1357,6 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                         ],
-                        cursorColor: Colors.white,
                         style: const TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
@@ -1881,7 +1364,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                           height: 1.0,
                         ),
                         decoration: InputDecoration(
-                          hintText: '00000',
+                          hintText: '450000',
                           hintStyle: TextStyle(
                             color: Colors.white.withOpacity(0.5),
                           ),
@@ -1921,8 +1404,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             icon: Icons.report_problem_rounded,
             title: _tr('Commission Warning', 'কমিশন সতর্কতা'),
             message: _tr(
-              'An additional 15% for customers and 5% for agents will be added to the final cost automatically.',
-              'চূড়ান্ত খরচে গ্রাহকদের জন্য অতিরিক্ত ১৫% এবং এজেন্টদের জন্য ৫% স্বয়ংক্রিয়ভাবে যোগ হবে।',
+              'An additional 10% for customers and 5% for agents will be added to the final cost automatically.',
+              'চূড়ান্ত খরচে গ্রাহকদের জন্য অতিরিক্ত ১০% এবং এজেন্টদের জন্য ৫% স্বয়ংক্রিয়ভাবে যোগ হবে।',
             ),
             background: const Color(0xFFFFFBEB),
             border: const Color(0xFFFEF3C7),
@@ -2008,149 +1491,47 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             color: AppPalette.textMuted,
           ),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildPaymentSystemCard(
-                value: 'ADVANCE_AFTER_VISA_BEFORE_FLIGHT',
-                title: _tr(
-                  'Advance Payment',
-                  'অগ্রিম পেমেন্ট',
+        const SizedBox(height: 8),
+        Container(
+          height: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _paymentSystem,
+              isExpanded: true,
+              items: [
+                DropdownMenuItem(
+                  value: 'ADVANCE_AFTER_VISA_BEFORE_FLIGHT',
+                  child: Text(
+                    _tr(
+                      'Advance + After Visa + Before Flight',
+                      'অগ্রিম + ভিসার পর + ফ্লাইটের আগে',
+                    ),
+                  ),
                 ),
-                subtitle: _tr(
-                  '3-Step Payment',
-                  '৩-ধাপ পেমেন্ট',
+                DropdownMenuItem(
+                  value: 'AFTER_VISA_BEFORE_FLIGHT',
+                  child: Text(
+                    _tr(
+                      'After Visa + Before Flight',
+                      'ভিসার পর + ফ্লাইটের আগে',
+                    ),
+                  ),
                 ),
-                icon: Icons.layers_outlined,
-              ),
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() => _paymentSystem = value);
+                if (!_usesAdvancePayment) _advancePriceController.clear();
+              },
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildPaymentSystemCard(
-                value: 'AFTER_VISA_BEFORE_FLIGHT',
-                title: _tr(
-                  'After Visa Payment',
-                  'ভিসা পরে পেমেন্ট',
-                ),
-                subtitle: _tr(
-                  '2-Step Payment',
-                  '২-ধাপ পেমেন্ট',
-                ),
-                icon: Icons.receipt_long_outlined,
-              ),
-            ),
-          ],
+          ),
         ),
       ],
-    );
-  }
-
-  Widget _buildPaymentSystemCard({
-    required String value,
-    required String title,
-    required String subtitle,
-    required IconData icon,
-  }) {
-    final isSelected = _paymentSystem == value;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _paymentSystem = value;
-          if (!_usesAdvancePayment) _advancePriceController.clear();
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppPalette.brandBlue.withOpacity(0.1)
-              : Colors.white,
-          border: Border.all(
-            color: isSelected ? AppPalette.brandBlue : Colors.grey[300]!,
-            width: isSelected ? 2.5 : 1.5,
-          ),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppPalette.brandBlue.withOpacity(0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppPalette.brandBlue
-                        : Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: isSelected ? Colors.white : Colors.grey[600],
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: isSelected
-                              ? AppPalette.brandBlue
-                              : Colors.grey[800],
-                        ),
-                      ),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (isSelected)
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: AppPalette.brandBlue,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -2538,7 +1919,6 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () async {
-              FocusScope.of(context).unfocus();
               final selected = await _showFormDropdownSheet<T>(
                 title: hint,
                 items: items,
@@ -2692,10 +2072,6 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                             textInputAction: TextInputAction.search,
                             onChanged: (value) =>
                                 setSheetState(() => query = value),
-                            onSubmitted: (value) {
-                              setSheetState(() => query = value);
-                              FocusScope.of(context).unfocus();
-                            },
                             decoration: InputDecoration(
                               hintText: _tr('Search $title', '$title খুঁজুন'),
                               prefixIcon: const Icon(
@@ -2731,7 +2107,9 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                             keyboardDismissBehavior:
                                 ScrollViewKeyboardDismissBehavior.onDrag,
                             padding: const EdgeInsets.symmetric(vertical: 8),
-                            itemCount: filteredItems.length,
+                            itemCount:
+                                filteredItems.length +
+                                (extraActionLabel == null ? 0 : 1),
                             separatorBuilder: (context, index) => const Divider(
                               height: 1,
                               indent: 18,
@@ -2739,6 +2117,32 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                               color: Color(0xFFF1F5F9),
                             ),
                             itemBuilder: (context, index) {
+                              if (extraActionLabel != null &&
+                                  index == filteredItems.length) {
+                                return ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 4,
+                                  ),
+                                  leading: const Icon(
+                                    Icons.add_circle_outline_rounded,
+                                    color: AppPalette.brandBlue,
+                                  ),
+                                  title: Text(
+                                    extraActionLabel,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppPalette.brandBlue,
+                                    ),
+                                  ),
+                                  onTap: () => Navigator.pop(
+                                    context,
+                                    _DropdownExtraAction.instance,
+                                  ),
+                                );
+                              }
+
                               final item = filteredItems[index];
                               final isSelected = item == selectedValue;
                               final leading = itemLeading?.call(item, 24);
@@ -2767,46 +2171,11 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                                         size: 22,
                                       )
                                     : null,
-                                onTap: () {
-                                  FocusScope.of(context).unfocus();
-                                  Navigator.pop(context, item);
-                                },
+                                onTap: () => Navigator.pop(context, item),
                               );
                             },
                           ),
                         ),
-                        if (extraActionLabel != null)
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Divider(height: 1, color: Color(0xFFF1F5F9)),
-                              ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 18,
-                                  vertical: 8,
-                                ),
-                                leading: const Icon(
-                                  Icons.add_circle_outline_rounded,
-                                  color: AppPalette.brandBlue,
-                                ),
-                                title: Text(
-                                  extraActionLabel,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppPalette.brandBlue,
-                                  ),
-                                ),
-                                onTap: () {
-                                  FocusScope.of(context).unfocus();
-                                  Navigator.pop(
-                                    context,
-                                    _DropdownExtraAction.instance,
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
                       ],
                     ),
                   ),

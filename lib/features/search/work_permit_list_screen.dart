@@ -4,16 +4,17 @@ import 'package:fui_kit/fui_kit.dart';
 import 'package:go_router/go_router.dart';
 
 import '../home/models/home_models.dart';
-import '../home/services/home_service.dart';
 import '../home/widgets/home_common_widgets.dart';
 import '../home/widgets/work_permit_card.dart';
 import 'work_permit_details_screen.dart';
 import 'widgets/filter_sidebar.dart';
+import 'services/work_permit_service.dart';
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_spacing.dart';
 import '../../common/theme/app_text_styles.dart';
 import '../../common/widgets/app_search_bar.dart';
 import '../../common/services/api_client.dart';
+import '../../common/services/profile_service.dart';
 import '../../routes/app_routes.dart';
 
 class WorkPermitListScreen extends StatefulWidget {
@@ -28,10 +29,14 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   final _searchController = TextEditingController();
   bool _isLoggedIn = false;
   bool _isLoading = true;
+  bool _isMoreLoading = false;
 
-  final HomeService _homeService = HomeService();
-  List<WorkPermitItem> _allItems = [];
+  final WorkPermitService _workPermitService = WorkPermitService();
+  final ProfileService _profileService = ProfileService();
   List<WorkPermitItem> _filteredItems = [];
+  FilterValue _currentFilter = const FilterValue(query: '');
+  String? _nextCursor;
+  String? _profileImageUrl;
 
   @override
   void initState() {
@@ -44,16 +49,70 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     final cookies = await ApiClient().tokenStorage.getCookies();
     if (mounted && cookies != null && cookies.isNotEmpty) {
       setState(() => _isLoggedIn = true);
+      try {
+        final profile = await _profileService.getAgencyProfile();
+        if (mounted) {
+          setState(() => _profileImageUrl = profile?.image);
+        }
+      } catch (e) {
+        debugPrint("Error fetching agency profile image: $e");
+      }
     }
   }
 
   Future<void> _loadData() async {
-    final permits = await _homeService.getWorkPermits();
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+      _nextCursor = null;
+    });
+    final response = await _workPermitService.getFilteredWorkPermits(
+      query: _currentFilter.query,
+      country: _currentFilter.country,
+      workType: _currentFilter.workType,
+      selectionType: _currentFilter.selectionType,
+      minAge: _currentFilter.minAge,
+      maxAge: _currentFilter.maxAge,
+    );
     if (mounted) {
       setState(() {
-        _allItems = permits;
-        _filteredItems = List.of(_allItems);
+        _filteredItems = response?.results ?? [];
+        _nextCursor = _extractCursor(response?.nextUrl);
         _isLoading = false;
+      });
+    }
+  }
+
+  String? _extractCursor(String? urlString) {
+    if (urlString == null || urlString.isEmpty) return null;
+    try {
+      final uri = Uri.parse(urlString);
+      return uri.queryParameters['cursor'];
+    } catch (e) {
+      debugPrint("Error parsing cursor from URL $urlString: $e");
+      return null;
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_isMoreLoading || _nextCursor == null) return;
+    setState(() => _isMoreLoading = true);
+    final response = await _workPermitService.getFilteredWorkPermits(
+      query: _currentFilter.query,
+      country: _currentFilter.country,
+      workType: _currentFilter.workType,
+      selectionType: _currentFilter.selectionType,
+      minAge: _currentFilter.minAge,
+      maxAge: _currentFilter.maxAge,
+      cursor: _nextCursor,
+    );
+    if (mounted) {
+      setState(() {
+        if (response != null) {
+          _filteredItems.addAll(response.results);
+          _nextCursor = _extractCursor(response.nextUrl);
+        }
+        _isMoreLoading = false;
       });
     }
   }
@@ -71,21 +130,8 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
   }
 
   void _applyFilters(FilterValue value) {
-    setState(() {
-      _filteredItems = _allItems.where((item) {
-        final queryOk =
-            value.query.isEmpty ||
-            item.title.toLowerCase().contains(value.query.toLowerCase());
-        final countryOk =
-            value.country == null || item.countryName == value.country;
-        final workTypeOk =
-            value.workType == null || item.workType == value.workType;
-        final selectionOk =
-            value.selectionType == null ||
-            item.selectionType == value.selectionType;
-        return queryOk && countryOk && workTypeOk && selectionOk;
-      }).toList();
-    });
+    _currentFilter = value;
+    _loadData();
   }
 
   void _openDetailsBySlug(WorkPermitItem item) {
@@ -103,6 +149,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: FilterSidebar(
+            initialValue: _currentFilter,
             onApply: (value) {
               _applyFilters(value);
               Navigator.pop(context);
@@ -127,8 +174,9 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
           if (result == true && mounted) setState(() => _isLoggedIn = true);
         },
         onSignUp: () => context.push(AppRoutes.agencySignUp),
-        onNotifications: _showComingSoon,
-        onProfile: _showComingSoon,
+        onNotifications: () => context.push('/dashboard/notifications'),
+        onProfile: () => context.push('/dashboard/customer/profile'),
+        profileImageUrl: _profileImageUrl,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -155,18 +203,30 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
     return AppSearchBar(
       controller: _searchController,
       hintText: 'Search in bideshgami',
-      onChanged: (query) => _applyFilters(FilterValue(query: query.trim())),
-      onSearchTap: _showComingSoon,
+      onChanged: (query) => _applyFilters(
+        FilterValue(
+          query: query.trim(),
+          country: _currentFilter.country,
+          workType: _currentFilter.workType,
+          selectionType: _currentFilter.selectionType,
+          minAge: _currentFilter.minAge,
+          maxAge: _currentFilter.maxAge,
+        ),
+      ),
+      onSearchTap: () => _applyFilters(
+        FilterValue(
+          query: _searchController.text.trim(),
+          country: _currentFilter.country,
+          workType: _currentFilter.workType,
+          selectionType: _currentFilter.selectionType,
+          minAge: _currentFilter.minAge,
+          maxAge: _currentFilter.maxAge,
+        ),
+      ),
     );
   }
 
   Widget _buildWorkPermitSection() {
-    if (_filteredItems.isEmpty && !_isLoading) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 30),
-        child: Text('No work permits found.'),
-      );
-    }
     final width = MediaQuery.of(context).size.width;
     final displayItems = _isLoading
         ? List.generate(4, (_) => WorkPermitItem.getDummy())
@@ -202,7 +262,18 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
           ],
         ),
         const SizedBox(height: AppSpacing.sm + 2),
-        LayoutBuilder(
+        if (_filteredItems.isEmpty && !_isLoading)
+          const Padding(
+            padding: EdgeInsets.only(top: 30, bottom: 30),
+            child: Center(
+              child: Text(
+                'No work permits found.',
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+            ),
+          )
+        else
+          LayoutBuilder(
           builder: (context, constraints) {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,27 +281,53 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
                 if (width >= 1024) ...[
                   SizedBox(
                     width: 320,
-                    child: FilterSidebar(onApply: _applyFilters),
+                    child: FilterSidebar(
+                      initialValue: _currentFilter,
+                      onApply: _applyFilters,
+                    ),
                   ),
                   const SizedBox(width: 16),
                 ],
                 Expanded(
                   child: Skeletonizer(
                     enabled: _isLoading,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: displayItems.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
-                      itemBuilder: (context, index) => WorkPermitCard(
-                        item: displayItems[index],
-                        brandBlue: _brandBlue,
-                        onViewDetails: () =>
-                            _openDetailsBySlug(displayItems[index]),
-                        formatBdt: _formatBdt,
-                        timeAgo: _timeAgo,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: displayItems.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 16),
+                          itemBuilder: (context, index) => WorkPermitCard(
+                            item: displayItems[index],
+                            brandBlue: _brandBlue,
+                            onViewDetails: () =>
+                                _openDetailsBySlug(displayItems[index]),
+                            formatBdt: _formatBdt,
+                            timeAgo: _timeAgo,
+                          ),
+                        ),
+                        if (!_isLoading && _nextCursor != null) ...[
+                          const SizedBox(height: 24),
+                          if (_isMoreLoading)
+                            const Center(child: CircularProgressIndicator())
+                          else
+                            ElevatedButton(
+                              onPressed: _loadMore,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _brandBlue,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text('Load More'),
+                            ),
+                        ],
+                      ],
                     ),
                   ),
                 ),

@@ -124,4 +124,71 @@ class WorkPermitService {
     if (value == null) return fallback;
     return value.toString();
   }
+
+  Future<WorkPermitsResponse?> getFilteredWorkPermits({
+    String? query,
+    String? country,
+    String? workType,
+    String? minAge,
+    String? maxAge,
+    String? companyName,
+    String? selectionType,
+    String? fromDate,
+    String? toDate,
+    String? cursor,
+  }) async {
+    try {
+      final Map<String, dynamic> queryParams = {
+        'service_type': 'WORK_PERMIT',
+      };
+      if (query != null && query.isNotEmpty) queryParams['q'] = query;
+      if (country != null && country.isNotEmpty) queryParams['country'] = country;
+      if (workType != null && workType.isNotEmpty) queryParams['work_type'] = workType;
+      if (minAge != null && minAge.isNotEmpty) queryParams['min_age'] = minAge;
+      if (maxAge != null && maxAge.isNotEmpty) queryParams['max_age'] = maxAge;
+      if (companyName != null && companyName.isNotEmpty) queryParams['company_name'] = companyName;
+      if (selectionType != null && selectionType.isNotEmpty && selectionType != 'All') {
+        queryParams['selection_type'] = selectionType;
+      }
+      if (fromDate != null && fromDate.isNotEmpty) queryParams['from_date'] = fromDate;
+      if (toDate != null && toDate.isNotEmpty) queryParams['to_date'] = toDate;
+      if (cursor != null && cursor.isNotEmpty) queryParams['cursor'] = cursor;
+
+      final response = await _apiClient.get(
+        '/filter/',
+        queryParameters: queryParams,
+        useCache: false,
+      );
+
+      final data = response.data;
+      if (data is Map) {
+        final resultsRaw = data['results'] as List? ?? [];
+        final results = resultsRaw.map((json) {
+          return _toWorkPermitItem(Map<String, dynamic>.from(json));
+        }).toList();
+
+        return WorkPermitsResponse(
+          results: results,
+          nextUrl: data['next']?.toString(),
+          previousUrl: data['previous']?.toString(),
+        );
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Error in getFilteredWorkPermits: $e");
+      return null;
+    }
+  }
+}
+
+class WorkPermitsResponse {
+  WorkPermitsResponse({
+    required this.results,
+    this.nextUrl,
+    this.previousUrl,
+  });
+
+  final List<WorkPermitItem> results;
+  final String? nextUrl;
+  final String? previousUrl;
 }

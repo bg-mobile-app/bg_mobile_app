@@ -41,7 +41,7 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
   final _service = PayoutRequestService();
   Timer? _debounce;
 
-  bool _cardView = false;
+  bool _cardView = true;
   bool _loading = true;
   String _search = '';
   String _status = '';
@@ -113,15 +113,9 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    ViewToggleButton(
-                      isCardView: _cardView,
-                      onChanged: (v) => setState(() => _cardView = v),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(child: _statusFilter()),
-                  ],
+                ViewToggleButton(
+                  isCardView: _cardView,
+                  onChanged: (v) => setState(() => _cardView = v),
                 ),
                 const SizedBox(height: 12),
                 AppSearchBar(
@@ -172,27 +166,6 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
     ),
   );
 
-  Widget _statusFilter() {
-    return DropdownButtonFormField<String>(
-      initialValue: _status.isEmpty ? null : _status,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        isDense: true,
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      ),
-      items: [
-        const DropdownMenuItem(value: '', child: Text('All Status')),
-        ...receivePaymentStatuses.map(
-          (s) => DropdownMenuItem(value: s, child: Text(s)),
-        ),
-      ],
-      onChanged: (value) {
-        setState(() => _status = value ?? '');
-        _load();
-      },
-    );
-  }
-
   Widget _tableView() {
     if (_items.isEmpty && !_loading)
       return const Center(
@@ -205,8 +178,6 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
       columns: const [
         DataColumn(label: Text('Post & Booking ID')),
         DataColumn(label: Text('Customer Info')),
-        DataColumn(label: Text('Processing By')),
-        DataColumn(label: Text('Reference By')),
         DataColumn(label: Text('Step & Status')),
         DataColumn(label: Text('Total Amount')),
         DataColumn(label: Text('Paid Amount')),
@@ -218,9 +189,27 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
               cells: [
                 DataCell(Text('${e.postId}\n#${e.bookingId}')),
                 DataCell(Text('${e.customerName}\n${e.passportNo}')),
-                DataCell(Text('${e.processingBy}\n${e.rlNo}')),
-                DataCell(Text(e.referenceBy)),
-                DataCell(Text('${e.step}\n${e.status}')),
+                DataCell(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(e.step),
+                      const SizedBox(height: 6),
+                      Text(
+                        e.status.isNotEmpty ? e.status : 'PENDING',
+                        style: TextStyle(
+                          color: e.status.toUpperCase() == 'PAID'
+                              ? AppPalette.success
+                              : (e.status.toUpperCase().contains('APPROVE')
+                                  ? AppPalette.brandBlue
+                                  : AppPalette.textPrimary),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 DataCell(Text('৳ ${e.totalAmount}')),
                 DataCell(Text('৳ ${e.paidAmount}')),
                 DataCell(Text('৳ ${e.currentRequest}')),
@@ -243,6 +232,10 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
   }
 
   Widget _card(PayoutRequestItem e) {
+    final status = e.status.toUpperCase();
+    final isPositiveStatus = status == 'PAID' || status.contains('APPROVE');
+    final tagColor = isPositiveStatus ? AppPalette.success : AppPalette.brandBlue;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Stack(
@@ -300,7 +293,7 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppPalette.brandBlue,
+                            color: tagColor,
                             borderRadius: BorderRadius.circular(999),
                             boxShadow: AppPalette.softShadow,
                           ),
@@ -366,68 +359,6 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Agency
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: AppPalette.borderSoftBlue,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(Icons.business_center, color: AppPalette.brandBlue),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Processing Agency',
-                                  style: AppTextStyles.caption
-                                      .copyWith(color: AppPalette.textMuted)),
-                              const SizedBox(height: 4),
-                              Text('${e.processingBy} (${e.rlNo})',
-                                  style: AppTextStyles.body1.copyWith(
-                                      fontWeight: FontWeight.w700)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Reference
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: AppPalette.borderSoftBlue,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(Icons.handshake, color: AppPalette.brandBlue),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Reference By',
-                                  style: AppTextStyles.caption
-                                      .copyWith(color: AppPalette.textMuted)),
-                              const SizedBox(height: 4),
-                              Text('${e.referenceBy}',
-                                  style: AppTextStyles.body1.copyWith(
-                                      fontWeight: FontWeight.w700)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
 

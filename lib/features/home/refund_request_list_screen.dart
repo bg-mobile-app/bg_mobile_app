@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../common/theme/app_palette.dart';
@@ -224,8 +225,6 @@ class _RefundRequestListScreenState extends State<RefundRequestListScreen> {
       columns: const [
         DataColumn(label: Text('Post & Booking ID')),
         DataColumn(label: Text('Customer Info')),
-        DataColumn(label: Text('Processing By')),
-        DataColumn(label: Text('Reference By')),
         DataColumn(label: Text('Step & Status')),
         DataColumn(label: Text('Total Amount')),
         DataColumn(label: Text('Paid Amount')),
@@ -235,8 +234,6 @@ class _RefundRequestListScreenState extends State<RefundRequestListScreen> {
       rows: _items.map((e) => DataRow(cells: [
         DataCell(Text('${e.postId}\n#${e.bookingId}')),
         DataCell(Text('${e.customerName}\n${e.passportNo}')),
-        DataCell(Text('${e.processingBy}\n${e.rlNo}')),
-        DataCell(Text(e.referenceBy)),
         DataCell(Text('${e.step}\n${e.status}')),
         DataCell(Text('৳ ${e.totalAmount}')),
         DataCell(Text('৳ ${e.paidAmount}')),
@@ -259,8 +256,6 @@ class _RefundRequestListScreenState extends State<RefundRequestListScreen> {
       Text('${e.postId} / #${e.bookingId}', style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w700)),
       const SizedBox(height: 8),
       Text('Customer: ${e.customerName} (${e.passportNo})'),
-      Text('Processing By: ${e.processingBy} (${e.rlNo})'),
-      Text('Reference By: ${e.referenceBy}'),
       Text('Step & Status: ${e.step} / ${e.status}'),
       Text('Total Amount: ৳ ${e.totalAmount}'),
       Text('Paid Amount: ৳ ${e.paidAmount}'),
@@ -270,11 +265,27 @@ class _RefundRequestListScreenState extends State<RefundRequestListScreen> {
     ]),
   );
 
-  Widget _actions(PayoutRequestItem item) => OutlinedButton.icon(
-    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Request #${item.id} selected'))),
-    icon: const Icon(Icons.visibility_outlined, size: 18),
-    label: const Text('View'),
-  );
+  Widget _actions(PayoutRequestItem item) {
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      TextButton.icon(
+        onPressed: () => context.go('/dashboard/receive-payment/view/${item.id}'),
+        icon: const Icon(Icons.visibility_outlined, size: 16),
+        label: const Text('View'),
+      ),
+      const SizedBox(width: 6),
+      if (item.postSlug.isNotEmpty)
+        TextButton(
+          onPressed: () => context.go('/dashboard/ads/edit/en/${item.postSlug}'),
+          child: const Text('View Post'),
+        ),
+      const SizedBox(width: 6),
+      if (!item.paid)
+        ElevatedButton(
+          onPressed: () => context.go('/dashboard/refund-payment/manage-bill/create/${item.id}'),
+          child: const Text('Add to Bill'),
+        ),
+    ]);
+  }
 
   Widget _emptyState() => const Center(child: Padding(padding: EdgeInsets.all(20), child: Text('No refund request found')));
 

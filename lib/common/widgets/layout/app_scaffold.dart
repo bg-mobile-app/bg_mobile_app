@@ -30,8 +30,11 @@ import '../../../features/home/my_ads_screen.dart';
 import '../../../features/home/notifications_screen.dart';
 import '../../../features/home/payments_screen.dart';
 import '../../../features/home/receive_payment_screen.dart';
+import '../../../features/home/receive_payment_history_screen.dart';
+import '../../../features/home/receive_payment_detail_screen.dart';
 import '../../../features/home/refund_request_list_screen.dart';
 import '../../../features/home/terms_conditions_screen.dart';
+import '../../../features/home/manage_bill_screen.dart';
 import '../../../features/home/user_activity_screen.dart';
 import '../../../features/reminder/medical_expiry_screen.dart';
 import '../../../features/search/work_permit_list_screen.dart';
@@ -39,6 +42,8 @@ import '../../../common/services/api_client.dart';
 import '../../../routes/app_router.dart';
 import 'app_bottom_nav.dart';
 import '../../../common/theme/app_palette.dart';
+
+import '../../../routes/navigation_history.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({super.key, required this.tabIndex, this.dashboardPath});
@@ -48,6 +53,9 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentPath = dashboardPath ?? _tabPath(tabIndex);
+    AppNavigationHistory.recordVisit(currentPath);
+
     final screens = [
       const HomeScreen(),
       const WorkPermitListScreen(),
@@ -62,11 +70,25 @@ class AppScaffold extends StatelessWidget {
           : const SizedBox.shrink(),
     ];
 
-    return Scaffold(
-      body: IndexedStack(index: tabIndex, children: screens),
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: tabIndex,
-        onTap: (index) => context.go(_tabPath(index)),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (AppNavigationHistory.canPop) {
+          final previous = AppNavigationHistory.pop();
+          if (previous != null && context.mounted) {
+            context.go(previous);
+          }
+        } else {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(index: tabIndex, children: screens),
+        bottomNavigationBar: AppBottomNav(
+          currentIndex: tabIndex,
+          onTap: (index) => context.go(_tabPath(index)),
+        ),
       ),
     );
   }
@@ -358,23 +380,18 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
         );
       case '/dashboard/receive-payment/approve-payment':
         return const ReceivePaymentScreen(
-          initialStatus: 'APPROVED',
+          initialStatus: 'APPROVE',
           currentHref: '/dashboard/receive-payment/approve-payment',
           title: 'Approve Payment',
         );
       case '/dashboard/receive-payment/receive-payment':
-        return const ReceivePaymentScreen(
-          initialStatus: 'PAID',
+        return const ReceivePaymentHistoryScreen(
           currentHref: '/dashboard/receive-payment/receive-payment',
-          title: 'Receive Payment',
         );
       case '/dashboard/refund-payment/request-list':
         return const RefundRequestListScreen();
       case '/dashboard/refund-payment/manage-bill':
-        return const DashboardDummyScreen(
-          currentHref: '/dashboard/refund-payment/manage-bill',
-          title: 'Manage Bill',
-        );
+        return const ManageBillScreen(currentHref: '/dashboard/refund-payment/manage-bill');
       case '/dashboard/commission':
         return const CommissionScreen();
       case '/dashboard/notifications':
@@ -387,6 +404,15 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
         return _buildLogoutScreen(context);
       default:
         final segments = Uri.parse(widget.route).pathSegments;
+        if (segments.length == 4 &&
+            segments[0] == 'dashboard' &&
+            segments[1] == 'receive-payment' &&
+            segments[2] == 'view') {
+          return ReceivePaymentDetailScreen(
+            billId: segments[3],
+            currentHref: widget.route,
+          );
+        }
         if (segments.length == 4 &&
             segments[0] == 'dashboard' &&
             segments[1] == 'ads' &&

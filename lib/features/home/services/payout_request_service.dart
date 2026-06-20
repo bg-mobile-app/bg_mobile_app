@@ -25,6 +25,8 @@ class PayoutRequestItem {
     required this.passportNo,
     required this.processingBy,
     required this.referenceBy,
+    required this.postSlug,
+    required this.paid,
     required this.rlNo,
     required this.step,
     required this.status,
@@ -40,6 +42,8 @@ class PayoutRequestItem {
   final String passportNo;
   final String processingBy;
   final String referenceBy;
+  final String postSlug;
+  final bool paid;
   final String rlNo;
   final String step;
   final String status;
@@ -86,6 +90,8 @@ class PayoutRequestItem {
           json['referenceBy']?.toString() ??
           json['reference_by']?.toString() ??
           '-',
+        postSlug: json['postSlug']?.toString() ?? json['post_slug']?.toString() ?? '',
+        paid: json['paid'] == true || (json['paid']?.toString() ?? '').toLowerCase() == 'true',
       rlNo: json['rlNo']?.toString() ?? json['rl_no']?.toString() ?? '-',
       step: json['step']?.toString() ?? '-',
       status: json['status']?.toString() ?? '-',
