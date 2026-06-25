@@ -447,6 +447,8 @@ class ReceiveBookingItemDto {
   final bool hasBeforeFlightPayout;
   final int? paymentStepCount;
   final bool isReturn;
+  /// Sourced from returnFile.requestedByType — 'CUSTOMER' or 'AGENCY'
+  final String requestedByType;
 
   const ReceiveBookingItemDto({
     required this.id,
@@ -470,6 +472,7 @@ class ReceiveBookingItemDto {
     required this.hasBeforeFlightPayout,
     this.paymentStepCount,
     required this.isReturn,
+    this.requestedByType = '',
   });
 
   factory ReceiveBookingItemDto.fromJson(Map<String, dynamic> json) {
@@ -568,6 +571,10 @@ class ReceiveBookingItemDto {
         'payment_step_count',
       ]),
       isReturn: _pickBool(json, ['isReturn', 'is_return'], fallback: false),
+      requestedByType: _pickString(returnFile, [
+        'requestedByType',
+        'requested_by_type',
+      ]),
     );
   }
 }

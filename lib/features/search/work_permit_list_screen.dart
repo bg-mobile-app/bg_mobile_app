@@ -200,7 +200,7 @@ class _WorkPermitListScreenState extends State<WorkPermitListScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to create chat conversation')),
+          const SnackBar(content: Text('Permission is not allowed')),
         );
       }
     }

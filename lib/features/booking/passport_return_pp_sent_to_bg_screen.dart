@@ -25,7 +25,6 @@ class _PassportReturnPpSentToBgScreenState
   List<ReceiveBookingItemDto> _items = [];
   Timer? _searchDebounce;
   bool _isCardView = false;
-  bool _isMyReturn = false; // false = Customer Return, true = My Return
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;
@@ -71,11 +70,7 @@ class _PassportReturnPpSentToBgScreenState
   }
 
   List<ReceiveBookingItemDto> get _filteredItems {
-    final filteredByType = _items
-        .where((item) => item.isReturn == _isMyReturn)
-        .toList();
-
-    return filteredByType;
+    return _items;
   }
 
   @override
@@ -116,8 +111,6 @@ class _PassportReturnPpSentToBgScreenState
                     Row(
                       children: [
                         _viewToggle(),
-                        const SizedBox(width: 10),
-                        _typeToggle(),
                         const SizedBox(width: 10),
                         Expanded(child: _dateRangeButton()),
                       ],
@@ -185,83 +178,7 @@ class _PassportReturnPpSentToBgScreenState
     );
   }
 
-  Widget _typeToggle() {
-    return Container(
-      width: 110,
-      height: 48,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE9EDFF),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Stack(
-        children: [
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
-            alignment: !_isMyReturn
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: Container(
-              width: 50,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _isMyReturn = false),
-                  behavior: HitTestBehavior.opaque,
-                  child: Center(
-                    child: Tooltip(
-                      message: 'Customer Return',
-                      child: Icon(
-                        Icons.groups_outlined,
-                        size: 22,
-                        color: !_isMyReturn
-                            ? const Color(0xFF004AC6)
-                            : const Color(0xFF434655),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _isMyReturn = true),
-                  behavior: HitTestBehavior.opaque,
-                  child: Center(
-                    child: Tooltip(
-                      message: 'My Return',
-                      child: Icon(
-                        Icons.person_outline,
-                        size: 22,
-                        color: _isMyReturn
-                            ? const Color(0xFF004AC6)
-                            : const Color(0xFF434655),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _dateRangeButton() {
     final label = _selectedDateRange == null
@@ -468,7 +385,22 @@ class _PassportReturnPpSentToBgScreenState
                 runSpacing: 8,
                 children: [
                   OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Reason for Return'),
+                          content: Text(item.returnFile?.reason ?? 'No reason provided.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     child: const Text('See Reason'),
                   ),
                   OutlinedButton(

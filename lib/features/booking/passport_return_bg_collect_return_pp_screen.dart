@@ -24,7 +24,6 @@ class _PassportReturnBgCollectReturnPpScreenState
   List<ReceiveBookingItemDto> _items = [];
   Timer? _searchDebounce;
   bool _isCardView = false;
-  bool _isMyReturn = false;
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;
@@ -70,11 +69,7 @@ class _PassportReturnBgCollectReturnPpScreenState
   }
 
   List<ReceiveBookingItemDto> get _filteredItems {
-    final filteredByType = _items
-        .where((item) => item.isReturn == _isMyReturn)
-        .toList();
-
-    return filteredByType;
+    return _items;
   }
 
   @override
@@ -119,8 +114,6 @@ class _PassportReturnBgCollectReturnPpScreenState
                           onChanged: (value) =>
                               setState(() => _isCardView = value),
                         ),
-                        const SizedBox(width: 10),
-                        _typeToggle(),
                         const SizedBox(width: 10),
                         Expanded(child: _dateRangeButton()),
                       ],
@@ -181,62 +174,7 @@ class _PassportReturnBgCollectReturnPpScreenState
     );
   }
 
-  Widget _typeToggle() {
-    return Container(
-      width: 110,
-      height: 48,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE9EDFF),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          _toggleIcon(
-            Icons.groups_outlined,
-            !_isMyReturn,
-            () => setState(() => _isMyReturn = false),
-            'Customer Return',
-          ),
-          _toggleIcon(
-            Icons.person_outline,
-            _isMyReturn,
-            () => setState(() => _isMyReturn = true),
-            'My Return',
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _toggleIcon(
-    IconData icon,
-    bool active,
-    VoidCallback onTap,
-    String tooltip,
-  ) {
-    return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: active ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          alignment: Alignment.center,
-          child: Tooltip(
-            message: tooltip,
-            child: Icon(
-              icon,
-              size: 22,
-              color: active ? const Color(0xFF004AC6) : const Color(0xFF434655),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _dateRangeButton() {
     final label = _selectedDateRange == null
@@ -487,7 +425,22 @@ class _PassportReturnBgCollectReturnPpScreenState
                 runSpacing: 8,
                 children: [
                   OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Reason for Return'),
+                          content: Text(item.returnFile?.reason ?? 'No reason provided.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     child: const Text('See Reason'),
                   ),
                   OutlinedButton(
@@ -495,7 +448,49 @@ class _PassportReturnBgCollectReturnPpScreenState
                     child: const Text('View Documents'),
                   ),
                   OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Collect Return PP'),
+                          content: const Text('Are you sure you want to clear this passport for handover?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.pop(ctx);
+                                setState(() => _isLoading = true);
+                                try {
+                                  await _bookingService.updateBookingStatus(
+                                    bookingId: item.id,
+                                    status: 'CLEAR_FOR_HANDOVER',
+                                  );
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Passport cleared for handover successfully.')),
+                                    );
+                                  }
+                                  _fetchData();
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Failed to update booking status: $e')),
+                                    );
+                                  }
+                                } finally {
+                                  if (mounted) setState(() => _isLoading = false);
+                                }
+                              },
+                              child: const Text('Yes, Collect'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     child: const Text('Collect Return PP'),
                   ),
                 ],

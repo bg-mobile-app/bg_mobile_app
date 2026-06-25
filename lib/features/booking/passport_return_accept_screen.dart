@@ -25,7 +25,8 @@ class _PassportReturnAcceptScreenState
   List<ReceiveBookingItemDto> _items = [];
   Timer? _searchDebounce;
   bool _isCardView = false;
-  bool _isMyReturn = false; // false = Customer Return, true = My Return
+  /// 'CUSTOMER' = Customer Return tab, 'AGENCY' = My Return tab
+  String _activeType = 'CUSTOMER';
   late final TextEditingController _searchController;
   String _searchQuery = '';
   DateTimeRange? _selectedDateRange;
@@ -71,11 +72,12 @@ class _PassportReturnAcceptScreenState
   }
 
   List<ReceiveBookingItemDto> get _filteredItems {
-    final filteredByType = _items
-        .where((item) => item.isReturn == _isMyReturn)
+    // Filter by requestedByType from the API (returnFile.requestedByType)
+    // 'CUSTOMER' → Customer Return tab
+    // 'AGENCY'   → My Return (agency-initiated) tab
+    return _items
+        .where((item) => item.requestedByType == _activeType)
         .toList();
-
-    return filteredByType;
   }
 
   @override
@@ -187,78 +189,70 @@ class _PassportReturnAcceptScreenState
 
   Widget _typeToggle() {
     return Container(
-      width: 110,
       height: 48,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: const Color(0xFFE9EDFF),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Stack(
-        children: [
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
-            alignment: !_isMyReturn
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: Container(
-              width: 50,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
+      child: IntrinsicWidth(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _typeTab('Customer Return', 'CUSTOMER', Icons.groups_outlined),
+            const SizedBox(width: 4),
+            _typeTab('My Return', 'AGENCY', Icons.person_outline),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _typeTab(String label, String type, IconData icon) {
+    final isActive = _activeType == type;
+    return GestureDetector(
+      onTap: () => setState(() => _activeType = type),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: isActive
+              ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withOpacity(0.06),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
-                ],
+                ]
+              : [],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isActive
+                  ? const Color(0xFF004AC6)
+                  : const Color(0xFF434655),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight:
+                    isActive ? FontWeight.w700 : FontWeight.w500,
+                color: isActive
+                    ? const Color(0xFF004AC6)
+                    : const Color(0xFF434655),
               ),
             ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _isMyReturn = false),
-                  behavior: HitTestBehavior.opaque,
-                  child: Center(
-                    child: Tooltip(
-                      message: 'Customer Return',
-                      child: Icon(
-                        Icons.groups_outlined,
-                        size: 22,
-                        color: !_isMyReturn
-                            ? const Color(0xFF004AC6)
-                            : const Color(0xFF434655),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _isMyReturn = true),
-                  behavior: HitTestBehavior.opaque,
-                  child: Center(
-                    child: Tooltip(
-                      message: 'My Return',
-                      child: Icon(
-                        Icons.person_outline,
-                        size: 22,
-                        color: _isMyReturn
-                            ? const Color(0xFF004AC6)
-                            : const Color(0xFF434655),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -468,7 +462,22 @@ class _PassportReturnAcceptScreenState
                 runSpacing: 8,
                 children: [
                   OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Reason for Return'),
+                          content: Text(item.returnFile?.reason ?? 'No reason provided.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     child: const Text('See Reason'),
                   ),
                   OutlinedButton(
@@ -476,7 +485,49 @@ class _PassportReturnAcceptScreenState
                     child: const Text('View Documents'),
                   ),
                   OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Send Passport to BG'),
+                          content: const Text('Are you sure you want to send this passport to BG?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.pop(ctx);
+                                setState(() => _isLoading = true);
+                                try {
+                                  await _bookingService.updateBookingStatus(
+                                    bookingId: item.id,
+                                    status: 'RETURN_PP_SENT_TO_BG',
+                                  );
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Passport sent to BG successfully.')),
+                                    );
+                                  }
+                                  _fetchData();
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Failed to update booking status: $e')),
+                                    );
+                                  }
+                                } finally {
+                                  if (mounted) setState(() => _isLoading = false);
+                                }
+                              },
+                              child: const Text('Yes, Send'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     child: const Text('Send PP to BG'),
                   ),
                 ],
