@@ -29,13 +29,29 @@ class _DropdownExtraAction {
   static const instance = _DropdownExtraAction._();
 }
 
+class _PaymentSystemOption {
+  const _PaymentSystemOption({
+    required this.value,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  final String value;
+  final String title;
+  final String subtitle;
+  final IconData icon;
+}
+
 class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
   final CreateAdService _createAdService = CreateAdService();
   final TextEditingController _jobTitleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _quotaController = TextEditingController();
   final TextEditingController _newWorkTypeController = TextEditingController();
-  final TextEditingController _packagePriceController = TextEditingController();
+  final TextEditingController _packagePriceController = TextEditingController(
+    text: '00000',
+  );
   final TextEditingController _advancePriceController = TextEditingController();
   final TextEditingController _afterVisaController = TextEditingController();
   final TextEditingController _beforeFlightController = TextEditingController();
@@ -205,9 +221,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            _tr('Job title is required', 'চাকরির শিরোনাম আবশ্যক'),
-          ),
+          content: Text(_tr('Job title is required', 'চাকরির শিরোনাম আবশ্যক')),
         ),
       );
       return false;
@@ -226,7 +240,10 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _tr('Please select a work type', 'দয়া করে একটি কাজের ধরন নির্বাচন করুন'),
+            _tr(
+              'Please select a work type',
+              'দয়া করে একটি কাজের ধরন নির্বাচন করুন',
+            ),
           ),
         ),
       );
@@ -236,7 +253,10 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _tr('Please select a selection type', 'নির্বাচন পদ্ধতি নির্বাচন করুন'),
+            _tr(
+              'Please select a selection type',
+              'নির্বাচন পদ্ধতি নির্বাচন করুন',
+            ),
           ),
         ),
       );
@@ -244,11 +264,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     }
     if (quota == null || quota <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            _tr('Quota is required', 'কোটা আবশ্যক'),
-          ),
-        ),
+        SnackBar(content: Text(_tr('Quota is required', 'কোটা আবশ্যক'))),
       );
       return false;
     }
@@ -267,7 +283,10 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _tr('Interview start date is required', 'ইন্টারভিউ শুরুর তারিখ আবশ্যক'),
+              _tr(
+                'Interview start date is required',
+                'ইন্টারভিউ শুরুর তারিখ আবশ্যক',
+              ),
             ),
           ),
         );
@@ -277,7 +296,10 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _tr('Interview end date is required', 'ইন্টারভিউ শেষের তারিখ আবশ্যক'),
+              _tr(
+                'Interview end date is required',
+                'ইন্টারভিউ শেষের তারিখ আবশ্যক',
+              ),
             ),
           ),
         );
@@ -287,7 +309,10 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _tr('Interview end date cannot be before start date', 'ইন্টারভিউ শেষের তারিখ শুরু তারিখের আগে হতে পারে না'),
+              _tr(
+                'Interview end date cannot be before start date',
+                'ইন্টারভিউ শেষের তারিখ শুরু তারিখের আগে হতে পারে না',
+              ),
             ),
           ),
         );
@@ -1357,14 +1382,20 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                         ],
+                        onTap: () {
+                          if (_packagePriceController.text == '00000') {
+                            _packagePriceController.clear();
+                          }
+                        },
                         style: const TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
                           height: 1.0,
                         ),
+                        cursorColor: Colors.white,
                         decoration: InputDecoration(
-                          hintText: '450000',
+                          hintText: '00000',
                           hintStyle: TextStyle(
                             color: Colors.white.withOpacity(0.5),
                           ),
@@ -1398,7 +1429,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildPaymentSystemDropdown(),
+          _buildPaymentSystemToggle(),
           const SizedBox(height: 20),
           _buildPaymentInfoBox(
             icon: Icons.report_problem_rounded,
@@ -1478,7 +1509,32 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
     );
   }
 
-  Widget _buildPaymentSystemDropdown() {
+  Widget _buildPaymentSystemToggle() {
+    final options = [
+      _PaymentSystemOption(
+        value: 'AFTER_VISA_BEFORE_FLIGHT',
+        title: _tr('After Visa / Before Flight', 'ভিসার পর / ফ্লাইটের আগে'),
+        subtitle: _tr('2 payment steps', '২টি পেমেন্ট ধাপ'),
+        icon: Icons.payments_outlined,
+      ),
+      _PaymentSystemOption(
+        value: 'ADVANCE_AFTER_VISA_BEFORE_FLIGHT',
+        title: _tr(
+          'Advance / After Visa / Before Flight',
+          'অগ্রিম / ভিসার পর / ফ্লাইটের আগে',
+        ),
+        subtitle: _tr(
+          '3 payment steps with advance',
+          'অগ্রিমসহ ৩টি পেমেন্ট ধাপ',
+        ),
+        icon: Icons.account_balance_wallet_outlined,
+      ),
+    ];
+
+    final selectedIndex = _paymentSystem == 'ADVANCE_AFTER_VISA_BEFORE_FLIGHT'
+        ? 1
+        : 0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1492,44 +1548,78 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 56,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _paymentSystem,
-              isExpanded: true,
-              items: [
-                DropdownMenuItem(
-                  value: 'ADVANCE_AFTER_VISA_BEFORE_FLIGHT',
-                  child: Text(
-                    _tr(
-                      'Advance + After Visa + Before Flight',
-                      'অগ্রিম + ভিসার পর + ফ্লাইটের আগে',
-                    ),
-                  ),
+        ToggleButtons(
+          isSelected: [selectedIndex == 0, selectedIndex == 1],
+          onPressed: (index) {
+            final selectedOption = options[index];
+            setState(() {
+              _paymentSystem = selectedOption.value;
+              if (!_usesAdvancePayment) _advancePriceController.clear();
+            });
+          },
+          borderRadius: BorderRadius.circular(18),
+          borderWidth: 1,
+          selectedBorderColor: AppPalette.brandBlue,
+          borderColor: const Color(0xFFE2E8F0),
+          fillColor: AppPalette.brandBlue.withOpacity(0.08),
+          color: AppPalette.textMuted,
+          selectedColor: AppPalette.brandBlue,
+          splashColor: AppPalette.brandBlue.withOpacity(0.12),
+          constraints: const BoxConstraints(minHeight: 112),
+          children: options.map((option) {
+            final isSelected = option.value == _paymentSystem;
+            return SizedBox(
+              width: (MediaQuery.of(context).size.width - 96) / 2,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 16,
                 ),
-                DropdownMenuItem(
-                  value: 'AFTER_VISA_BEFORE_FLIGHT',
-                  child: Text(
-                    _tr(
-                      'After Visa + Before Flight',
-                      'ভিসার পর + ফ্লাইটের আগে',
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      option.icon,
+                      size: 18,
+                      color: isSelected
+                          ? AppPalette.brandBlue
+                          : AppPalette.textMuted,
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            option.title,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: isSelected
+                                  ? AppPalette.brandBlue
+                                  : AppPalette.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            option.subtitle,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: isSelected
+                                  ? AppPalette.brandBlue.withOpacity(0.8)
+                                  : AppPalette.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-              onChanged: (value) {
-                if (value == null) return;
-                setState(() => _paymentSystem = value);
-                if (!_usesAdvancePayment) _advancePriceController.clear();
-              },
-            ),
-          ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -2583,7 +2673,7 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                 onPressed: _isPublishing
                     ? null
                     : () {
-                                if (_currentStep == 0 &&
+                        if (_currentStep == 0 &&
                             !_isEditMode &&
                             _selectedImage == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -2599,7 +2689,8 @@ class _CreateAdFormScreenState extends State<CreateAdFormScreen> {
                           return;
                         }
 
-                        if (_currentStep == 1 && !_validateBasicInformationStep()) {
+                        if (_currentStep == 1 &&
+                            !_validateBasicInformationStep()) {
                           return;
                         }
 

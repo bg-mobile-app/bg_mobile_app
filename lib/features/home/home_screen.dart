@@ -230,7 +230,10 @@ class _HomeScreenState extends State<HomeScreen> {
       params['maxAge'] = _maxAgeController.text.trim();
     }
 
-    final uri = Uri(path: '/search', queryParameters: params.isNotEmpty ? params : null);
+    final uri = Uri(
+      path: '/search',
+      queryParameters: params.isNotEmpty ? params : null,
+    );
     context.go(uri.toString());
   }
 
@@ -355,7 +358,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   _dropdown(
                     value: _selectionType,
                     hint: 'Selection Type',
-                    items: const ['All', 'DELEGATE', 'PUSHING', 'ZOOM INTERVIEW', 'CV SELECTION'],
+                    items: const [
+                      'All',
+                      'DELEGATE',
+                      'PUSHING',
+                      'ZOOM INTERVIEW',
+                      'CV SELECTION',
+                    ],
                     height: responsive.size(56, min: 48, max: 56),
                     horizontalPadding: responsive.size(10, min: 8, max: 10),
                     fontSize: responsive.font(11, min: 10, max: 11),
@@ -711,7 +720,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           _sectionHeader(
-            'Work Permit',
+            'Work Aboard',
             actionLabel: 'See More',
             onActionTap: () => context.push('/search'),
           ),

@@ -202,8 +202,8 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                           color: e.status.toUpperCase() == 'PAID'
                               ? AppPalette.success
                               : (e.status.toUpperCase().contains('APPROVE')
-                                  ? AppPalette.brandBlue
-                                  : AppPalette.textPrimary),
+                                    ? AppPalette.brandBlue
+                                    : AppPalette.textPrimary),
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -234,7 +234,9 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
   Widget _card(PayoutRequestItem e) {
     final status = e.status.toUpperCase();
     final isPositiveStatus = status == 'PAID' || status.contains('APPROVE');
-    final tagColor = isPositiveStatus ? AppPalette.success : AppPalette.brandBlue;
+    final tagColor = isPositiveStatus
+        ? AppPalette.success
+        : AppPalette.brandBlue;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -263,8 +265,11 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.confirmation_number,
-                                  color: AppPalette.brandBlue, size: 18),
+                              const Icon(
+                                Icons.confirmation_number,
+                                color: AppPalette.brandBlue,
+                                size: 18,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'Post & Booking ID'.toUpperCase(),
@@ -291,7 +296,9 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: tagColor,
                             borderRadius: BorderRadius.circular(999),
@@ -300,17 +307,19 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                           child: Text(
                             e.status.isNotEmpty ? e.status : 'PENDING',
                             style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12),
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           e.step.toUpperCase(),
                           style: AppTextStyles.caption.copyWith(
-                              color: AppPalette.brandBlue,
-                              fontWeight: FontWeight.w700),
+                            color: AppPalette.brandBlue,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
@@ -335,30 +344,40 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                             color: AppPalette.borderSoftBlue,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.person, color: AppPalette.brandBlue),
+                          child: const Icon(
+                            Icons.person,
+                            color: AppPalette.brandBlue,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Customer Name & Passport',
-                                  style: AppTextStyles.caption
-                                      .copyWith(color: AppPalette.textMuted)),
+                              Text(
+                                'Customer Name & Passport',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppPalette.textMuted,
+                                ),
+                              ),
                               const SizedBox(height: 4),
-                              Text('${e.customerName}',
-                                  style: AppTextStyles.body1
-                                      .copyWith(fontWeight: FontWeight.w700)),
+                              Text(
+                                '${e.customerName}',
+                                style: AppTextStyles.body1.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                               const SizedBox(height: 2),
-                              Text('Passport: ${e.passportNo}',
-                                  style: AppTextStyles.body2),
+                              Text(
+                                'Passport: ${e.passportNo}',
+                                style: AppTextStyles.body2,
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
-
                   ],
                 ),
 
@@ -370,7 +389,9 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                   decoration: BoxDecoration(
                     color: AppPalette.pageBackground,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppPalette.borderSoftBlue.withOpacity(0.4)),
+                    border: Border.all(
+                      color: AppPalette.borderSoftBlue.withOpacity(0.4),
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -380,13 +401,19 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Total Amount',
-                                    style: AppTextStyles.caption
-                                        .copyWith(color: AppPalette.textMuted)),
+                                Text(
+                                  'Total Amount',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppPalette.textMuted,
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
-                                Text('৳ ${e.totalAmount}',
-                                    style: AppTextStyles.body1
-                                        .copyWith(fontWeight: FontWeight.w800)),
+                                Text(
+                                  '৳ ${e.totalAmount}',
+                                  style: AppTextStyles.body1.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -394,14 +421,20 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text('Paid Amount',
-                                    style: AppTextStyles.caption
-                                        .copyWith(color: AppPalette.textMuted)),
+                                Text(
+                                  'Paid Amount',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppPalette.textMuted,
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
-                                Text('৳ ${e.paidAmount}',
-                                    style: AppTextStyles.body1.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                        color: AppPalette.brandBlue)),
+                                Text(
+                                  '৳ ${e.paidAmount}',
+                                  style: AppTextStyles.body1.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: AppPalette.brandBlue,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -412,61 +445,33 @@ class _ReceivePaymentScreenState extends State<ReceivePaymentScreen> {
                       const SizedBox(height: 12),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text('Current Request',
-                            style: AppTextStyles.caption.copyWith(
-                                color: AppPalette.brandBlue,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.2)),
+                        child: Text(
+                          'Current Request',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppPalette.brandBlue,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('৳ ${e.currentRequest}',
-                              style: AppTextStyles.headline2
-                                  .copyWith(color: AppPalette.brandBlue)),
-                          const Icon(Icons.trending_up, color: AppPalette.brandBlue),
+                          Text(
+                            '৳ ${e.currentRequest}',
+                            style: AppTextStyles.headline2.copyWith(
+                              color: AppPalette.brandBlue,
+                            ),
+                          ),
+                          const Icon(
+                            Icons.trending_up,
+                            color: AppPalette.brandBlue,
+                          ),
                         ],
                       ),
                     ],
                   ),
-                ),
-
-                // Actions
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.check_circle),
-                        label: const Text('Approve'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppPalette.brandBlue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 2,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppPalette.borderNeutral),
-                        color: Colors.white,
-                      ),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.more_vert),
-                        color: AppPalette.textMuted,
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
