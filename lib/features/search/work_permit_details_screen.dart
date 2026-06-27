@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 
 import '../../common/services/api_client.dart';
 import '../../routes/app_routes.dart';
@@ -64,6 +64,17 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     final shareText = 'Check out this work permit: $title in $country. Price: BDT ${widget.item.customerPrice}. Learn more at: $shareUrl';
     final imageUrl = _details?.image.isNotEmpty == true ? _details!.image : widget.item.image;
 
+    debugPrint('╔══════════════════════════════════════════════════════');
+    debugPrint('║ [SHARE] Share sheet opened');
+    debugPrint('║  source      = WorkPermitDetailsScreen._showShareSheet()');
+    debugPrint('║  title       = $title');
+    debugPrint('║  country     = $country');
+    debugPrint('║  slug        = $slug');
+    debugPrint('║  shareUrl    = $shareUrl');
+    debugPrint('║  shareText   = $shareText');
+    debugPrint('║  imageUrl    = $imageUrl');
+    debugPrint('╚══════════════════════════════════════════════════════');
+
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.white,
@@ -86,78 +97,15 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _shareOption(
-                    icon: FontAwesomeIcons.whatsapp,
-                    label: 'WhatsApp',
-                    color: const Color(0xFF25D366),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final url = Uri.parse('https://api.whatsapp.com/send?text=${Uri.encodeComponent(shareText)}');
-                      try {
-                        await launchUrl(url, mode: LaunchMode.externalApplication);
-                      } catch (e) {
-                        debugPrint('Could not launch WhatsApp: $e');
-                      }
-                    },
-                  ),
-                  _shareOption(
-                    icon: FontAwesomeIcons.facebook,
-                    label: 'Facebook',
-                    color: const Color(0xFF1877F2),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final url = Uri.parse('https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(shareUrl)}');
-                      try {
-                        await launchUrl(url, mode: LaunchMode.externalApplication);
-                      } catch (e) {
-                        debugPrint('Could not launch Facebook: $e');
-                      }
-                    },
-                  ),
-                  _shareOption(
-                    icon: FontAwesomeIcons.telegram,
-                    label: 'Telegram',
-                    color: const Color(0xFF0088CC),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final url = Uri.parse('https://t.me/share/url?url=${Uri.encodeComponent(shareUrl)}&text=${Uri.encodeComponent(shareText)}');
-                      try {
-                        await launchUrl(url, mode: LaunchMode.externalApplication);
-                      } catch (e) {
-                        debugPrint('Could not launch Telegram: $e');
-                      }
-                    },
-                  ),
-                  _shareOption(
-                    icon: FontAwesomeIcons.twitter,
-                    label: 'Twitter',
-                    color: const Color(0xFF1DA1F2),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final url = Uri.parse('https://twitter.com/intent/tweet?text=${Uri.encodeComponent(shareText)}');
-                      try {
-                        await launchUrl(url, mode: LaunchMode.externalApplication);
-                      } catch (e) {
-                        debugPrint('Could not launch Twitter: $e');
-                      }
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              const Divider(color: _outline, height: 1),
-              const SizedBox(height: 8),
               // Share with Image — uses platform native share sheet
               if (imageUrl.isNotEmpty)
                 ListTile(
                   leading: const Icon(Icons.image_rounded, color: _brandBlue),
-                  title: const Text('Share with Image', style: TextStyle(fontWeight: FontWeight.w600)),
+                  title: const Text('Share in Social Media', style: TextStyle(fontWeight: FontWeight.w600)),
                   subtitle: const Text('Opens native share sheet with image', style: TextStyle(fontSize: 12)),
                   onTap: () async {
                     Navigator.pop(context);
+                    debugPrint('║ [SHARE] Native share with image requested');
                     await _shareWithImage(
                       imageUrl: imageUrl,
                       shareText: shareText,
@@ -172,9 +120,15 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 subtitle: const Text('Opens native share sheet', style: TextStyle(fontSize: 12)),
                 onTap: () async {
                   Navigator.pop(context);
-                  await SharePlus.instance.share(
-                    ShareParams(text: shareText),
-                  );
+                  debugPrint('║ [SHARE] Native share link requested');
+                  try {
+                    await SharePlus.instance.share(
+                      ShareParams(text: shareText),
+                    );
+                    debugPrint('║  ✅ Native share completed');
+                  } catch (e) {
+                    debugPrint('║  ❌ Native share failed: $e');
+                  }
                 },
               ),
               ListTile(
@@ -182,7 +136,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 title: const Text('Copy Link', style: TextStyle(fontWeight: FontWeight.w600)),
                 onTap: () {
                   Navigator.pop(context);
+                  debugPrint('║ [SHARE] Copy link requested');
                   Clipboard.setData(ClipboardData(text: shareUrl));
+                  debugPrint('║  ✅ Link copied to clipboard');
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Link copied to clipboard!'),
@@ -204,6 +160,13 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     required String shareUrl,
   }) async {
     try {
+      debugPrint('╔══════════════════════════════════════════════════════');
+      debugPrint('║ [SHARE] Preparing image-based share');
+      debugPrint('║  imageUrl = $imageUrl');
+      debugPrint('║  shareText = $shareText');
+      debugPrint('║  shareUrl = $shareUrl');
+      debugPrint('╚══════════════════════════════════════════════════════');
+
       // Show loading indicator
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -225,7 +188,9 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
       );
 
       // Download image bytes
+      debugPrint('║ [SHARE] Downloading share image');
       final response = await http.get(Uri.parse(imageUrl));
+      debugPrint('║  image download status = ${response.statusCode}');
       if (response.statusCode != 200) {
         throw Exception('Failed to download image: ${response.statusCode}');
       }
@@ -235,19 +200,22 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
       final ext = imageUrl.contains('.png') ? 'png' : 'jpg';
       final file = File('${tempDir.path}/wp_share_image.$ext');
       await file.writeAsBytes(response.bodyBytes);
+      debugPrint('║  image saved to = ${file.path}');
 
       // Dismiss loading snackbar
       if (mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       // Share with image using share_plus
+      debugPrint('║ [SHARE] Invoking native share with image');
       await SharePlus.instance.share(
         ShareParams(
           text: shareText,
           files: [XFile(file.path)],
         ),
       );
+      debugPrint('║  ✅ Image share completed');
     } catch (e) {
-      debugPrint('Error sharing with image: $e');
+      debugPrint('║  ❌ Error sharing with image: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -268,42 +236,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     }
   }
 
-  Widget _shareOption({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: FaIcon(icon, color: color, size: 24),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: _mutedText,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Future<void> _checkLoginStatus() async {
     final cookies = await ApiClient().tokenStorage.getCookies();
