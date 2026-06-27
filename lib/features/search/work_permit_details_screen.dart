@@ -1350,11 +1350,11 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     final maxAge = displayDetails.maxAge;
 
     if (minAge > 0 && maxAge > 0) {
-      return _tr('$minAge - $maxAge\nYears', '$minAge - $maxAge\nবছর');
+      return _tr('$minAge - $maxAge Years', '$minAge - $maxAge বছর');
     }
-    if (minAge > 0) return _tr('$minAge+\nYears', '$minAge+\nবছর');
+    if (minAge > 0) return _tr('$minAge+ Years', '$minAge+ বছর');
     if (maxAge > 0) {
-      return _tr('Up to $maxAge\nYears', '$maxAge বছর পর্যন্ত');
+      return _tr('Up to $maxAge Years', '$maxAge বছর পর্যন্ত');
     }
     return _tr('N/A', 'প্রযোজ্য নয়');
   }

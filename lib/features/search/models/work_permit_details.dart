@@ -401,11 +401,26 @@ class WorkPermitDetails {
     );
   }
 
+  static String _convertToEnglishDigits(String input) {
+    const banglaToEnglish = {
+      '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+      '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9',
+    };
+    String result = input;
+    banglaToEnglish.forEach((bn, en) {
+      result = result.replaceAll(bn, en);
+    });
+    return result;
+  }
+
   static int _parseInt(dynamic value) {
     if (value == null) return 0;
     if (value is int) return value;
     if (value is double) return value.toInt();
-    if (value is String) return double.tryParse(value)?.toInt() ?? 0;
+    if (value is String) {
+      final engStr = _convertToEnglishDigits(value);
+      return double.tryParse(engStr)?.toInt() ?? 0;
+    }
     return 0;
   }
 
@@ -413,7 +428,10 @@ class WorkPermitDetails {
     if (value == null) return null;
     if (value is int) return value;
     if (value is double) return value.toInt();
-    if (value is String) return double.tryParse(value)?.toInt();
+    if (value is String) {
+      final engStr = _convertToEnglishDigits(value);
+      return double.tryParse(engStr)?.toInt();
+    }
     return null;
   }
 

@@ -153,7 +153,7 @@ class WorkPermitCard extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      'BDT ${formatBdt(item.customerPrice)}',
+                                      'BDT ${formatBdt(item.agentPrice)}',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(

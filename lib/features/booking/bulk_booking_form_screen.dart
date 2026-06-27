@@ -4,6 +4,7 @@ import '../../common/services/api_exception.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../home/models/home_models.dart';
+import '../policy/policy_screen.dart';
 import 'services/booking_service.dart';
 
 const Color _brandBlue = Color(0xFF2563EB);
@@ -289,12 +290,65 @@ class _BulkBookingFormScreenState extends State<BulkBookingFormScreen> {
                             ),
                           ),
                           Expanded(
-                            child: Text(
-                              'I agree to the Terms and Conditions for all applications.',
-                              style: TextStyle(
-                                color: _text,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
+                            child: RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  color: _text,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  height: 1.5,
+                                ),
+                                children: [
+                                  const TextSpan(text: 'I agree to the '),
+                                  WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const PolicyScreen(policyType: 'TERMS'),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text(
+                                        'Terms & Conditions',
+                                        style: TextStyle(
+                                          color: _brandBlue,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: _brandBlue,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const TextSpan(text: ' and '),
+                                  WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const PolicyScreen(policyType: 'PRIVACY'),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text(
+                                        'Privacy Policy',
+                                        style: TextStyle(
+                                          color: _brandBlue,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: _brandBlue,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const TextSpan(text: ' for all applications.'),
+                                ],
                               ),
                             ),
                           ),
