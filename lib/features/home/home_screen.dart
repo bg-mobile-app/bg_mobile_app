@@ -13,16 +13,21 @@ import 'widgets/home_common_widgets.dart';
 import 'widgets/home_responsive.dart';
 import 'widgets/work_permit_card.dart';
 import '../../common/theme/app_palette.dart';
-import '../../common/theme/app_spacing.dart';
 import '../../common/theme/app_text_styles.dart';
 import '../../common/services/api_client.dart';
 import '../../common/services/expiry_reminder_dialog_service.dart';
 import '../../common/services/profile_service.dart';
 import '../../routes/app_routes.dart';
 import '../search/work_permit_details_screen.dart';
+import '../search/widgets/filter_sidebar.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.tabIndex = 0});
+
+  /// The bottom-nav tab index that is currently active.
+  /// Used to distinguish a push-to-search (tabIndex 0) from
+  /// a bottom-nav-search tap (tabIndex 1).
+  final int tabIndex;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -37,8 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? _country;
   String? _workType;
-  String _serviceType = 'WORK_PERMIT';
-  String _selectionType = 'All';
+
 
   final _bannerController = PageController(viewportFraction: 1);
   Timer? _bannerTimer;
@@ -217,9 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_workType != null && _workType!.isNotEmpty) {
       params['workType'] = _workType!;
     }
-    if (_selectionType != 'All') {
-      params['selectionType'] = _selectionType;
-    }
+
     if (_companyController.text.trim().isNotEmpty) {
       params['query'] = _companyController.text.trim();
     }
@@ -241,6 +243,75 @@ class _HomeScreenState extends State<HomeScreen> {
     _navigateToSearch();
   }
 
+  Future<void> _openAdvancedFilterSheet() async {
+    // Seed the current dropdown selections into the filter sidebar
+    String? countryCode;
+    if (_country != null) {
+      try {
+        countryCode = _countries.firstWhere((c) => c.name == _country).code;
+      } catch (_) {}
+    }
+
+    final initialFilter = FilterValue(
+      query: _companyController.text.trim(),
+      country: countryCode,
+      workType: _workType,
+      minAge: _minAgeController.text.trim().isNotEmpty
+          ? _minAgeController.text.trim()
+          : null,
+      maxAge: _maxAgeController.text.trim().isNotEmpty
+          ? _maxAgeController.text.trim()
+          : null,
+    );
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => FractionallySizedBox(
+        heightFactor: 0.85,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: FilterSidebar(
+            initialValue: initialFilter,
+            onApply: (value) {
+              Navigator.pop(ctx);
+              // Navigate to search screen with the applied filter values
+              final params = <String, String>{};
+              if (value.country != null && value.country!.isNotEmpty) {
+                params['country'] = value.country!;
+              }
+              if (value.workType != null && value.workType!.isNotEmpty) {
+                params['workType'] = value.workType!;
+              }
+              if (value.query.isNotEmpty) {
+                params['query'] = value.query;
+              }
+              if (value.selectionType != null && value.selectionType!.isNotEmpty) {
+                params['selectionType'] = value.selectionType!;
+              }
+              if (value.minAge != null && value.minAge!.isNotEmpty) {
+                params['minAge'] = value.minAge!;
+              }
+              if (value.maxAge != null && value.maxAge!.isNotEmpty) {
+                params['maxAge'] = value.maxAge!;
+              }
+              final uri = Uri(
+                path: '/search',
+                queryParameters: params.isNotEmpty ? params : null,
+              );
+              context.go(uri.toString());
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _companyController.dispose();
@@ -257,159 +328,6 @@ class _HomeScreenState extends State<HomeScreen> {
     ).showSnackBar(const SnackBar(content: Text('Working on this page')));
   }
 
-  Future<void> _showAdvancedFilterSheet() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      builder: (context) {
-        final responsive = HomeResponsive.of(context);
-        final sheetGap = responsive.size(10, min: 8, max: 12);
-
-        final mediaQuery = MediaQuery.of(context);
-        final horizontalInset = responsive.size(
-          AppSpacing.md,
-          min: 12,
-          max: AppSpacing.md,
-        );
-        final bottomInset = responsive.size(
-          AppSpacing.md,
-          min: 12,
-          max: AppSpacing.md,
-        );
-
-        String sheetServiceType = _serviceType;
-        String sheetSelectionType = _selectionType;
-
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            void submitAdvancedFilters() {
-              setState(() {
-                _serviceType = sheetServiceType;
-                _selectionType = sheetSelectionType;
-              });
-              Navigator.pop(context);
-              _applyFilters();
-            }
-
-            return AnimatedPadding(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOut,
-              padding: EdgeInsets.only(
-                left: horizontalInset,
-                right: horizontalInset,
-                bottom: mediaQuery.viewInsets.bottom + bottomInset,
-              ),
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  horizontal: responsive.size(AppSpacing.sm + 2, min: 10, max: 14),
-                  vertical: responsive.size(
-                    AppSpacing.md,
-                    min: 12,
-                    max: AppSpacing.md,
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(
-                    responsive.size(16, min: 12, max: 16),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x26000000),
-                      blurRadius: 18,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _dropdown(
-                        value: sheetServiceType,
-                        hint: 'Service Type',
-                        items: const ['WORK_PERMIT'],
-                        height: responsive.size(56, min: 48, max: 56),
-                        horizontalPadding: responsive.size(10, min: 8, max: 10),
-                        fontSize: responsive.font(11, min: 10, max: 11),
-                        onChanged: (v) => setSheetState(
-                          () => sheetServiceType = v ?? 'WORK_PERMIT',
-                        ),
-                      ),
-                      SizedBox(height: sheetGap),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _textField(
-                              _minAgeController,
-                              'Min Age',
-                              onSubmitted: submitAdvancedFilters,
-                            ),
-                          ),
-                          SizedBox(width: responsive.size(8, min: 6, max: 8)),
-                          Expanded(
-                            child: _textField(
-                              _maxAgeController,
-                              'Max Age',
-                              onSubmitted: submitAdvancedFilters,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: sheetGap),
-                      _textField(
-                        _companyController,
-                        'Company Name',
-                        onSubmitted: submitAdvancedFilters,
-                      ),
-                      SizedBox(height: sheetGap),
-                      _dropdown(
-                        value: sheetSelectionType,
-                        hint: 'Selection Type',
-                        items: const [
-                          'All',
-                          'DELEGATE',
-                          'PUSHING',
-                          'ZOOM INTERVIEW',
-                          'CV SELECTION',
-                        ],
-                        height: responsive.size(56, min: 48, max: 56),
-                        horizontalPadding: responsive.size(10, min: 8, max: 10),
-                        fontSize: responsive.font(11, min: 10, max: 11),
-                        onChanged: (v) => setSheetState(
-                          () => sheetSelectionType = v ?? 'All',
-                        ),
-                      ),
-                      SizedBox(height: responsive.size(12, min: 10, max: 12)),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: submitAdvancedFilters,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _brandBlue,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: Text(
-                            'Search',
-                            style: TextStyle(
-                              fontSize: responsive.font(14, min: 12, max: 14),
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -478,69 +396,81 @@ class _HomeScreenState extends State<HomeScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final responsive = HomeResponsive.fromWidth(constraints.maxWidth);
-        final isTightPhone = responsive.isTightPhone;
-        final gap = responsive.size(isTightPhone ? 6 : 8, min: 5, max: 8);
-        final filterButtonSize = responsive.size(48, min: 42, max: 48);
+        final gap = responsive.size(8, min: 5, max: 8);
+        final searchButtonSize = responsive.size(48, min: 42, max: 48);
         final dropdownHeight = responsive.size(56, min: 46, max: 56);
         final dropdownPadding = responsive.size(10, min: 7, max: 10);
         final dropdownFontSize = responsive.font(13, min: 12, max: 13);
 
-        return Row(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: _dropdown(
-                value: _country,
-                hint: 'Country Name',
-                items: _countries.map((e) => e.name).toList(),
-                height: dropdownHeight,
-                horizontalPadding: dropdownPadding,
-                fontSize: dropdownFontSize,
-                leadingBuilder: _countryOptionLeading,
-                onChanged: (v) {
-                  setState(() => _country = v);
-                  _applyFilters();
-                },
-              ),
-            ),
-            SizedBox(width: gap),
-            Expanded(
-              child: _dropdown(
-                value: _workType,
-                hint: 'Type of Work',
-                items: _workTypes.map((e) => e.name).toList(),
-                height: dropdownHeight,
-                horizontalPadding: dropdownPadding,
-                fontSize: dropdownFontSize,
-                onChanged: (v) {
-                  setState(() => _workType = v);
-                  _applyFilters();
-                },
-              ),
-            ),
-            SizedBox(width: gap),
-            InkWell(
-              onTap: _showAdvancedFilterSheet,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                height: filterButtonSize,
-                width: filterButtonSize,
-                decoration: BoxDecoration(
-                  color: _brandBlue,
+            // ── Dropdowns + Filter button row ────────────────────────────
+            Row(
+              children: [
+                Expanded(
+                  child: _dropdown(
+                    value: _country,
+                    hint: 'Country Name',
+                    items: _countries.map((e) => e.name).toList(),
+                    height: dropdownHeight,
+                    horizontalPadding: dropdownPadding,
+                    fontSize: dropdownFontSize,
+                    leadingBuilder: _countryOptionLeading,
+                    onChanged: (v) {
+                      setState(() => _country = v);
+                      // Only auto-navigate when BOTH dropdowns are selected
+                      if (v != null && _workType != null) {
+                        _applyFilters();
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(width: gap),
+                Expanded(
+                  child: _dropdown(
+                    value: _workType,
+                    hint: 'Type of Work',
+                    items: _workTypes.map((e) => e.name).toList(),
+                    height: dropdownHeight,
+                    horizontalPadding: dropdownPadding,
+                    fontSize: dropdownFontSize,
+                    onChanged: (v) {
+                      setState(() => _workType = v);
+                      // Only auto-navigate when BOTH dropdowns are selected
+                      if (v != null && _country != null) {
+                        _applyFilters();
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(width: gap),
+                // Filter icon button — opens advanced filter bottom sheet
+                InkWell(
+                  onTap: _openAdvancedFilterSheet,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x332563EB),
-                      blurRadius: 14,
-                      offset: Offset(0, 6),
+                  child: Container(
+                    height: searchButtonSize,
+                    width: searchButtonSize,
+                    decoration: BoxDecoration(
+                      color: _brandBlue,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x332563EB),
+                          blurRadius: 14,
+                          offset: Offset(0, 6),
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Icon(
+                      Icons.tune_rounded,
+                      color: Colors.white,
+                      size: responsive.size(22, min: 18, max: 22),
+                    ),
+                  ),
                 ),
-                child: Icon(
-                  Icons.tune,
-                  color: Colors.white,
-                  size: responsive.size(20, min: 17, max: 20),
-                ),
-              ),
+              ],
             ),
           ],
         );
@@ -591,6 +521,19 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             itemBuilder: (context, index) {
               final item = navLinkData[index];
+
+              // Determine which service icon is "active":
+              // - Read the current router location.
+              // - If the location matches this item's href, highlight it.
+              // - Exception: if we're on /search but got there via the
+              //   bottom-nav Search tab (tabIndex == 1), do NOT highlight
+              //   Work Abroad — nothing in the services grid should be active.
+              final currentPath = GoRouterState.of(context).uri.path;
+              final isBottomNavSearch = widget.tabIndex == 1;
+              final isSelected = item.href.isNotEmpty &&
+                  currentPath == item.href &&
+                  !(item.href == '/search' && isBottomNavSearch);
+
               return InkWell(
                 onTap: item.href.isEmpty
                     ? _showComingSoon
@@ -608,11 +551,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: iconBoxSize,
                         height: iconBoxSize,
                         decoration: BoxDecoration(
-                          color: index == 0 ? _brandBlue : Colors.white,
+                          color: isSelected ? _brandBlue : Colors.white,
                           borderRadius: BorderRadius.circular(
                             responsive.size(18, min: 14, max: 18),
                           ),
-                          boxShadow: index == 0
+                          boxShadow: isSelected
                               ? const [
                                   BoxShadow(
                                     color: Color(0x332563EB),
@@ -632,12 +575,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: item.customIconData != null
                               ? Icon(
                                   item.customIconData,
-                                  color: index == 0 ? Colors.white : _brandBlue,
+                                  color: isSelected ? Colors.white : _brandBlue,
                                   size: iconSize,
                                 )
                               : FUI(
                                   item.icon,
-                                  color: index == 0 ? Colors.white : _brandBlue,
+                                  color: isSelected ? Colors.white : _brandBlue,
                                   width: iconSize,
                                   height: iconSize,
                                 ),
@@ -653,6 +596,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: serviceTextFontSize,
                           height: serviceTextHeight,
                           fontWeight: FontWeight.w600,
+                          color: isSelected ? _brandBlue : null,
                         ),
                       ),
                     ],
@@ -1310,53 +1254,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _textField(
-    TextEditingController controller,
-    String hint, {
-    VoidCallback? onSubmitted,
-  }) {
-    final responsive = HomeResponsive.of(context);
-    final radius = responsive.size(8, min: 7, max: 8);
-
-    return TextField(
-      controller: controller,
-      textInputAction: TextInputAction.search,
-      onSubmitted: (_) {
-        if (onSubmitted != null) {
-          onSubmitted();
-        } else {
-          _applyFilters();
-        }
-      },
-      style: TextStyle(
-        color: Colors.black,
-        fontSize: responsive.font(14, min: 12, max: 14),
-      ),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(
-          color: Colors.black54,
-          fontSize: responsive.font(14, min: 12, max: 14),
-        ),
-        isDense: true,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: responsive.size(10, min: 8, max: 10),
-          vertical: responsive.size(10, min: 8, max: 10),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(radius)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-        ),
-      ),
-    );
-  }
 }
 
 class _ExpiryReminderDialogCard extends StatelessWidget {

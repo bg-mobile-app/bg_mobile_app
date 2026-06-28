@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../common/services/auth_service.dart';
@@ -90,6 +91,23 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   void _onOtpChanged(int index, String value) {
+    if (value.length > 1) {
+      // User pasted or typed multiple digits
+      final clean = value.replaceAll(RegExp(r'[^0-9]'), '');
+      if (clean.isNotEmpty) {
+        // Distribute the digits starting from the current index
+        int digitIdx = 0;
+        for (int i = index; i < 6 && digitIdx < clean.length; i++) {
+          _otpControllers[i].text = clean[digitIdx];
+          digitIdx++;
+        }
+        // Focus the last filled box or the next one
+        final focusTarget = (index + clean.length).clamp(0, 5);
+        _focusNodes[focusTarget].requestFocus();
+      }
+      return;
+    }
+
     final clean = value.replaceAll(RegExp(r'[^0-9]'), '');
     if (clean != value) {
       _otpControllers[index].text = clean;
@@ -98,10 +116,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       );
     }
 
-    if (clean.isNotEmpty && index < 5) {
-      _focusNodes[index + 1].requestFocus();
-    } else if (clean.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
+    if (clean.isNotEmpty) {
+      if (index < 5) {
+        _focusNodes[index + 1].requestFocus();
+      }
     }
   }
 
@@ -238,22 +256,36 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     children: List.generate(6, (index) {
                       return SizedBox(
                         width: 48,
-                        child: TextField(
-                          controller: _otpControllers[index],
-                          focusNode: _focusNodes[index],
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          maxLength: 1,
-                          decoration: InputDecoration(
-                            counterText: '',
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 14,
+                        child: KeyboardListener(
+                          focusNode: FocusNode(skipTraversal: true),
+                          onKeyEvent: (event) {
+                            if (event is KeyDownEvent) {
+                              if (event.logicalKey == LogicalKeyboardKey.backspace) {
+                                if (_otpControllers[index].text.isEmpty && index > 0) {
+                                  _otpControllers[index - 1].clear();
+                                  _focusNodes[index - 1].requestFocus();
+                                }
+                              }
+                            }
+                          },
+                          child: TextField(
+                            controller: _otpControllers[index],
+                            focusNode: _focusNodes[index],
+                            textAlign: TextAlign.center,
+                            keyboardType: TextInputType.number,
+                            maxLength: 6, // Allowed larger length so paste events are captured by onChanged
+                            buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
+                            decoration: InputDecoration(
+                              counterText: '',
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                            onChanged: (value) => _onOtpChanged(index, value),
                           ),
-                          onChanged: (value) => _onOtpChanged(index, value),
                         ),
                       );
                     }),

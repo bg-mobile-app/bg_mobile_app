@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../common/services/auth_service.dart';
 import '../../common/services/location_service.dart';
 import '../../routes/app_routes.dart';
+import '../policy/policy_screen.dart';
 
 class AgentSignUpScreen extends StatefulWidget {
   const AgentSignUpScreen({super.key});
@@ -139,8 +140,37 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    debugPrint('╔══════════════════════════════════════════════════════');
+    debugPrint('║ [SIGNUP] _submit() called');
+    debugPrint('╠══════════════════════════════════════════════════════');
+    debugPrint('║  fullName       = "${_fullNameController.text.trim()}"');
+    debugPrint('║  email          = "${_emailController.text.trim()}"');
+    debugPrint('║  phone          = "${_phoneController.text.trim()}"');
+    debugPrint('║  gender         = "$_gender"');
+    debugPrint('║  agencyName     = "${_agencyNameController.text.trim()}"');
+    debugPrint('║  agencyAddress  = "${_agencyAddressController.text.trim()}"');
+    debugPrint('║  address        = "${_addressController.text.trim()}"');
+    debugPrint('║  district       = ${_selectedDistrict?.name} (id=${_selectedDistrict?.id})');
+    debugPrint('║  policeStation  = ${_selectedPoliceStation?.name} (id=${_selectedPoliceStation?.id})');
+    debugPrint('║  profileImage   = ${_profileImage?.name ?? "NULL ❌"}');
+    debugPrint('║  nidImage       = ${_nidImage?.name ?? "NULL ❌"}');
+    debugPrint('║  tradeLicense   = ${_tradeLicenseImage?.name ?? "not provided (optional)"}');
+    debugPrint('║  agreeTerms     = $_agreeTerms');
+    debugPrint('║  passwordMatch  = ${_passwordController.text == _confirmPasswordController.text}');
+    debugPrint('╚══════════════════════════════════════════════════════');
+
+    // ── Step 1: Form validation ─────────────────────────────────────────
+    final formValid = _formKey.currentState!.validate();
+    debugPrint('[SIGNUP] Step 1 — Form validation: ${formValid ? "✅ PASSED" : "❌ FAILED"}');
+    if (!formValid) {
+      debugPrint('[SIGNUP]   → form has invalid fields, aborting');
+      return;
+    }
+
+    // ── Step 2: Terms check ─────────────────────────────────────────────
+    debugPrint('[SIGNUP] Step 2 — Terms agreed: ${_agreeTerms ? "✅" : "❌"}');
     if (!_agreeTerms) {
+      debugPrint('[SIGNUP]   → User has not agreed to terms, aborting');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please agree to Privacy Policy and Terms.'),
@@ -148,7 +178,12 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
       );
       return;
     }
+
+    // ── Step 3: District & Police Station check ─────────────────────────
+    debugPrint('[SIGNUP] Step 3 — District: ${_selectedDistrict == null ? "❌ NULL" : "✅ ${_selectedDistrict!.name}"}');
+    debugPrint('[SIGNUP]           Police Station: ${_selectedPoliceStation == null ? "❌ NULL" : "✅ ${_selectedPoliceStation!.name}"}');
     if (_selectedDistrict == null || _selectedPoliceStation == null) {
+      debugPrint('[SIGNUP]   → Missing district or police station, aborting');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select district and police station.'),
@@ -156,7 +191,12 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
       );
       return;
     }
-    if (_passwordController.text != _confirmPasswordController.text) {
+
+    // ── Step 4: Password match check ────────────────────────────────────
+    final passwordsMatch = _passwordController.text == _confirmPasswordController.text;
+    debugPrint('[SIGNUP] Step 4 — Passwords match: ${passwordsMatch ? "✅" : "❌"}');
+    if (!passwordsMatch) {
+      debugPrint('[SIGNUP]   → Passwords do not match, aborting');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Password and confirm password do not match.'),
@@ -164,23 +204,36 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
       );
       return;
     }
-    if (_profileImage == null ||
-        _nidImage == null ||
-        _tradeLicenseImage == null) {
+
+    // ── Step 5: Required file uploads check ─────────────────────────────
+    debugPrint('[SIGNUP] Step 5 — profileImage: ${_profileImage == null ? "❌ NULL" : "✅ ${_profileImage!.name}"}');
+    debugPrint('[SIGNUP]           nidImage:     ${_nidImage == null ? "❌ NULL" : "✅ ${_nidImage!.name}"}');
+    debugPrint('[SIGNUP]           tradeLicense: ${_tradeLicenseImage == null ? "⚠️ not provided (optional)" : "✅ ${_tradeLicenseImage!.name}"}');
+    if (_profileImage == null || _nidImage == null) {
+      debugPrint('[SIGNUP]   → Missing required upload(s), aborting');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please upload photo, NID and trade license.'),
+          content: Text('Please upload photo and NID.'),
         ),
       );
       return;
     }
 
+    debugPrint('[SIGNUP] ✅ All pre-flight checks passed — building payload...');
     setState(() {
       _loading = true;
       _fieldErrors.clear();
     });
+
     try {
-      final formData = FormData.fromMap({
+      // ── Step 6: Build multipart payload ───────────────────────────────
+      debugPrint('[SIGNUP] Step 6 — Converting images to multipart...');
+      final profileMp = await _toMultipart(_profileImage!);
+      final nidMp = await _toMultipart(_nidImage!);
+      debugPrint('[SIGNUP]   profileImage multipart: ${profileMp.filename}');
+      debugPrint('[SIGNUP]   nidImage multipart:     ${nidMp.filename}');
+
+      final payload = <String, dynamic>{
         'fullName': _fullNameController.text.trim(),
         'phone': _phoneController.text.trim(),
         'email': _emailController.text.trim(),
@@ -192,12 +245,38 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
         'address': _addressController.text.trim(),
         'district': _selectedDistrict!.id.toString(),
         'policeStation': _selectedPoliceStation!.id.toString(),
-        'image': await _toMultipart(_profileImage!),
-        'nid_image': await _toMultipart(_nidImage!),
-        'trade_license_image': await _toMultipart(_tradeLicenseImage!),
-      });
+        'image': profileMp,
+        'nid_image': nidMp,
+      };
 
-      await _authService.registerAgent(formData);
+      if (_tradeLicenseImage != null) {
+        final tradeMp = await _toMultipart(_tradeLicenseImage!);
+        payload['trade_license_image'] = tradeMp;
+        debugPrint('[SIGNUP]   tradeLicense multipart: ${tradeMp.filename}');
+      } else {
+        debugPrint('[SIGNUP]   tradeLicense: skipped (optional, not provided)');
+      }
+
+      debugPrint('╔══════════════════════════════════════════════════════');
+      debugPrint('║ [SIGNUP] Step 7 — Payload summary (no passwords):');
+      payload.forEach((key, value) {
+        if (key != 'password') {
+          debugPrint('║  $key = ${value is MultipartFile ? "[MultipartFile: ${value.filename}]" : value}');
+        }
+      });
+      debugPrint('╚══════════════════════════════════════════════════════');
+
+      final formData = FormData.fromMap(payload);
+      debugPrint('[SIGNUP] Step 7 — Calling AuthService.registerAgent()...');
+
+      final response = await _authService.registerAgent(formData);
+
+      debugPrint('╔══════════════════════════════════════════════════════');
+      debugPrint('║ [SIGNUP] ✅ registerAgent() succeeded!');
+      debugPrint('║  statusCode = ${response.statusCode}');
+      debugPrint('║  data       = ${response.data}');
+      debugPrint('╚══════════════════════════════════════════════════════');
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -208,12 +287,25 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
         '${AppRoutes.otpVerify}?username=${Uri.encodeComponent(_emailController.text.trim())}&next=${Uri.encodeComponent(AppRoutes.agentSignUpThankYou)}',
       );
     } on DioException catch (e) {
+      debugPrint('╔══════════════════════════════════════════════════════');
+      debugPrint('║ [SIGNUP] ❌ DioException caught');
+      debugPrint('║  type           = ${e.type}');
+      debugPrint('║  statusCode     = ${e.response?.statusCode}');
+      debugPrint('║  message        = ${e.message}');
+      debugPrint('║  requestPath    = ${e.requestOptions.path}');
+      debugPrint('║  requestMethod  = ${e.requestOptions.method}');
+      debugPrint('║  response.data  = ${e.response?.data}');
+      debugPrint('║  response.headers = ${e.response?.headers}');
+      debugPrint('╚══════════════════════════════════════════════════════');
+
       if (!mounted) return;
       String message = 'Registration failed. Please try again.';
       final data = e.response?.data;
       if (data is Map) {
+        debugPrint('[SIGNUP]   response data is Map — checking for field errors...');
         if (data['errors'] is Map) {
           final errors = data['errors'] as Map;
+          debugPrint('[SIGNUP]   field errors found: $errors');
           setState(() {
             errors.forEach((key, value) {
               if (value is List) {
@@ -223,7 +315,8 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
               }
             });
           });
-          
+          debugPrint('[SIGNUP]   _fieldErrors set: $_fieldErrors');
+
           if (_fieldErrors.containsKey('fullName')) {
             _fullNameFocus.requestFocus();
           } else if (_fieldErrors.containsKey('email')) {
@@ -240,24 +333,34 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
             _addressFocus.requestFocus();
           } else {
             message = _fieldErrors.values.first;
+            debugPrint('[SIGNUP]   showing snackbar with: $message');
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
           }
           setState(() => _loading = false);
           return;
         } else if (data['detail'] != null) {
           message = data['detail'].toString();
+          debugPrint('[SIGNUP]   detail error: $message');
         } else if (data['message'] != null) {
           message = data['message'].toString();
+          debugPrint('[SIGNUP]   message error: $message');
         } else {
           message = data.toString();
+          debugPrint('[SIGNUP]   raw data error: $message');
         }
       } else if (data is String) {
         message = data;
+        debugPrint('[SIGNUP]   string error: $message');
       }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
-    } catch (_) {
+    } catch (e, stack) {
+      debugPrint('╔══════════════════════════════════════════════════════');
+      debugPrint('║ [SIGNUP] ❌ Unexpected exception caught');
+      debugPrint('║  error = $e');
+      debugPrint('║  stack = $stack');
+      debugPrint('╚══════════════════════════════════════════════════════');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registration failed. Please try again.')),
@@ -266,6 +369,7 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
       if (mounted) setState(() => _loading = false);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -587,21 +691,78 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
           ),
           const SizedBox(height: 14),
           _UploadBox(
-            label: 'Trade License',
+            label: 'Trade License (Optional)',
             file: _tradeLicenseImage,
             icon: Icons.verified_user_outlined,
             onTap: () => _pickFile((f) => _tradeLicenseImage = f),
           ),
           const SizedBox(height: 10),
-          CheckboxListTile(
-            value: _agreeTerms,
-            onChanged: (v) => setState(() => _agreeTerms = v ?? false),
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-            title: const Text(
-              'By signing up, I agree to the Privacy Policy and Terms & Conditions.',
-              style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Checkbox(
+                value: _agreeTerms,
+                onChanged: (v) => setState(() => _agreeTerms = v ?? false),
+                activeColor: _brandBlue,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'By signing up, I agree to the ',
+                      style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
+                      children: [
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.baseline,
+                          baseline: TextBaseline.alphabetic,
+                          child: GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const PolicyScreen(policyType: 'PRIVACY'),
+                              ),
+                            ),
+                            child: const Text(
+                              'Privacy Policy',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: _brandBlue,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const TextSpan(text: ' and '),
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.baseline,
+                          baseline: TextBaseline.alphabetic,
+                          child: GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const PolicyScreen(policyType: 'TERMS'),
+                              ),
+                            ),
+                            child: const Text(
+                              'Terms & Conditions',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: _brandBlue,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const TextSpan(text: '.'),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -712,6 +873,82 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
     return spanTwoColumns ? _SpanTwoColumn(field) : field;
   }
 
+  void _showSearchableDialog<T>({
+    required String title,
+    required List<T> items,
+    required String Function(T) getName,
+    required ValueChanged<T> onSelected,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String query = '';
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            final filtered = items.where((item) {
+              return getName(item).toLowerCase().contains(query.toLowerCase());
+            }).toList();
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text('Select $title'),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 400,
+                child: Column(
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search $title...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                      onChanged: (val) {
+                        setStateDialog(() => query = val);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: filtered.isEmpty
+                          ? const Center(child: Text('No results found'))
+                          : ListView.builder(
+                              itemCount: filtered.length,
+                              itemBuilder: (context, index) {
+                                final item = filtered[index];
+                                return ListTile(
+                                  title: Text(getName(item)),
+                                  onTap: () {
+                                    onSelected(item);
+                                    Navigator.pop(context);
+                                  },
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _districtDropdown() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -724,28 +961,36 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
           ),
         ),
         const SizedBox(height: 6),
-        DropdownButtonFormField<DistrictOption>(
-          value: _selectedDistrict,
-          items: _districts
-              .map(
-                (d) => DropdownMenuItem<DistrictOption>(
-                  value: d,
-                  child: Text(d.name),
-                ),
-              )
-              .toList(),
-          onChanged: _locationsLoading
+        InkWell(
+          onTap: _locationsLoading
               ? null
-              : (v) {
-                  if (v == null) return;
-                  setState(() => _selectedDistrict = v);
-                  _loadPoliceStations(v.id);
+              : () {
+                  _showSearchableDialog<DistrictOption>(
+                    title: 'District',
+                    items: _districts,
+                    getName: (d) => d.name,
+                    onSelected: (v) {
+                      setState(() {
+                        _selectedDistrict = v;
+                        _fieldErrors.remove('district');
+                      });
+                      _loadPoliceStations(v.id);
+                    },
+                  );
                 },
-          decoration: _dropdownDecoration('Select district', errorText: _fieldErrors['district']),
-          validator: (v) {
-            if (_fieldErrors['district'] != null) return _fieldErrors['district'];
-            return v == null ? 'Required' : null;
-          },
+          child: InputDecorator(
+            decoration: _dropdownDecoration(
+              'Select district',
+              errorText: _fieldErrors['district'],
+            ),
+            isEmpty: _selectedDistrict == null,
+            child: _selectedDistrict == null
+                ? null
+                : Text(
+                    _selectedDistrict!.name,
+                    style: const TextStyle(color: Colors.black),
+                  ),
+          ),
         ),
       ],
     );
@@ -764,27 +1009,35 @@ class _AgentSignUpScreenState extends State<AgentSignUpScreen> {
           ),
         ),
         const SizedBox(height: 6),
-        DropdownButtonFormField<PoliceStationOption>(
-          value: _selectedPoliceStation,
-          items: _policeStations
-              .map(
-                (ps) => DropdownMenuItem<PoliceStationOption>(
-                  value: ps,
-                  child: Text(ps.name),
-                ),
-              )
-              .toList(),
-          onChanged: enabled
-              ? (v) => setState(() => _selectedPoliceStation = v)
-              : null,
-          decoration: _dropdownDecoration(
-            enabled ? 'Select police station' : 'Select district first',
-            errorText: _fieldErrors['policeStation'],
+        InkWell(
+          onTap: !enabled
+              ? null
+              : () {
+                  _showSearchableDialog<PoliceStationOption>(
+                    title: 'Police Station',
+                    items: _policeStations,
+                    getName: (ps) => ps.name,
+                    onSelected: (v) {
+                      setState(() {
+                        _selectedPoliceStation = v;
+                        _fieldErrors.remove('policeStation');
+                      });
+                    },
+                  );
+                },
+          child: InputDecorator(
+            decoration: _dropdownDecoration(
+              enabled ? 'Select police station' : 'Select district first',
+              errorText: _fieldErrors['policeStation'],
+            ),
+            isEmpty: _selectedPoliceStation == null,
+            child: _selectedPoliceStation == null
+                ? null
+                : Text(
+                    _selectedPoliceStation!.name,
+                    style: const TextStyle(color: Colors.black),
+                  ),
           ),
-          validator: (v) {
-            if (_fieldErrors['policeStation'] != null) return _fieldErrors['policeStation'];
-            return v == null ? 'Required' : null;
-          },
         ),
       ],
     );

@@ -199,6 +199,7 @@ class WorkPermitDetails {
   final int beforeFlight;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final int agentCmPrice;
 
   WorkPermitDetails({
     required this.id,
@@ -252,6 +253,7 @@ class WorkPermitDetails {
     required this.beforeFlight,
     required this.createdAt,
     this.updatedAt,
+    this.agentCmPrice = 0,
   });
 
   factory WorkPermitDetails.fromJson(Map<String, dynamic> json) {
@@ -398,6 +400,7 @@ class WorkPermitDetails {
       updatedAt: json['updatedAt'] != null || json['updated_at'] != null
           ? DateTime.tryParse(json['updatedAt'] ?? json['updated_at'])
           : null,
+      agentCmPrice: _parseInt(json['agentCmPrice'] ?? json['agent_cm_price']),
     );
   }
 

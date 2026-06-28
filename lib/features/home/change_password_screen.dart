@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 
 import '../../common/services/api_client.dart';
+import '../../common/services/api_exception.dart';
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
 import 'dashboard_screen.dart';
@@ -55,7 +56,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       _oldPasswordController.clear();
       _newPasswordController.clear();
       _confirmPasswordController.clear();
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
@@ -70,30 +71,55 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     }
   }
 
-  String _extractApiError(DioException error) {
-    final data = error.response?.data;
-    if (data is Map) {
-      final errors = data['errors'];
-      if (errors is Map) {
-        final detail = errors['detail'];
-        if (detail is List && detail.isNotEmpty) {
-          return detail.join(', ');
+  String _extractApiError(ApiException e) {
+    if (e.data is Map) {
+      final map = e.data as Map;
+      
+      // If errors are nested
+      if (map.containsKey('errors') && map['errors'] is Map) {
+        final errorsMap = map['errors'] as Map;
+        final messages = <String>[];
+        for (final entry in errorsMap.entries) {
+          final val = entry.value;
+          if (val is List) {
+            messages.add('${entry.key}: ${val.join(', ')}');
+          } else {
+            messages.add('${entry.key}: $val');
+          }
         }
-        if (detail != null) {
-          return detail.toString();
-        }
-        return errors.values.where((v) => v != null).join(', ');
+        if (messages.isNotEmpty) return messages.join('\n');
       }
 
-      if (data['detail'] != null) {
-        return data['detail'].toString();
+      // If flat map of field errors (like DRF)
+      final messages = <String>[];
+      for (final entry in map.entries) {
+        final key = entry.key.toString();
+        // Skip common non-error keys if present
+        if (key == 'status' || key == 'statusCode') continue;
+        
+        final val = entry.value;
+        if (val is List) {
+          messages.add('${_formatKey(key)}: ${val.join(', ')}');
+        } else if (val is String && key != 'message' && key != 'detail') {
+          messages.add('${_formatKey(key)}: $val');
+        }
       }
-      if (data['message'] != null) {
-        return data['message'].toString();
-      }
+      
+      if (messages.isNotEmpty) return messages.join('\n');
+      
+      if (map.containsKey('detail')) return map['detail'].toString();
+      if (map.containsKey('message')) return map['message'].toString();
+      if (map.containsKey('error')) return map['error'].toString();
     }
+    
+    if (e.message.isNotEmpty && e.message != 'Unknown error occurred') {
+      return e.message;
+    }
+    return 'Failed to change password. Please check your inputs.';
+  }
 
-    return 'Failed to change password';
+  String _formatKey(String key) {
+    return key.split('_').map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1)}' : '').join(' ');
   }
 
   @override

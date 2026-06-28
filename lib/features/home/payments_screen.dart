@@ -476,6 +476,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Row 1: Payment Date  |  Passport No
                 Row(
                   children: [
                     Expanded(
@@ -488,68 +489,15 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                     const SizedBox(width: 14),
                     Expanded(
                       child: _detailTile(
-                        'PAYMENT TIME',
-                        _formatTime(item.collectedAt),
-                        Icons.schedule,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _detailTile(
                         'PASSPORT NO',
                         item.passportNo,
                         Icons.badge_outlined,
                       ),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: _detailTile(
-                        'SERVICE TYPE',
-                        item.terminal,
-                        Icons.miscellaneous_services_outlined,
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 18),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _detailTile(
-                        'TRANSACTION TYPE',
-                        item.transactionType,
-                        Icons.compare_arrows_rounded,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: _detailTile(
-                        'STEP',
-                        item.step,
-                        Icons.linear_scale_rounded,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _detailTile(
-                        'STATUS',
-                        item.status.isEmpty ? item.step : item.status,
-                        Icons.verified_outlined,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    const Expanded(child: SizedBox()),
-                  ],
-                ),
-                const SizedBox(height: 18),
+                // Amount footer
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -841,12 +789,6 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     );
   }
 
-  String _formatTime(DateTime date) {
-    final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
-    final min = date.minute.toString().padLeft(2, '0');
-    final meridiem = date.hour >= 12 ? 'PM' : 'AM';
-    return '$hour:$min $meridiem';
-  }
 
   String _formatListDate(DateTime date) {
     const monthNames = [

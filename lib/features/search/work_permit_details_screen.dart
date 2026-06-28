@@ -19,6 +19,7 @@ import 'models/work_permit_details.dart';
 import 'services/work_permit_service.dart';
 import '../chat/services/chat_service.dart';
 import '../chat/chat_conversation_screen.dart';
+import '../favourite/services/favorite_service.dart';
 
 const Color _brandBlue = Color(0xFF2563EB);
 const Color _primary = Color(0xFF004AC6);
@@ -45,6 +46,8 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
   bool _isLoading = true;
   bool _isLoggedIn = false;
   bool _isBangla = false;
+  bool _isFavorited = false;
+  int? _favoriteId;
   WorkPermitDetails? _details;
   List<WorkPermitItem> _similarPermits = [];
   final WorkPermitService _service = WorkPermitService();
@@ -242,6 +245,29 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
     final cookies = await ApiClient().tokenStorage.getCookies();
     if (mounted && cookies != null && cookies.isNotEmpty) {
       setState(() => _isLoggedIn = true);
+      _loadFavoriteStatus();
+    }
+  }
+
+  Future<void> _loadFavoriteStatus() async {
+    if (!_isLoggedIn) return;
+    final favorites = await FavoriteService().getFavorites();
+    if (!mounted) return;
+    
+    final currentWpId = widget.item.id ?? _details?.id;
+    if (currentWpId == null) return;
+    
+    final match = favorites.where((f) => f.workPermit.id == currentWpId).toList();
+    if (match.isNotEmpty) {
+      setState(() {
+        _isFavorited = true;
+        _favoriteId = match.first.id;
+      });
+    } else {
+      setState(() {
+        _isFavorited = false;
+        _favoriteId = null;
+      });
     }
   }
 
@@ -1257,7 +1283,7 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                     child: _PriceTimelineStep(
                       title: _paymentStepLabel(displayDetails.paymentSteps[i].name, i),
                       amount:
-                          'BDT ${_formatMoney(displayDetails.paymentSteps[i].amount.toInt())}',
+                          'BDT ${_formatMoney(displayDetails.paymentSteps[i].amount.toInt() + (i == 0 ? displayDetails.agentCmPrice : 0))}',
                       active: i == 0,
                       isLast: i == displayDetails.paymentSteps.length - 1,
                     ),
@@ -1487,12 +1513,49 @@ class _WorkPermitDetailsScreenState extends State<WorkPermitDetailsScreen> {
                 ),
                 SizedBox(width: compact ? 8 : 12),
                 _ActionIconButton(
-                  icon: const FaIcon(FontAwesomeIcons.bookmark, size: 18),
-                  semanticLabel: _tr('Bookmark', 'বুকমার্ক'),
-                  onPressed: () => _showMessage(
-                    context,
-                    _tr('Saved to bookmarks', 'বুকমার্কে সংরক্ষণ করা হয়েছে'),
+                  icon: Icon(
+                    _isFavorited ? Icons.favorite_rounded : Icons.favorite_border_rounded, 
+                    size: 24, 
+                    color: _error
                   ),
+                  semanticLabel: _tr('Favorite', 'পছন্দসই'),
+                  onPressed: () async {
+                    if (!_isLoggedIn) {
+                      _showMessage(context, _tr('Please login first', 'দয়া করে আগে লগইন করুন'));
+                      return;
+                    }
+                    if (widget.item.id == null && _details?.id == null) {
+                      _showMessage(context, _tr('Invalid work permit ID', 'অকার্যকর ওয়ার্ক পারমিট আইডি'));
+                      return;
+                    }
+                    
+                    final targetId = widget.item.id ?? _details!.id;
+                    
+                    if (_isFavorited && _favoriteId != null) {
+                      final success = await FavoriteService().removeFavorite(_favoriteId!);
+                      if (mounted) {
+                        if (success) {
+                          setState(() {
+                            _isFavorited = false;
+                            _favoriteId = null;
+                          });
+                          _showMessage(context, _tr('Removed from favorites', 'পছন্দসই তালিকা থেকে মুছে ফেলা হয়েছে'));
+                        } else {
+                          _showMessage(context, _tr('Failed to remove from favorites', 'পছন্দসই তালিকা থেকে মুছে ফেলতে ব্যর্থ'));
+                        }
+                      }
+                    } else {
+                      final success = await FavoriteService().addToFavorite(targetId);
+                      if (mounted) {
+                        if (success) {
+                          _showMessage(context, _tr('Added to favorites', 'পছন্দসই তালিকায় যোগ করা হয়েছে'));
+                          _loadFavoriteStatus();
+                        } else {
+                          _showMessage(context, _tr('Failed to add to favorites', 'পছন্দসই তালিকায় যোগ করতে ব্যর্থ'));
+                        }
+                      }
+                    }
+                  },
                 ),
               ],
             );

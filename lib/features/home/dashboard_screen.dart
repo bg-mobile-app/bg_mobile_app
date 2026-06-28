@@ -399,6 +399,11 @@ const List<SidebarLink> kDashboardSidebarLinks = [
     href: '/dashboard/customer/profile',
   ),
   SidebarLink(
+    name: 'My Favorites',
+    icon: Icons.favorite_border,
+    href: '/dashboard/favorites',
+  ),
+  SidebarLink(
     name: 'My Booking',
     icon: Icons.grid_view,
     children: [

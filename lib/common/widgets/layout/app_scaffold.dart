@@ -21,6 +21,7 @@ import '../../../features/home/notifications_screen.dart';
 import '../../../features/home/payments_screen.dart';
 import '../../../features/home/terms_conditions_screen.dart';
 import '../../../features/search/work_permit_list_screen.dart';
+import '../../../features/favourite/favorite_screen.dart';
 import '../../../common/services/api_client.dart';
 import '../../../routes/app_router.dart';
 import 'app_bottom_nav.dart';
@@ -41,7 +42,7 @@ class AppScaffold extends StatelessWidget {
     AppNavigationHistory.recordVisit(currentPath);
 
     final screens = [
-      const HomeScreen(),
+      HomeScreen(tabIndex: tabIndex),
       WorkPermitListScreen(queryParams: queryParams),
       const AppointmentBookingScreen(),
       const ChatListScreen(),
@@ -224,6 +225,8 @@ class _DashboardHostScreenState extends State<_DashboardHostScreen> {
         return const ChangePasswordScreen();
       case '/dashboard/agent/terms-conditions':
         return const TermsConditionsScreen();
+      case '/dashboard/favorites':
+        return const FavoriteScreen();
       case '/dashboard/customer/profile':
         return const CustomerProfileScreen();
       case '/dashboard/customer/profile/edit':

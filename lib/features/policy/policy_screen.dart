@@ -161,7 +161,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _policy == null
-              ? _buildError()
+              ? const SizedBox.shrink()
               : _buildContent(),
     );
   }
