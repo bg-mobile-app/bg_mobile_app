@@ -448,11 +448,6 @@ const List<SidebarLink> kDashboardSidebarLinks = [
     icon: Icons.swap_horiz,
     href: '/dashboard/agent/change-password',
   ),
-  SidebarLink(
-    name: 'Terms & Conditions',
-    icon: Icons.gavel_outlined,
-    href: '/dashboard/agent/terms-conditions',
-  ),
 ];
 
 class DashboardPageScaffold extends StatefulWidget {

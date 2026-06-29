@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -126,6 +127,9 @@ class ChatService {
 
   WebSocketChannel? _channel;
 
+  /// Exposes the active WebSocket channel (null if not connected).
+  WebSocketChannel? get channel => _channel;
+
   WebSocketChannel? connectWebSocket(String conversationId, {String? token}) {
     final host = _apiClient.baseUri.host;
     final scheme = _apiClient.baseUri.scheme == 'http' ? 'ws' : 'wss';
@@ -174,6 +178,70 @@ class ChatService {
       _channel!.sink.add(payload);
     } else {
       debugPrint('[CHAT] sendChatMessage SKIPPED — channel is null (WS not connected)');
+    }
+  }
+
+  /// Sends a file attachment over the WebSocket as a base64-encoded payload.
+  /// The WS frame carries:
+  ///   type            = "chat_message"
+  ///   content         = optional caption text (may be empty)
+  ///   attachment_name = original filename
+  ///   attachment_type = MIME type (image/png, application/pdf, …)
+  ///   attachment_data = base64-encoded file content
+  ///
+  /// Returns true if the frame was queued successfully, false on error.
+  Future<bool> sendChatMessageWithAttachment({
+    required String fileName,
+    required String mimeType,
+    String? filePath,
+    Uint8List? fileBytes,
+    String content = '',
+  }) async {
+    if (_channel == null) {
+      debugPrint('[CHAT] sendChatMessageWithAttachment SKIPPED — WS not connected');
+      return false;
+    }
+    debugPrint('╔══════════════════════════════════════════════════════');
+    debugPrint('║ [CHAT] sendChatMessageWithAttachment');
+    debugPrint('║  fileName = $fileName');
+    debugPrint('║  mimeType = $mimeType');
+    debugPrint('║  content  = "$content"');
+    debugPrint('╠══════════════════════════════════════════════════════');
+    try {
+      Uint8List bytes;
+      if (fileBytes != null) {
+        bytes = fileBytes;
+        debugPrint('║  Source: in-memory bytes (${bytes.length} bytes)');
+      } else if (filePath != null) {
+        bytes = await File(filePath).readAsBytes();
+        debugPrint('║  Source: file path → ${bytes.length} bytes read');
+      } else {
+        debugPrint('║  ❌ No fileBytes or filePath provided');
+        debugPrint('╚══════════════════════════════════════════════════════');
+        return false;
+      }
+
+      final b64 = base64Encode(bytes);
+      debugPrint('║  Base64 length: ${b64.length} chars');
+
+      final payload = jsonEncode({
+        "type": "chat_message",
+        "content": content,
+        "attachment_name": fileName,
+        "attachment_type": mimeType,
+        "attachment_data": b64,
+      });
+
+      debugPrint('║  Sending WS frame (~${payload.length} chars)…');
+      _channel!.sink.add(payload);
+      debugPrint('║  ✅ Frame queued');
+      debugPrint('╚══════════════════════════════════════════════════════');
+      return true;
+    } catch (e, stack) {
+      debugPrint('║  ❌ Error: $e');
+      debugPrint('║     $stack');
+      debugPrint('╚══════════════════════════════════════════════════════');
+      return false;
     }
   }
 

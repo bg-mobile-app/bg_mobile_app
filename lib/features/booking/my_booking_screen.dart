@@ -11,6 +11,36 @@ import '../home/dashboard_screen.dart';
 import 'services/booking_service.dart';
 import 'widgets/my_booking_card.dart';
 
+bool shouldShowReturnPassportAction(String status) {
+  final normalized = status.trim().toUpperCase();
+  const workflowOrder = <String>[
+    'APPLIED_FILE',
+    'BG_COLLECT_PP',
+    'BG_SENT_PP',
+    'A_RECEIVE_PP',
+    'UNDER_PROCESSING',
+    'VISA_APPROVED',
+    'BMET_DONE',
+    'TICKET_DONE',
+    'PP_SENT_TO_BG',
+    'BG_RECEIVED_PP',
+    'READY_FOR_FLIGHT',
+    'SUCCESS_FLIGHT',
+    'RETURN_REQUEST',
+    'RETURN_ACCEPTED',
+    'RETURN_PP_SENT_TO_BG',
+    'BG_COLLECT_RETURN_PP',
+    'CLEAR_FOR_HANDOVER',
+    'BG_HANDOVER_PP_TO_CUSTOMER',
+    'REJECT_FILE',
+  ];
+
+  final currentIndex = workflowOrder.indexOf(normalized);
+  final startIndex = workflowOrder.indexOf('BG_COLLECT_PP');
+  return currentIndex >= startIndex &&
+      !const {'REJECT_FILE', 'BG_HANDOVER_PP_TO_CUSTOMER', 'SUCCESS_FLIGHT'}.contains(normalized);
+}
+
 class MyBookingScreen extends StatefulWidget {
   const MyBookingScreen({
     super.key,
@@ -58,11 +88,6 @@ class MyBookingScreen extends StatefulWidget {
 
 class _MyBookingScreenState extends State<MyBookingScreen> {
   final BookingService _bookingService = BookingService();
-  static const Set<String> _hiddenReturnStatuses = {
-    'BG_HANDOVER_PP_TO_CUSTOMER',
-    'REJECT_FILE',
-    'SUCCESS_FLIGHT',
-  };
   bool _isCardView = true;
   bool _isLoading = false;
   String? _error;
@@ -513,7 +538,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                   },
                   child: const Text('View Return Reason'),
                 ),
-              if (!_hiddenReturnStatuses.contains(item.status))
+              if (shouldShowReturnPassportAction(item.status))
                 OutlinedButton(
                   onPressed: () async {
                     Navigator.of(context).pop();

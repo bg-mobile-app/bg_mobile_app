@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:go_router/go_router.dart';
 import '../../common/theme/app_palette.dart';
 import '../../common/theme/app_text_styles.dart';
 import '../home/dashboard_screen.dart';
 import '../home/widgets/work_permit_card.dart';
+import '../search/work_permit_details_screen.dart';
 import 'services/favorite_service.dart';
 
 class FavoriteScreen extends StatefulWidget {
@@ -107,7 +107,15 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                               return WorkPermitCard(
                                 item: fav.workPermit,
                                 brandBlue: AppPalette.brandBlue,
-                                onViewDetails: () => context.push('/search/details', extra: fav.workPermit),
+                                onViewDetails: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => WorkPermitDetailsScreen(
+                                        item: fav.workPermit,
+                                      ),
+                                    ),
+                                  );
+                                },
                                 formatBdt: (val) => '৳ $val',
                                 timeAgo: (val) => '',
                               );

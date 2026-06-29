@@ -44,7 +44,7 @@ class AppScaffold extends StatelessWidget {
     final screens = [
       HomeScreen(tabIndex: tabIndex),
       WorkPermitListScreen(queryParams: queryParams),
-      const AppointmentBookingScreen(),
+      const MyBookingScreen(),
       const ChatListScreen(),
       tabIndex == 4
           ? _DashboardHostScreen(route: dashboardPath ?? '/profile')
@@ -79,7 +79,7 @@ class AppScaffold extends StatelessWidget {
       case 1:
         return '/search';
       case 2:
-        return '/booking';
+        return '/dashboard/booking/my';
       case 3:
         return '/chat';
       case 4:
